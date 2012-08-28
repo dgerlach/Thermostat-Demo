@@ -1,6 +1,7 @@
 #include "awayscreen.h"
 #include "thermostatwidget.h"
 #include "settingscreen.h"
+#include "globalsettings.h"
 
 awayscreen::awayscreen(QWidget *parent) :
     QWidget(parent)
@@ -8,6 +9,8 @@ awayscreen::awayscreen(QWidget *parent) :
     // the away screen provides the user an AWAY MODE with the tap of a button
     // it is meant to be used for long periods of away time (i.e. vacation)
     // it is called from the mainwindow
+
+    m_globalSettings = GlobalSettings::getInstance();
 
     // title
     awayLabel = new QLabel("System is using energy saving AWAY MODE");
@@ -118,7 +121,7 @@ void awayscreen::updateUnit()
     float FFloat, CFloat;
     QString FString, CString;
 
-    if(settingscreen::unit) {
+    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {
         // true means F
         // we want Fahrenheit, but currently in Celsius
         CString = currentTempLabel->text();

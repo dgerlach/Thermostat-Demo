@@ -19,10 +19,9 @@ SOURCES += main.cpp \
     mainwindow.cpp \
     schedulescreen.cpp \
     schedulepoint.cpp \
-    openingscreen.cpp \
     keyboard/keyboard.cpp \
-    proxysetupdialog.cpp \
-    settingscreen.cpp
+    settingscreen.cpp \
+    globalsettings.cpp
 
 HEADERS  += \
     weatherwidget.h \
@@ -33,11 +32,10 @@ HEADERS  += \
     mainwindow.h \
     schedulescreen.h \
     schedulepoint.h \
-    openingscreen.h \
     keyboard/keyboard.h \
-    proxysetupdialog.h \
     settingscreen.h \
-    STARTHERE.h
+    STARTHERE.h \
+    globalsettings.h
 
 RESOURCES += \
     thermostatdemo.qrc

@@ -7,6 +7,8 @@
 #include <QGraphicsItem>
 #include <QSet>
 
+class GlobalSettings;
+
 class schedulepoint : public QObject, public QGraphicsItem {
     Q_OBJECT
 public:
@@ -43,6 +45,7 @@ private:
     int ID;
     int location;
 
+    GlobalSettings* m_globalSettings;
     
 signals:
     void clicked(schedulepoint *);

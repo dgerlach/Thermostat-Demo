@@ -5,7 +5,6 @@
 #include "thermostatwidget.h"
 #include "optionswidget.h"
 #include "webdata.h"
-#include "openingscreen.h"
 
 #include <QtDebug>
 
@@ -22,7 +21,8 @@ int main(int argc, char *argv[])
     app.setStyleSheet(file.readAll());
 
     // create opening dialog for internet and proxy settings
-    new openingscreen;
+    mainwindow *w = new mainwindow;
+    w->showFullScreen();
 
     // enter application loop
     return app.exec();

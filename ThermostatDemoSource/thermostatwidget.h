@@ -3,6 +3,8 @@
 
 #include <QtGui>
 
+class GlobalSettings;
+
 class thermostatwidget : public QWidget
 {
     Q_OBJECT
@@ -31,6 +33,7 @@ private:
     QPushButton *decreaseTempButton;
     QTimer *updateTimer;
     bool setpointReached;
+    GlobalSettings *m_globalSettings;
 };
 
 #endif // THERMOSTATWIDGET_H

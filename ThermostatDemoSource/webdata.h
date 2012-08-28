@@ -5,6 +5,8 @@
 #include <QtNetwork>
 #include <QUrl>
 
+class GlobalSettings;
+
 class webdata : public QObject
 {
     Q_OBJECT
@@ -50,6 +52,8 @@ private:
     QStringList weekdayList;
     QStringList forecastTempList;
     QString unitConversion(QString);
+
+    GlobalSettings *m_globalSettings;
 
     
 };

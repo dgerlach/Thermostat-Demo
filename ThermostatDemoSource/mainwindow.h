@@ -5,6 +5,8 @@
 #include "webdata.h"
 #include "weatherwidget.h"
 
+class GlobalSettings;
+
 class mainwindow : public QWidget
 {
     Q_OBJECT
@@ -19,6 +21,7 @@ signals:
 public slots:
     void updateUnit();
     void changeCity(QString);
+    void closeEvent(QCloseEvent *);
 
 private:
     webdata *webData;
@@ -31,6 +34,8 @@ private:
     void setBackground(QString);
     weatherwidget *weatherWidget;
     void getWebData();
+
+    GlobalSettings* m_globalSettings;
 
 private slots:
     void updateClock();

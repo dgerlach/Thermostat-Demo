@@ -1,10 +1,14 @@
 #include "schedulepoint.h"
 #include "schedulescreen.h"
 #include "settingscreen.h"
+#include "globalsettings.h"
+
 #include <QtGui>
 
 schedulepoint::schedulepoint(int seqNumber)
 {
+    m_globalSettings = GlobalSettings::getInstance();
+
     // create schedule point with necessary information
     ID = seqNumber;
     myBackgroundColor = Qt::blue;
@@ -154,7 +158,7 @@ QString schedulepoint::time()
 void schedulepoint::updateUnit()
 {
     // provide switch between celsius and fahrenheit
-    if(settingscreen::unit) {
+    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {
         // true means F
         // we want Fahrenheit, but currently in Celsius
         temp = (temp*1.8)+32;

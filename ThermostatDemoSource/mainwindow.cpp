@@ -2,8 +2,8 @@
 #include "weatherwidget.h"
 #include "thermostatwidget.h"
 #include "optionswidget.h"
-#include "openingscreen.h"
 #include "settingscreen.h"
+#include "globalsettings.h"
 
 #include <QtGui>
 
@@ -17,14 +17,13 @@ mainwindow::mainwindow(QWidget *parent) :
     // it is set to initial hard-coded values first, and only updated from the web if internet options
     // have been allowed
 
+    m_globalSettings = GlobalSettings::getInstance();
+
     // sets initial weather background
     setStyleSheet("mainwindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");        
 
     // remove cursor (i.e. mouse pointer) throughout application
-    qApp->setOverrideCursor( QCursor( Qt::BlankCursor ) );
-
-    // unit is Fahrenheit
-    settingscreen::unit = true;
+    //qApp->setOverrideCursor( QCursor( Qt::BlankCursor ) );
 
     // create weather widget
     weatherWidget = new weatherwidget;
@@ -75,7 +74,7 @@ mainwindow::mainwindow(QWidget *parent) :
     closeButton->setIconSize(QSize(20,20));
     closeButton->setObjectName("closeButton");
     closeButton->setFocusPolicy(Qt::NoFocus);
-    connect(closeButton,SIGNAL(clicked()),qApp, SLOT(quit()));
+    connect(closeButton,SIGNAL(clicked()),this, SLOT(close()));
 
     // create screen layout
     QVBoxLayout *leftLayout = new QVBoxLayout;
@@ -115,39 +114,29 @@ mainwindow::mainwindow(QWidget *parent) :
     // show layout
     setLayout(mainLayout);
 
-    if(openingscreen::webFlag) {
-        // openingscreen::webFlag is only set if web connectivity is enabled
+    //because we don't want to ask the user if internet is enabled we removed that check
+    //however now app will crash if internet is not connected. Asynchronous web calls are
+    //the next priority
 
         // create web data object and set all dynamic properties based on web data
         webData = new webdata;
 
-        dateButton->setText(webData->date());
-        timeButton->setText(webData->time());
-        clock = webData->clockObject();
         clockTimer = new QTimer(this);
         connect(clockTimer,SIGNAL(timeout()),this,SLOT(updateClock()));
         clockTimer->start(60000); // makes the clock tick every 60 seconds
 
-        setBackground(webData->currentIcon());
+        changeCity(m_globalSettings->currentCity());
 
-        weatherWidget->setCurrentTemp(webData->temp());
-        weatherWidget->setCurrentIcon(webData->currentIcon());
-        weatherWidget->setDay1Icon(webData->day1Icon());
-        weatherWidget->setDay2Icon(webData->day2Icon());
-        weatherWidget->setDay3Icon(webData->day3Icon());
-        weatherWidget->setDay1(webData->day1());
-        weatherWidget->setDay2(webData->day2());
-        weatherWidget->setDay3(webData->day3());
-        weatherWidget->setDay1High(webData->day1High());
-        weatherWidget->setDay1Low(webData->day1Low());
-        weatherWidget->setDay2High(webData->day2High());
-        weatherWidget->setDay2Low(webData->day2Low());
-        weatherWidget->setDay3High(webData->day3High());
-        weatherWidget->setDay3Low(webData->day3Low());
-    }
 
     // make energy button change when setpoint is reached
     connect(thermostatWidget, SIGNAL(setpointIsReached(bool)),this,SLOT(energySaving(bool)));
+}
+
+void mainwindow::closeEvent(QCloseEvent *e)
+{
+    m_globalSettings->writeToFile();
+    delete m_globalSettings;
+    e->accept();
 }
 
 void mainwindow::paintEvent(QPaintEvent *)
@@ -248,7 +237,7 @@ void mainwindow::updateUnit()
     float FFloat, CFloat;
     QString FString, CString;
 
-    if(settingscreen::unit) {
+    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {
         // true means F
         // we want Fahrenheit, but currently in Celsius
         CString = weatherWidget->getCurrentTemp();
@@ -358,13 +347,14 @@ void mainwindow::updateUnit()
 
 void mainwindow::changeCity(QString city)
 {
+    qDebug() << city;
     // get new city information and pass it to webdata to send
     // a new request and get updated information for that city
     weatherWidget->setCity(city);
-    if(openingscreen::webFlag) {
+
         webData->changeCity(city);
         getWebData();
-    }
+
 }
 
 void mainwindow::getWebData()

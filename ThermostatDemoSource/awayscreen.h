@@ -3,6 +3,8 @@
 
 #include <QtGui>
 
+class GlobalSettings;
+
 class awayscreen : public QWidget
 {
     Q_OBJECT
@@ -22,6 +24,7 @@ private:
     QSpinBox *upperBound;
     QSpinBox *lowerBound;
 
+    GlobalSettings* m_globalSettings;
 };
 
 #endif // AWAYSCREEN_H

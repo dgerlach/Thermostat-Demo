@@ -3,6 +3,8 @@
 
 #include <QtGui>
 
+class GlobalSettings;
+
 class settingscreen : public QWidget
 {
     Q_OBJECT
@@ -17,10 +19,13 @@ signals:
 public slots:
     void unitIsF();
     void unitIsC();
+    void changeCity(QString city);
 
 private:
     QPushButton *FButton;
     QPushButton *CButton;
+
+    GlobalSettings* m_globalSettings;
     
 };
 

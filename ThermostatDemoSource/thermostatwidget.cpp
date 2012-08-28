@@ -1,11 +1,14 @@
 #include "thermostatwidget.h"
 #include "settingscreen.h"
+#include "globalsettings.h"
 
 int thermostatwidget::currentTempStatic;
 
 thermostatwidget::thermostatwidget(QWidget *parent) :
     QWidget(parent)
 {
+    m_globalSettings = GlobalSettings::getInstance();
+
     // create new thermostat widget with default values in case internet options are disabled
     setpointReached = false;
     currentTempInt = 72;
@@ -103,7 +106,7 @@ void thermostatwidget::update()
 void thermostatwidget::updateUnit()
 {
     // provide switch between Fahrenheit and Celsius based on current settings
-    if(settingscreen::unit) {
+    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {
         // true means F
         // we want Fahrenheit, but currently in Celsius
         currentTempInt = ((currentTempInt*1.8)+32);

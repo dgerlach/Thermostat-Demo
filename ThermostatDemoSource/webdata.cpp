@@ -1,6 +1,6 @@
 #include "webdata.h"
-#include "openingscreen.h"
 #include "settingscreen.h"
+#include "globalsettings.h"
 
 #include <QtDebug>
 #include <QTime>
@@ -8,32 +8,19 @@
 webdata::webdata(QObject *parent) :
     QObject(parent)
 {
+    m_globalSettings = GlobalSettings::getInstance();
+
     // create network access manager
     manager = new QNetworkAccessManager(this);
 
     // check and see if proxy settings are necessary
-    if(openingscreen::proxyFlag) {
+    if(m_globalSettings->proxyHost() != "") {
         QNetworkProxy proxy;
         proxy.setType(QNetworkProxy::HttpProxy);
-        proxy.setHostName(proxyName);
-        proxy.setPort(80);
+        proxy.setHostName(m_globalSettings->proxyHost());
+        proxy.setPort(m_globalSettings->proxyPort());
         manager->setProxy(proxy);
     }
-
-    // provide default request for Dallas, TX
-    request = new QNetworkRequest(QUrl("http://api.wunderground.com/api/9d8a29de9939cbb7/geolookup/conditions/forecast/q/TX/Dallas.xml"));
-    reply = manager->get(*request);
-    // reply is an XML document with all the data from the request
-    // reply is parsed once the document is finished downloading in parseXML()
-    connect(reply,SIGNAL(finished()),this,SLOT(parseXML()));
-
-    /* The following event loop force a (nearly) synchronous call to QNetworkAcessManager.
-    This is not an ideal or scalable solution, but it ensures the data will be available from main().
-    Since so little data is called, the added latency is acceptable. By adding the event loop,
-    we will not show the data before it is ready */
-    QEventLoop eventLoop;
-    connect(reply,SIGNAL(finished()),&eventLoop,SLOT(quit()));
-    eventLoop.exec();
 }
 
 void webdata::parseXML()
@@ -200,6 +187,7 @@ QTime webdata::clockObject()
 
 void webdata::changeCity(QString city)
 {
+    qDebug() << city;
     // if the city is changed, this function receives the city name and generates
     // the proper URL to send the right request
     QStringList cityList;
@@ -229,7 +217,7 @@ QString webdata::unitConversion(QString currentValue)
     // values are read in as Fahrenheit, so only need to convert to Celsius if necessary
     int FInt, CInt;
 
-    if(!settingscreen::unit) {
+    if(!(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF)) {
         // false means C
         // we want Celsius, but currently in Fahrenheit
         FInt = currentValue.toInt();

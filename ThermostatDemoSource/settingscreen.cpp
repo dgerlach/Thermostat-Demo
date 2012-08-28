@@ -1,13 +1,14 @@
 #include "settingscreen.h"
 #include "mainwindow.h"
+#include "globalsettings.h"
 
 #include <QtGui>
-
-bool settingscreen::unit; // true means F & false means C
 
 settingscreen::settingscreen(QWidget *parent) :
     QWidget(parent)
 {
+    m_globalSettings = GlobalSettings::getInstance();
+
     // create title
     QLabel *title = new QLabel("Select your CURRENT SETTINGS");
 
@@ -57,7 +58,7 @@ settingscreen::settingscreen(QWidget *parent) :
     cityBox->addItem("Mexico City,Mexico");
     cityBox->addItem("Johannesburg,South Africa");
     // when city is changed, create chain of events to send to web request and update main screen
-    connect(cityBox, SIGNAL(activated(QString)), this, SIGNAL(cityChanged(QString)));
+    connect(cityBox, SIGNAL(activated(QString)), this, SLOT(changeCity(QString)));
 
     // create city label
     QLabel *cityLabel = new QLabel("City: ");
@@ -101,7 +102,7 @@ void settingscreen::unitIsF()
     // mark F button as down and enable C button to be clicked
     CButton->setDisabled(false);
     // unit: true means F & false means C
-    unit = true;
+    m_globalSettings->setTemperatureFormat(GlobalSettings::TempFormatF);
     CButton->setChecked(false);
     FButton->setDisabled(true);
 }
@@ -111,9 +112,15 @@ void settingscreen::unitIsC()
     // mark C button as down and enable F button to be clicked
     FButton->setDisabled(false);
     // unit: true means F & false means C
-    unit = false;
+    m_globalSettings->setTemperatureFormat(GlobalSettings::TempFormatC);
     FButton->setChecked(false);
     CButton->setDisabled(true);
 
 
+}
+
+void settingscreen::changeCity(QString city)
+{
+    m_globalSettings->setCurrentCity(city);
+    emit cityChanged(city);
 }
