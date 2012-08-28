@@ -1,10 +1,10 @@
 == TI Thermostat Demo ==
 
   Notes:
-    The included thermostat.conf file should be placed under the home
-    directory under ./config/ti/ (example ~/.config/ti/thermostat.conf)
-    in order from a default configuration. This configuration will be 
-    completely configurable from the application in a future version
+    The included thermostat.conf file can be placed at 
+    /Settings/ti/thermostat.conf if a default ti-internal configuration is 
+    desired. All settings will be completely configurable from the application 
+    in a future version.
 
   Summary:
     This software provides a demo thermostat application.  All values are

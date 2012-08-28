@@ -10,7 +10,7 @@ weatherwidget::weatherwidget(QWidget *parent) :
     currentTemp = new QLabel("86°");
     currentIcon = new QLabel();
     QPixmap *partlySunny = new QPixmap(":Images/weather-few-clouds.png");
-    *partlySunny = partlySunny->scaled(72,72,Qt::KeepAspectRatio);
+    *partlySunny = partlySunny->scaled(60,60,Qt::KeepAspectRatio);
     currentIcon->setPixmap(*partlySunny);
     currentCity = new QLabel("Dallas,TX");
 
@@ -21,7 +21,7 @@ weatherwidget::weatherwidget(QWidget *parent) :
     day1Label = new QLabel("Mon");
     day1Icon = new QLabel();
     QPixmap *partlyCloudy = new QPixmap(":Images/weather-sunny-very-few-clouds.png");
-    *partlyCloudy = partlyCloudy->scaled(40,40,Qt::KeepAspectRatio);
+    *partlyCloudy = partlyCloudy->scaled(32,32,Qt::KeepAspectRatio);
     day1Icon->setPixmap(*partlyCloudy);
     day1Low = new QLabel("83°");
     day1High = new QLabel("89°");
@@ -30,7 +30,7 @@ weatherwidget::weatherwidget(QWidget *parent) :
     day2Label = new QLabel("Tue");
     day2Icon = new QLabel();
     QPixmap *overcast = new QPixmap(":Images/weather-overcast.png");
-    *overcast = overcast->scaled(40,40,Qt::KeepAspectRatio);
+    *overcast = overcast->scaled(32,32,Qt::KeepAspectRatio);
     day2Icon->setPixmap(*overcast);
     day2Low = new QLabel("81°");
     day2High = new QLabel("85°");
@@ -39,7 +39,7 @@ weatherwidget::weatherwidget(QWidget *parent) :
     day3Label = new QLabel("Wed");
     day3Icon = new QLabel();
     QPixmap *tshower = new QPixmap(":Images/weather-thundershower.png");
-    *tshower = tshower->scaled(40,40,Qt::KeepAspectRatio);
+    *tshower = tshower->scaled(32,32,Qt::KeepAspectRatio);
     day3Icon->setPixmap(*tshower);
     day3Low = new QLabel("79°");
     day3High = new QLabel("83°");
@@ -75,12 +75,23 @@ weatherwidget::weatherwidget(QWidget *parent) :
     day3Layout->addWidget(day3Low);
     day3Layout->addWidget(day3High);
 
+    //create status layout
+    statusMovieLabel = new QLabel;
+    statusMovie = new QMovie(":/Images/ajax-loader.gif");
+    statusMovieLabel->setMovie(statusMovie);
+    statusLabel = new QLabel("Connecting...");
+    statusMovie->start();
+    QHBoxLayout *statusLayout = new QHBoxLayout;
+    statusLayout->addWidget(statusMovieLabel);
+    statusLayout->addWidget(statusLabel);
+
     // create final layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(currentHLayout);
     mainLayout->addLayout(day1Layout);
     mainLayout->addLayout(day2Layout);
     mainLayout->addLayout(day3Layout);
+    mainLayout->addLayout(statusLayout);
 
     // show layout
     setLayout(mainLayout);
@@ -107,59 +118,59 @@ void weatherwidget::setCurrentIcon(QString icon)
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
         if(clock->hour() < 5 || clock->hour() > 20) {
             QPixmap *partlyMoony = new QPixmap(":Images/weather-moony-few-clouds.png");
-            *partlyMoony = partlyMoony->scaled(72, 72, Qt::KeepAspectRatio);
+            *partlyMoony = partlyMoony->scaled(60, 60, Qt::KeepAspectRatio);
             currentIcon->setPixmap(*partlyMoony);
         } else {
             QPixmap *partlySunny = new QPixmap(":Images/weather-few-clouds.png");
-            *partlySunny = partlySunny->scaled(72,72,Qt::KeepAspectRatio);
+            *partlySunny = partlySunny->scaled(60,60,Qt::KeepAspectRatio);
             currentIcon->setPixmap(*partlySunny);
         }
     }
     else if (icon == "fog") {
         QPixmap *fog = new QPixmap(":Images/weather-fog.png");
-        *fog = fog->scaled(72,72,Qt::KeepAspectRatio);
+        *fog = fog->scaled(60,60,Qt::KeepAspectRatio);
         currentIcon->setPixmap(*fog);
     }
     else if (icon == "hazy") {
         if(clock->hour() < 5 || clock->hour() > 20) {
             QPixmap *hazeyMoony = new QPixmap(":Images/weather-moony.png");
-            *hazeyMoony = hazeyMoony->scaled(72, 72, Qt::KeepAspectRatio);
+            *hazeyMoony = hazeyMoony->scaled(60, 60, Qt::KeepAspectRatio);
             currentIcon->setPixmap(*hazeyMoony);
         } else {
             QPixmap *haze = new QPixmap(":Images/weather-haze.png");
-            *haze = haze->scaled(72,72,Qt::KeepAspectRatio);
+            *haze = haze->scaled(60,60,Qt::KeepAspectRatio);
             currentIcon->setPixmap(*haze);
         }
     }
     else if (icon == "cloudy") {
         QPixmap *cloudy = new QPixmap(":Images/weather-overcast.png");
-        *cloudy = cloudy->scaled(72,72,Qt::KeepAspectRatio);
+        *cloudy = cloudy->scaled(60,60,Qt::KeepAspectRatio);
         currentIcon->setPixmap(*cloudy);
     }
     else if (icon == "rain" || icon == "chancerain") {
         QPixmap *showers = new QPixmap(":Images/weather-showers.png");
-        *showers = showers->scaled(72,72,Qt::KeepAspectRatio);
+        *showers = showers->scaled(60,60,Qt::KeepAspectRatio);
         currentIcon->setPixmap(*showers);
     }
     else if (icon == "sleet" || icon == "chancesleet") {
         QPixmap *sleet = new QPixmap(":Images/weather-sleet.png");
-        *sleet = sleet->scaled(72,72,Qt::KeepAspectRatio);
+        *sleet = sleet->scaled(60,60,Qt::KeepAspectRatio);
         currentIcon->setPixmap(*sleet);
     }
     else if (icon == "flurries" || icon == "snow" ||
               icon == "chanceflurries" || icon == "chancesnow") {
         QPixmap *snow = new QPixmap(":Images/weather-snow.png");
-        *snow = snow->scaled(72,72,Qt::KeepAspectRatio);
+        *snow = snow->scaled(60,60,Qt::KeepAspectRatio);
         currentIcon->setPixmap(*snow);
     }
     else if (icon == "clear" || icon == "sunny") {
         if(clock->hour() < 5 || clock->hour() > 20) {
             QPixmap *moony = new QPixmap(":Images/weather-moony.png");
-            *moony = moony->scaled(72, 72, Qt::KeepAspectRatio);
+            *moony = moony->scaled(60, 60, Qt::KeepAspectRatio);
             currentIcon->setPixmap(*moony);
         } else {
             QPixmap *sunny = new QPixmap(":Images/weather-sunny.png");
-            *sunny = sunny->scaled(72,72,Qt::KeepAspectRatio);
+            *sunny = sunny->scaled(60,60,Qt::KeepAspectRatio);
             currentIcon->setPixmap(*sunny);
         }
     }
@@ -167,17 +178,17 @@ void weatherwidget::setCurrentIcon(QString icon)
              icon == "unknown") {
         if(clock->hour() < 5 || clock->hour() > 20) {
             QPixmap *partlyCloudy = new QPixmap(":Images/weather-moony-very-few-clouds");
-            *partlyCloudy = partlyCloudy->scaled(72, 72, Qt::KeepAspectRatio);
+            *partlyCloudy = partlyCloudy->scaled(60, 60, Qt::KeepAspectRatio);
             currentIcon->setPixmap(*partlyCloudy);
         } else {
             QPixmap *partlyCloudy = new QPixmap(":Images/weather-sunny-very-few-clouds.png");
-            *partlyCloudy = partlyCloudy->scaled(72,72,Qt::KeepAspectRatio);
+            *partlyCloudy = partlyCloudy->scaled(60,60,Qt::KeepAspectRatio);
             currentIcon->setPixmap(*partlyCloudy);
         }
     }
     else if (icon == "tstorms" || icon == "chancetstorms") {
         QPixmap *thundershower = new QPixmap(":Images/weather-thundershower.png");
-        *thundershower = thundershower->scaled(72,72,Qt::KeepAspectRatio);
+        *thundershower = thundershower->scaled(60,60,Qt::KeepAspectRatio);
         currentIcon->setPixmap(*thundershower);
     }
 
@@ -189,54 +200,54 @@ void weatherwidget::setDay1Icon(QString icon)
     // set icon for day 1 of forecast
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
         QPixmap *partlySunny = new QPixmap(":Images/weather-few-clouds.png");
-        *partlySunny = partlySunny->scaled(40,40,Qt::KeepAspectRatio);
+        *partlySunny = partlySunny->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*partlySunny);
     }
     else if (icon == "fog") {
         QPixmap *fog = new QPixmap(":Images/weather-fog.png");
-        *fog = fog->scaled(40,40,Qt::KeepAspectRatio);
+        *fog = fog->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*fog);
     }
     else if (icon == "hazy") {
         QPixmap *haze = new QPixmap(":Images/weather-haze.png");
-        *haze = haze->scaled(40,40,Qt::KeepAspectRatio);
+        *haze = haze->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*haze);
     }
     else if (icon == "cloudy") {
         QPixmap *cloudy = new QPixmap(":Images/weather-overcast.png");
-        *cloudy = cloudy->scaled(40,40,Qt::KeepAspectRatio);
+        *cloudy = cloudy->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*cloudy);
     }
     else if (icon == "rain" || icon == "chancerain") {
         QPixmap *showers = new QPixmap(":Images/weather-showers.png");
-        *showers = showers->scaled(40,40,Qt::KeepAspectRatio);
+        *showers = showers->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*showers);
     }
     else if (icon == "sleet" || icon == "chancesleet") {
         QPixmap *sleet = new QPixmap(":Images/weather-sleet.png");
-        *sleet = sleet->scaled(40,40,Qt::KeepAspectRatio);
+        *sleet = sleet->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*sleet);
     }
     else if (icon == "flurries" || icon == "snow" ||
               icon == "chanceflurries" || icon == "chancesnow") {
         QPixmap *snow = new QPixmap(":Images/weather-snow.png");
-        *snow = snow->scaled(40,40,Qt::KeepAspectRatio);
+        *snow = snow->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*snow);
     }
     else if (icon == "clear" || icon == "sunny") {
         QPixmap *sunny = new QPixmap(":Images/weather-sunny.png");
-        *sunny = sunny->scaled(40,40,Qt::KeepAspectRatio);
+        *sunny = sunny->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*sunny);
     }
     else if (icon == "mostlysunny" || icon == "partlycloudy" ||
              icon == "unknown") {
         QPixmap *partlyCloudy = new QPixmap(":Images/weather-sunny-very-few-clouds.png");
-        *partlyCloudy = partlyCloudy->scaled(40,40,Qt::KeepAspectRatio);
+        *partlyCloudy = partlyCloudy->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*partlyCloudy);
     }
     else if (icon == "tstorms" || icon == "chancetstorms") {
         QPixmap *thundershower = new QPixmap(":Images/weather-thundershower.png");
-        *thundershower = thundershower->scaled(40,40,Qt::KeepAspectRatio);
+        *thundershower = thundershower->scaled(32,32,Qt::KeepAspectRatio);
         day1Icon->setPixmap(*thundershower);
     }
 
@@ -247,54 +258,54 @@ void weatherwidget::setDay2Icon(QString icon)
     // set icon for day 2 of forecast
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
         QPixmap *partlySunny = new QPixmap(":Images/weather-few-clouds.png");
-        *partlySunny = partlySunny->scaled(40,40,Qt::KeepAspectRatio);
+        *partlySunny = partlySunny->scaled(32,32,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*partlySunny);
     }
     else if (icon == "fog") {
         QPixmap *fog = new QPixmap(":Images/weather-fog.png");
-        *fog = fog->scaled(40,40,Qt::KeepAspectRatio);
+        *fog = fog->scaled(32,32,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*fog);
     }
     else if (icon == "hazy") {
         QPixmap *haze = new QPixmap(":Images/weather-haze.png");
-        *haze = haze->scaled(40,40,Qt::KeepAspectRatio);
+        *haze = haze->scaled(32,32,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*haze);
     }
     else if (icon == "cloudy") {
         QPixmap *cloudy = new QPixmap(":Images/weather-overcast.png");
-        *cloudy = cloudy->scaled(40,40,Qt::KeepAspectRatio);
+        *cloudy = cloudy->scaled(32,32,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*cloudy);
     }
     else if (icon == "rain" || icon == "chancerain") {
         QPixmap *showers = new QPixmap(":Images/weather-showers.png");
-        *showers = showers->scaled(40,40,Qt::KeepAspectRatio);
+        *showers = showers->scaled(32,32,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*showers);
     }
     else if (icon == "sleet" || icon == "chancesleet") {
         QPixmap *sleet = new QPixmap(":Images/weather-sleet.png");
-        *sleet = sleet->scaled(72,72,Qt::KeepAspectRatio);
+        *sleet = sleet->scaled(60,60,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*sleet);
     }
     else if (icon == "flurries" || icon == "snow" ||
               icon == "chanceflurries" || icon == "chancesnow") {
         QPixmap *snow = new QPixmap(":Images/weather-snow.png");
-        *snow = snow->scaled(40,40,Qt::KeepAspectRatio);
+        *snow = snow->scaled(32,32,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*snow);
     }
     else if (icon == "clear" || icon == "sunny") {
         QPixmap *sunny = new QPixmap(":Images/weather-sunny.png");
-        *sunny = sunny->scaled(40,40,Qt::KeepAspectRatio);
+        *sunny = sunny->scaled(32,32,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*sunny);
     }
     else if (icon == "mostlysunny" || icon == "partlycloudy" ||
              icon == "unknown") {
         QPixmap *partlyCloudy = new QPixmap(":Images/weather-sunny-very-few-clouds.png");
-        *partlyCloudy = partlyCloudy->scaled(40,40,Qt::KeepAspectRatio);
+        *partlyCloudy = partlyCloudy->scaled(32,32,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*partlyCloudy);
     }
     else if (icon == "tstorms" || icon == "chancetstorms") {
         QPixmap *thundershower = new QPixmap(":Images/weather-thundershower.png");
-        *thundershower = thundershower->scaled(40,40,Qt::KeepAspectRatio);
+        *thundershower = thundershower->scaled(32,32,Qt::KeepAspectRatio);
         day2Icon->setPixmap(*thundershower);
     }
 
@@ -306,54 +317,54 @@ void weatherwidget::setDay3Icon(QString icon)
     // set icon for day 3 of forecast
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
         QPixmap *partlySunny = new QPixmap(":Images/weather-few-clouds.png");
-        *partlySunny = partlySunny->scaled(40,40,Qt::KeepAspectRatio);
+        *partlySunny = partlySunny->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*partlySunny);
     }
     else if (icon == "fog") {
         QPixmap *fog = new QPixmap(":Images/weather-fog.png");
-        *fog = fog->scaled(40,40,Qt::KeepAspectRatio);
+        *fog = fog->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*fog);
     }
     else if (icon == "hazy") {
         QPixmap *haze = new QPixmap(":Images/weather-haze.png");
-        *haze = haze->scaled(40,40,Qt::KeepAspectRatio);
+        *haze = haze->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*haze);
     }
     else if (icon == "cloudy") {
         QPixmap *cloudy = new QPixmap(":Images/weather-overcast.png");
-        *cloudy = cloudy->scaled(40,40,Qt::KeepAspectRatio);
+        *cloudy = cloudy->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*cloudy);
     }
     else if (icon == "rain" || icon == "chancerain") {
         QPixmap *showers = new QPixmap(":Images/weather-showers.png");
-        *showers = showers->scaled(40,40,Qt::KeepAspectRatio);
+        *showers = showers->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*showers);
     }
     else if (icon == "sleet" || icon == "chancesleet") {
         QPixmap *sleet = new QPixmap(":Images/weather-sleet.png");
-        *sleet = sleet->scaled(40,40,Qt::KeepAspectRatio);
+        *sleet = sleet->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*sleet);
     }
     else if (icon == "flurries" || icon == "snow" ||
               icon == "chanceflurries" || icon == "chancesnow") {
         QPixmap *snow = new QPixmap(":Images/weather-snow.png");
-        *snow = snow->scaled(40,40,Qt::KeepAspectRatio);
+        *snow = snow->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*snow);
     }
     else if (icon == "clear" || icon == "sunny") {
         QPixmap *sunny = new QPixmap(":Images/weather-sunny.png");
-        *sunny = sunny->scaled(40,40,Qt::KeepAspectRatio);
+        *sunny = sunny->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*sunny);
     }
     else if (icon == "mostlysunny" || icon == "partlycloudy" ||
              icon == "unknown") {
         QPixmap *partlyCloudy = new QPixmap(":Images/weather-sunny-very-few-clouds.png");
-        *partlyCloudy = partlyCloudy->scaled(40,40,Qt::KeepAspectRatio);
+        *partlyCloudy = partlyCloudy->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*partlyCloudy);
     }
     else if (icon == "tstorms" || icon == "chancetstorms") {
         QPixmap *thundershower = new QPixmap(":Images/weather-thundershower.png");
-        *thundershower = thundershower->scaled(40,40,Qt::KeepAspectRatio);
+        *thundershower = thundershower->scaled(32,32,Qt::KeepAspectRatio);
         day3Icon->setPixmap(*thundershower);
     }
 
@@ -496,4 +507,26 @@ void weatherwidget::setClock(QTime webClock)
 {
     // set clock that is used to display night icons
     *clock = webClock;
+}
+
+
+void weatherwidget::setStatusUpdated()
+{
+    statusMovie->stop();
+    statusMovieLabel->setVisible(false);
+    statusLabel->setText("Updated");
+}
+
+void weatherwidget::setStatusUpdating()
+{
+    //statusMovie->setFileName(":/Images/ajax-loader.gif");
+    statusMovie->start();
+    statusLabel->setText("Updating...");
+}
+
+void weatherwidget::setStatusFailed()
+{
+    statusMovie->stop();
+    statusMovieLabel->setVisible(false);
+    statusLabel->setText("Update Failed");
 }

@@ -36,9 +36,13 @@ public:
     void setCity(QString);
     void setClock(QTime);
 
+
 signals:
 
 public slots:
+    void setStatusUpdated();
+    void setStatusUpdating();
+    void setStatusFailed();
 
 
 protected:
@@ -61,6 +65,9 @@ private:
     QLabel *day3High;
     QString weatherStyleSheet;
     QTime *clock;
+    QLabel *statusLabel;
+    QLabel *statusMovieLabel;
+    QMovie *statusMovie;
     
 };
 

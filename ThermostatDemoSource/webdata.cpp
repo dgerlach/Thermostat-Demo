@@ -13,6 +13,11 @@ webdata::webdata(QObject *parent) :
     // create network access manager
     manager = new QNetworkAccessManager(this);
 
+    configureProxy();
+}
+
+void webdata::configureProxy()
+{
     // check and see if proxy settings are necessary
     if(m_globalSettings->proxyHost() != "") {
         QNetworkProxy proxy;
@@ -21,6 +26,16 @@ webdata::webdata(QObject *parent) :
         proxy.setPort(m_globalSettings->proxyPort());
         manager->setProxy(proxy);
     }
+}
+
+void webdata::responseReceived()
+{
+    qDebug() << reply->error() << reply->errorString();
+
+    if(reply->error() == QNetworkReply::NoError)
+        parseXML();
+    else
+        emit networkTimeout();
 }
 
 void webdata::parseXML()
@@ -79,7 +94,8 @@ void webdata::parseXML()
     else if (reader.atEnd()) {
         qDebug() << "Reached end of XML document" << endl;
     }
-
+    reply->deleteLater();
+    emit dataAvailable();
 }
 
 
@@ -198,17 +214,10 @@ void webdata::changeCity(QString city)
     qDebug() << cityUrl;
 
     // receive document and parse it
-    request = new QNetworkRequest(QUrl(cityUrl));
-    reply = manager->get(*request);
-    connect(reply,SIGNAL(finished()),this,SLOT(parseXML()));
+    request.setUrl(QUrl(cityUrl));
 
-    /* The following event loop force a (nearly) synchronous call to QNetworkAcessManager.
-    This is not an ideal or scalable solution, but it ensures the data will be available from main().
-    Since so little data is called, the added latency is acceptable. */
-    QEventLoop eventLoop;
-    connect(reply,SIGNAL(finished()),&eventLoop,SLOT(quit()));
-    eventLoop.exec();
-
+    reply = manager->get(request);
+    connect(reply,SIGNAL(finished()),this,SLOT(responseReceived()));
 }
 
 QString webdata::unitConversion(QString currentValue)

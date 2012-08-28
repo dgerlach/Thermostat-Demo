@@ -33,15 +33,18 @@ public:
     void changeCity(QString);
     
 signals:
+    void dataAvailable();
+    void networkTimeout();
     
 public slots:
-
+    void configureProxy();
 private slots:
     void parseXML();
+    void responseReceived();
 
 private:
     QNetworkAccessManager *manager;
-    QNetworkRequest *request;
+    QNetworkRequest request;
     QNetworkReply *reply;
     QXmlStreamReader reader;
     QString currentDate;

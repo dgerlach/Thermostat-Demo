@@ -23,7 +23,7 @@ mainwindow::mainwindow(QWidget *parent) :
     setStyleSheet("mainwindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");        
 
     // remove cursor (i.e. mouse pointer) throughout application
-    //qApp->setOverrideCursor( QCursor( Qt::BlankCursor ) );
+    qApp->setOverrideCursor( QCursor( Qt::BlankCursor ) );
 
     // create weather widget
     weatherWidget = new weatherwidget;
@@ -351,10 +351,10 @@ void mainwindow::changeCity(QString city)
     // get new city information and pass it to webdata to send
     // a new request and get updated information for that city
     weatherWidget->setCity(city);
-
-        webData->changeCity(city);
-        getWebData();
-
+    weatherWidget->setStatusUpdating();
+    webData->changeCity(city);
+    connect(webData, SIGNAL(dataAvailable()), this, SLOT(getWebData()));
+    connect(webData, SIGNAL(networkTimeout()), this, SLOT(webDataFailed()));
 }
 
 void mainwindow::getWebData()
@@ -381,4 +381,10 @@ void mainwindow::getWebData()
     weatherWidget->setDay2Low(webData->day2Low());
     weatherWidget->setDay3High(webData->day3High());
     weatherWidget->setDay3Low(webData->day3Low());
+    weatherWidget->setStatusUpdated();
+}
+
+void mainwindow::webDataFailed()
+{
+    weatherWidget->setStatusFailed();
 }

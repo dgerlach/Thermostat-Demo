@@ -57,6 +57,12 @@ settingscreen::settingscreen(QWidget *parent) :
     cityBox->addItem("Moscow,Russia");
     cityBox->addItem("Mexico City,Mexico");
     cityBox->addItem("Johannesburg,South Africa");
+
+    int index = cityBox->findText(m_globalSettings->currentCity());
+
+    if(index>-1)
+        cityBox->setCurrentIndex(index);
+
     // when city is changed, create chain of events to send to web request and update main screen
     connect(cityBox, SIGNAL(activated(QString)), this, SLOT(changeCity(QString)));
 

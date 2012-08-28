@@ -40,6 +40,8 @@ HEADERS  += \
 RESOURCES += \
     thermostatdemo.qrc
 
+RCC_DIR = Images/
+
 FORMS += \
     keyboard/keyboard.ui
 

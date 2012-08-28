@@ -22,6 +22,8 @@ public slots:
     void updateUnit();
     void changeCity(QString);
     void closeEvent(QCloseEvent *);
+    void getWebData();
+    void webDataFailed();
 
 private:
     webdata *webData;
@@ -33,7 +35,7 @@ private:
     QTime clock;
     void setBackground(QString);
     weatherwidget *weatherWidget;
-    void getWebData();
+
 
     GlobalSettings* m_globalSettings;
 

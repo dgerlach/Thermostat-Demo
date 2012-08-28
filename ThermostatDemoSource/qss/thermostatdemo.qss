@@ -15,16 +15,20 @@ optionswidget {
 */
 weatherwidget > QLabel {
 	color: white;	
-	font-size: 20px;
+	font-size: 18px;
 	qproperty-alignment: AlignCenter;
 }
 
 weatherwidget > QLabel#currentCity {
-	font-size: 16px;
+	font-size: 14px;
 }
 
 weatherwidget > QLabel#currentTemp {
-	font-size: 50px;
+	font-size: 36px;
+}
+
+weatherwidget > QLabel#statusLabel {
+	font-size: 3px;
 }
 
 weatherwidget:pressed {

@@ -35,7 +35,6 @@
         <file>Images/weather-snow.png</file>
         <file>Images/weather-storm.png</file>
         <file>Images/weather-sunny.png</file>
-        <file>Images/weather-sunny-very-few-clouds.png</file>
         <file>Images/weather-thundershower.png</file>
         <file>Images/simple-black-square-icon-check-box-empty.png</file>
         <file>Images/simple-black-square-icon-check-box-full.png</file>
@@ -44,5 +43,6 @@
         <file>Images/weather-moony.png</file>
         <file>Images/weather-moony-few-clouds.png</file>
         <file>Images/weather-moony-very-few-clouds.png</file>
+        <file>Images/ajax-loader.gif</file>
     </qresource>
 </RCC>
