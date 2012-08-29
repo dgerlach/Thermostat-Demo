@@ -4,7 +4,7 @@
 #include "schedulescreen.h"
 #include "settingscreen.h"
 
-optionswidget::optionswidget(QWidget *parent) :
+OptionsWidget::OptionsWidget(QWidget *parent) :
     QWidget(parent)
 {
     // create settings button
@@ -14,7 +14,7 @@ optionswidget::optionswidget(QWidget *parent) :
     settingsButton->setFocusPolicy(Qt::NoFocus);
 
     // create settings screen
-    settingScreen = new settingscreen;
+    settingScreen = new SettingScreen;
     // when settings button is clicked, show settings screen
     connect(settingsButton,SIGNAL(clicked()),settingScreen,SLOT(showFullScreen()));
     // pass C/F value from settings screen to options widget and out to main window
@@ -29,7 +29,7 @@ optionswidget::optionswidget(QWidget *parent) :
     calendarButton->setFocusPolicy(Qt::NoFocus);
 
     // create new schedule screen
-    scheduleScreen = new schedulescreen;
+    scheduleScreen = new ScheduleScreen;
     connect(calendarButton,SIGNAL(clicked()),scheduleScreen,SLOT(showFullScreen()));
     connect(settingScreen, SIGNAL(valueChanged()), scheduleScreen, SIGNAL(valueChanged()));
 
@@ -40,7 +40,7 @@ optionswidget::optionswidget(QWidget *parent) :
     awayButton->setFocusPolicy(Qt::NoFocus);
 
     // create new away screen
-    awayScreen = new awayscreen;
+    awayScreen = new AwayScreen;
     connect(awayButton,SIGNAL(clicked()),awayScreen,SLOT(showFullScreen()));
     connect(this, SIGNAL(currentTempChanged()), awayScreen, SLOT(updateCurrentTemp()));
     connect(settingScreen, SIGNAL(valueChanged()), awayScreen, SLOT(updateUnit()));

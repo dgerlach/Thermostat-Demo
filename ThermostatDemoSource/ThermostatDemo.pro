@@ -21,7 +21,8 @@ SOURCES += main.cpp \
     schedulepoint.cpp \
     keyboard/keyboard.cpp \
     settingscreen.cpp \
-    globalsettings.cpp
+    globalsettings.cpp \
+    qkeyboardlineedit.cpp
 
 HEADERS  += \
     weatherwidget.h \
@@ -35,7 +36,8 @@ HEADERS  += \
     keyboard/keyboard.h \
     settingscreen.h \
     STARTHERE.h \
-    globalsettings.h
+    globalsettings.h \
+    qkeyboardlineedit.h
 
 RESOURCES += \
     thermostatdemo.qrc

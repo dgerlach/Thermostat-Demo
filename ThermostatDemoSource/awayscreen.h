@@ -5,11 +5,11 @@
 
 class GlobalSettings;
 
-class awayscreen : public QWidget
+class AwayScreen : public QWidget
 {
     Q_OBJECT
 public:
-    explicit awayscreen(QWidget *parent = 0);
+    explicit AwayScreen(QWidget *parent = 0);
     
 signals:
     

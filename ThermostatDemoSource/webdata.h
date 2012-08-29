@@ -7,11 +7,11 @@
 
 class GlobalSettings;
 
-class webdata : public QObject
+class WebData : public QObject
 {
     Q_OBJECT
 public:
-    explicit webdata(QObject *parent = 0);
+    explicit WebData(QObject *parent = 0);
     QString date();
     QString time();
     QString temp();
@@ -29,8 +29,13 @@ public:
     QString day3High();
     QString day3Low();
     QTime clockObject();
-    static QString proxyName;
+
     void changeCity(QString);
+
+    bool writeToCache(QByteArray *xmlData);
+    bool readFromCache(QByteArray *xmlData, QString alternateCacheFile = "");
+
+    void loadLocalData();
     
 signals:
     void dataAvailable();
@@ -39,8 +44,9 @@ signals:
 public slots:
     void configureProxy();
 private slots:
-    void parseXML();
+    void parseXML(QByteArray *xmlData);
     void responseReceived();
+
 
 private:
     QNetworkAccessManager *manager;
@@ -58,7 +64,7 @@ private:
 
     GlobalSettings *m_globalSettings;
 
-    
+
 };
 
 #endif // WEBDATA_H

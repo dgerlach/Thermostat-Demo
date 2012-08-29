@@ -9,42 +9,44 @@
 
 #include <QtDebug>
 
-mainwindow::mainwindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
-    // the mainwindow provides the container for the thermostatwidget, weatherwidget, and optionswidget
-    // it is also provides much of the interface between webdata and the widgets that require web updates
+
+    setObjectName("MainWindow");
+    // the MainWindow provides the container for the ThermostatWidget, WeatherWidget, and OptionsWidget
+    // it is also provides much of the interface between WebData and the widgets that require web updates
     // it is set to initial hard-coded values first, and only updated from the web if internet options
     // have been allowed
 
     m_globalSettings = GlobalSettings::getInstance();
 
     // sets initial weather background
-    setStyleSheet("mainwindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");        
+    setStyleSheet("mainwindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");
 
     // remove cursor (i.e. mouse pointer) throughout application
     qApp->setOverrideCursor( QCursor( Qt::BlankCursor ) );
 
     // create weather widget
-    weatherWidget = new weatherwidget;
+    weatherWidget = new WeatherWidget;
     weatherWidget->setObjectName("weatherWidget");
     weatherWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     weatherWidget->setAttribute(Qt::WA_StyledBackground,true);
 
     // create thermostat widget
-    thermostatwidget *thermostatWidget = new thermostatwidget;
+    ThermostatWidget *thermostatWidget = new ThermostatWidget;
     thermostatWidget->setObjectName("thermostatWidget");
     thermostatWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     thermostatWidget->setAttribute(Qt::WA_StyledBackground,true);
 
     // create options widget
-    optionswidget *optionsWidget = new optionswidget;
+    OptionsWidget *optionsWidget = new OptionsWidget;
     optionsWidget->setObjectName("optionsWidget");
     optionsWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     optionsWidget->setAttribute(Qt::WA_StyledBackground,true);
     // connect 10 second timer that causes current temp to follow setpoint to pass signal through options widget
     connect(thermostatWidget, SIGNAL(timeout()), optionsWidget, SIGNAL(currentTempChanged()));
-    // connect new city name signal to the mainwindow function changeCity()
+    // connect new city name signal to the MainWindow function changeCity()
     connect(optionsWidget, SIGNAL(cityChanged(QString)), this, SLOT(changeCity(QString)));
 
     // create energy button
@@ -114,32 +116,32 @@ mainwindow::mainwindow(QWidget *parent) :
     // show layout
     setLayout(mainLayout);
 
-    //because we don't want to ask the user if internet is enabled we removed that check
-    //however now app will crash if internet is not connected. Asynchronous web calls are
-    //the next priority
+    // create web data object and set all dynamic properties based on web data
+    webData = new WebData;
 
-        // create web data object and set all dynamic properties based on web data
-        webData = new webdata;
+    //first set based on local cache so user sees something!
+    webData->loadLocalData();
+    getWebData();
 
-        clockTimer = new QTimer(this);
-        connect(clockTimer,SIGNAL(timeout()),this,SLOT(updateClock()));
-        clockTimer->start(60000); // makes the clock tick every 60 seconds
+    clockTimer = new QTimer(this);
+    connect(clockTimer,SIGNAL(timeout()),this,SLOT(updateClock()));
+    clockTimer->start(60000); // makes the clock tick every 60 seconds
 
-        changeCity(m_globalSettings->currentCity());
+    changeCity(m_globalSettings->currentCity());
 
 
     // make energy button change when setpoint is reached
     connect(thermostatWidget, SIGNAL(setpointIsReached(bool)),this,SLOT(energySaving(bool)));
 }
 
-void mainwindow::closeEvent(QCloseEvent *e)
+void MainWindow::closeEvent(QCloseEvent *e)
 {
-    m_globalSettings->writeToFile();
+    m_globalSettings->save();
     delete m_globalSettings;
     e->accept();
 }
 
-void mainwindow::paintEvent(QPaintEvent *)
+void MainWindow::paintEvent(QPaintEvent *)
 {
     /* Applying CSS styles to custom widgets inherited from QWidget
     requires reimplementing paintEvent(). Without doing it, custom
@@ -152,7 +154,7 @@ void mainwindow::paintEvent(QPaintEvent *)
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
-void mainwindow::updateClock()
+void MainWindow::updateClock()
 {
     // make clock tick
     clock = clock.addSecs(60);
@@ -160,63 +162,63 @@ void mainwindow::updateClock()
 
 }
 
-void mainwindow::setBackground(QString icon)
+void MainWindow::setBackground(QString icon)
 {
-    // set the mainwindow background based on the current conditions
+    // set the MainWindow background based on the current conditions
 
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
         if(clock.hour() < 5 || clock.hour() > 20) {
-            setStyleSheet("mainwindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
         } else {
-            setStyleSheet("mainwindow {border-image: url(:/Images/mostlycloudy.jpg)}");
+            setStyleSheet("MainWindow {border-image: url(:/Images/mostlycloudy.jpg)}");
         }
     }
     else if (icon == "fog") {
-        setStyleSheet("mainwindow {border-image: url(:/Images/fog.jpg)}");
+        setStyleSheet("MainWindow {border-image: url(:/Images/fog.jpg)}");
     }
     else if (icon == "hazy") {
         if(clock.hour() < 5 || clock.hour() > 20) {
-            setStyleSheet("mainwindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
         } else {
-            setStyleSheet("mainwindow {border-image: url(:/Images/hazy.jpg)}");
+            setStyleSheet("MainWindow {border-image: url(:/Images/hazy.jpg)}");
         }
     }
     else if (icon == "cloudy") {
-        setStyleSheet("mainwindow {border-image: url(:/Images/overcast.jpg)}");
+        setStyleSheet("MainWindow {border-image: url(:/Images/overcast.jpg)}");
     }
     else if (icon == "rain" || icon == "chancerain") {
-        setStyleSheet("mainwindow {border-image: url(:/Images/rain.jpg)}");
+        setStyleSheet("MainWindow {border-image: url(:/Images/rain.jpg)}");
     }
     else if (icon == "sleet" || icon == "chancesleet") {
-        setStyleSheet("mainwindow {border-image: url(:/Images/sleet.jpg)}");
+        setStyleSheet("MainWindow {border-image: url(:/Images/sleet.jpg)}");
     }
     else if (icon == "flurries" || icon == "snow" ||
              icon == "chanceflurries" || icon == "chancesnow") {
-        setStyleSheet("mainwindow {border-image: url(:/Images/snow.jpg)}");
+        setStyleSheet("MainWindow {border-image: url(:/Images/snow.jpg)}");
     }
     else if (icon == "clear" || icon == "sunny") {
         if(clock.hour() < 5 || clock.hour() > 20) {
-            setStyleSheet("mainwindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
         } else {
-            setStyleSheet("mainwindow {border-image: url(:/Images/clear_sky.jpg)}");
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_sky.jpg)}");
         }
     }
     else if (icon == "mostlysunny" || icon == "partlycloudy" ||
              icon == "unknown") {
         if(clock.hour() < 5 || clock.hour() > 20) {
-            setStyleSheet("mainwindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
         } else {
-            setStyleSheet("mainwindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");
+            setStyleSheet("MainWindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");
         }
     }
     else if (icon == "tstorms" || icon == "chancetstorms") {
-        setStyleSheet("mainwindow {border-image: url(:/Images/storm.jpg)}");
+        setStyleSheet("MainWindow {border-image: url(:/Images/storm.jpg)}");
 
     }
 
 }
 
-void mainwindow::energySaving(bool setpointReached)
+void MainWindow::energySaving(bool setpointReached)
 {
     // change energyButton based on whether or not setpoint is reached
     if(setpointReached == true) {
@@ -230,7 +232,7 @@ void mainwindow::energySaving(bool setpointReached)
 
 }
 
-void mainwindow::updateUnit()
+void MainWindow::updateUnit()
 {
     // provide Celius/Fahrenheit conversions for weather widget
     int FInt, CInt;
@@ -345,10 +347,10 @@ void mainwindow::updateUnit()
     }
 }
 
-void mainwindow::changeCity(QString city)
+void MainWindow::changeCity(QString city)
 {
     qDebug() << city;
-    // get new city information and pass it to webdata to send
+    // get new city information and pass it to WebData to send
     // a new request and get updated information for that city
     weatherWidget->setCity(city);
     weatherWidget->setStatusUpdating();
@@ -357,7 +359,7 @@ void mainwindow::changeCity(QString city)
     connect(webData, SIGNAL(networkTimeout()), this, SLOT(webDataFailed()));
 }
 
-void mainwindow::getWebData()
+void MainWindow::getWebData()
 {
     // pull a new set of important web information
     dateButton->setText(webData->date());
@@ -384,7 +386,7 @@ void mainwindow::getWebData()
     weatherWidget->setStatusUpdated();
 }
 
-void mainwindow::webDataFailed()
+void MainWindow::webDataFailed()
 {
     weatherWidget->setStatusFailed();
 }

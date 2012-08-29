@@ -5,7 +5,7 @@
 
 #include <QtGui>
 
-schedulepoint::schedulepoint(int seqNumber)
+SchedulePoint::SchedulePoint(int seqNumber)
 {
     m_globalSettings = GlobalSettings::getInstance();
 
@@ -18,12 +18,12 @@ schedulepoint::schedulepoint(int seqNumber)
     location=0;
 }
 
-schedulepoint::~schedulepoint()
+SchedulePoint::~SchedulePoint()
 {
     // destructor
 }
 
-void schedulepoint::setText(const QString &text)
+void SchedulePoint::setText(const QString &text)
 {
     // add new text
     prepareGeometryChange();
@@ -31,7 +31,7 @@ void schedulepoint::setText(const QString &text)
     update();
 }
 
-QRectF schedulepoint::outlineRect() const
+QRectF SchedulePoint::outlineRect() const
 {
     // define outline rectangle
     const int padding = 3;
@@ -42,14 +42,14 @@ QRectF schedulepoint::outlineRect() const
     return rect;
 }
 
-QRectF schedulepoint::boundingRect() const
+QRectF SchedulePoint::boundingRect() const
 {
     // provide size of each point for collision detection
     const int margin = 1;
     return outlineRect().adjusted(-margin, -margin, +margin, +margin);
 }
 
-QPainterPath schedulepoint::shape() const
+QPainterPath SchedulePoint::shape() const
 {
     // provide shape of each point
     QRectF rect = outlineRect();
@@ -58,7 +58,7 @@ QPainterPath schedulepoint::shape() const
     return path;
 }
 
-void schedulepoint::paint(QPainter *painter,
+void SchedulePoint::paint(QPainter *painter,
                           const QStyleOptionGraphicsItem *option, QWidget * /*widget*/)
 {
     // draw point itself
@@ -75,14 +75,14 @@ void schedulepoint::paint(QPainter *painter,
     painter->drawText(rect, Qt::AlignCenter, myText);
 }
 
-void schedulepoint::mousePressEvent(QGraphicsSceneMouseEvent * /* event */)
+void SchedulePoint::mousePressEvent(QGraphicsSceneMouseEvent * /* event */)
 {
     // provide event handler for mouse click
     emit clicked(this);
 
 }
 
-int schedulepoint::roundness(double size) const
+int SchedulePoint::roundness(double size) const
 {
     // rounded edges for rectangle
     const int diameter = 12;
@@ -90,7 +90,7 @@ int schedulepoint::roundness(double size) const
 }
 
 
-void schedulepoint::shiftLeft()
+void SchedulePoint::shiftLeft()
 {
     // provide a slot to allow point shifting to the left
     location--;
@@ -98,7 +98,7 @@ void schedulepoint::shiftLeft()
     update();
 }
 
-void schedulepoint::shiftRight()
+void SchedulePoint::shiftRight()
 {
     // provide a slot to allow point shifting to the right
     location++;
@@ -106,7 +106,7 @@ void schedulepoint::shiftRight()
     update();
 }
 
-void schedulepoint::increaseTemp()
+void SchedulePoint::increaseTemp()
 {
     // provide a slot to increase point temperature
     temp++;
@@ -114,7 +114,7 @@ void schedulepoint::increaseTemp()
     update();
 }
 
-void schedulepoint::decreaseTemp()
+void SchedulePoint::decreaseTemp()
 {
     // provide a slot to decrease temperature
     temp--;
@@ -122,31 +122,31 @@ void schedulepoint::decreaseTemp()
     update();
 }
 
-int schedulepoint::getID()
+int SchedulePoint::getID()
 {
     // provide point's unique ID number
     return ID;
 }
 
-void schedulepoint::setID(int seqNumber)
+void SchedulePoint::setID(int seqNumber)
 {
     // give point a unique ID number
     ID = seqNumber;
 }
 
-void schedulepoint::setLocation(int num)
+void SchedulePoint::setLocation(int num)
 {
     // track point's horizontal movement from starting position
     location=num;
 }
 
-int schedulepoint::getLocation()
+int SchedulePoint::getLocation()
 {
     // return how much point has moved from start
     return location;
 }
 
-QString schedulepoint::time()
+QString SchedulePoint::time()
 {
     // output the current time represnted by this point's location
     int hours = ((15/3.4)*(this->pos().x()+12.7)) / 60;
@@ -155,7 +155,7 @@ QString schedulepoint::time()
     return time->toString("h:mm AP");
 }
 
-void schedulepoint::updateUnit()
+void SchedulePoint::updateUnit()
 {
     // provide switch between celsius and fahrenheit
     if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {

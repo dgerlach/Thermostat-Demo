@@ -7,11 +7,11 @@
 
 class GlobalSettings;
 
-class mainwindow : public QWidget
+class MainWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit mainwindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0);
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -26,7 +26,7 @@ public slots:
     void webDataFailed();
 
 private:
-    webdata *webData;
+    WebData *webData;
     QPushButton *energyButton;
     QPushButton *timeButton;
     QPushButton *dateButton;
@@ -34,7 +34,7 @@ private:
     QTimer *clockTimer;
     QTime clock;
     void setBackground(QString);
-    weatherwidget *weatherWidget;
+    WeatherWidget *weatherWidget;
 
 
     GlobalSettings* m_globalSettings;

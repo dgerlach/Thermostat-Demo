@@ -44,5 +44,6 @@
         <file>Images/weather-moony-few-clouds.png</file>
         <file>Images/weather-moony-very-few-clouds.png</file>
         <file>Images/ajax-loader.gif</file>
+        <file>data/cache.xml</file>
     </qresource>
 </RCC>

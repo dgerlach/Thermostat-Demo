@@ -2,9 +2,9 @@
 #include "settingscreen.h"
 #include "globalsettings.h"
 
-int thermostatwidget::currentTempStatic;
+int ThermostatWidget::currentTempStatic;
 
-thermostatwidget::thermostatwidget(QWidget *parent) :
+ThermostatWidget::ThermostatWidget(QWidget *parent) :
     QWidget(parent)
 {
     m_globalSettings = GlobalSettings::getInstance();
@@ -52,7 +52,7 @@ thermostatwidget::thermostatwidget(QWidget *parent) :
 
 }
 
-void thermostatwidget::increaseTemp()
+void ThermostatWidget::increaseTemp()
 {
     // provide function to increase current setpoint
     setpointTempInt++;
@@ -68,7 +68,7 @@ void thermostatwidget::increaseTemp()
     }
 }
 
-void thermostatwidget::decreaseTemp()
+void ThermostatWidget::decreaseTemp()
 {
     // provid functino to decrease current setpoint
     setpointTempInt--;
@@ -84,7 +84,7 @@ void thermostatwidget::decreaseTemp()
     }
 }
 
-void thermostatwidget::update()
+void ThermostatWidget::update()
 {
     // when timer fires (every 10 seconds), have current temperature approach setpoint temperature by one degree
     if (currentTempInt < setpointTempInt) {
@@ -103,7 +103,7 @@ void thermostatwidget::update()
     }
 }
 
-void thermostatwidget::updateUnit()
+void ThermostatWidget::updateUnit()
 {
     // provide switch between Fahrenheit and Celsius based on current settings
     if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {

@@ -3,7 +3,7 @@
 
 #include "QtDebug"
 
-schedulescreen::schedulescreen(QWidget *parent) :
+ScheduleScreen::ScheduleScreen(QWidget *parent) :
     QWidget(parent)
 {
     // seqNumber will track the number of points that have been created
@@ -147,148 +147,148 @@ schedulescreen::schedulescreen(QWidget *parent) :
     setLayout(mainLayout);
 }
 
-void schedulescreen::addSchedulePoints()
+void ScheduleScreen::addSchedulePoints()
 {
 
     // create all 28 schedule points with proper connections
     // fill all points into pointList for easy access
-    point0 = new schedulepoint(0);
-    connect(point0, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point0 = new SchedulePoint(0);
+    connect(point0, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point0, SLOT(updateUnit()));
     showPoint(point0);
     pointList.append(point0);
-    point1 = new schedulepoint(1);
-    connect(point1, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point1 = new SchedulePoint(1);
+    connect(point1, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point1, SLOT(updateUnit()));
     showPoint(point1);
     pointList.append(point1);
-    point2 = new schedulepoint(2);
-    connect(point2, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point2 = new SchedulePoint(2);
+    connect(point2, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point2, SLOT(updateUnit()));
     showPoint(point2);
     pointList.append(point2);
-    point3 = new schedulepoint(3);
-    connect(point3, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point3 = new SchedulePoint(3);
+    connect(point3, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point3, SLOT(updateUnit()));
     showPoint(point3);
     pointList.append(point3);
-    point4 = new schedulepoint(4);
-    connect(point4, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point4 = new SchedulePoint(4);
+    connect(point4, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point4, SLOT(updateUnit()));
     showPoint(point4);
     pointList.append(point4);
-    point5 = new schedulepoint(5);
-    connect(point5, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point5 = new SchedulePoint(5);
+    connect(point5, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point5, SLOT(updateUnit()));
     showPoint(point5);
     pointList.append(point5);
-    point6 = new schedulepoint(6);
-    connect(point6, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point6 = new SchedulePoint(6);
+    connect(point6, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point6, SLOT(updateUnit()));
     showPoint(point6);
     pointList.append(point6);
-    point7 = new schedulepoint(7);
-    connect(point7, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point7 = new SchedulePoint(7);
+    connect(point7, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point7, SLOT(updateUnit()));
     showPoint(point7);
     pointList.append(point7);
-    point8 = new schedulepoint(8);
-    connect(point8, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point8 = new SchedulePoint(8);
+    connect(point8, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point8, SLOT(updateUnit()));
     showPoint(point8);
     pointList.append(point8);
-    point9 = new schedulepoint(9);
-    connect(point9, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point9 = new SchedulePoint(9);
+    connect(point9, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point9, SLOT(updateUnit()));
     showPoint(point9);
     pointList.append(point9);
-    point10 = new schedulepoint(10);
-    connect(point10, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point10 = new SchedulePoint(10);
+    connect(point10, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point10, SLOT(updateUnit()));
     showPoint(point10);
     pointList.append(point10);
-    point11 = new schedulepoint(11);
-    connect(point11, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point11 = new SchedulePoint(11);
+    connect(point11, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point11, SLOT(updateUnit()));
     showPoint(point11);
     pointList.append(point11);
-    point12 = new schedulepoint(12);
-    connect(point12, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point12 = new SchedulePoint(12);
+    connect(point12, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point12, SLOT(updateUnit()));
     showPoint(point12);
     pointList.append(point12);
-    point13 = new schedulepoint(13);
-    connect(point13, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point13 = new SchedulePoint(13);
+    connect(point13, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point13, SLOT(updateUnit()));
     showPoint(point13);
     pointList.append(point13);
-    point14 = new schedulepoint(14);
-    connect(point14, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point14 = new SchedulePoint(14);
+    connect(point14, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point14, SLOT(updateUnit()));
     showPoint(point14);
     pointList.append(point14);
-    point15 = new schedulepoint(15);
-    connect(point15, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point15 = new SchedulePoint(15);
+    connect(point15, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point15, SLOT(updateUnit()));
     showPoint(point15);
     pointList.append(point15);
-    point16 = new schedulepoint(16);
-    connect(point16, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point16 = new SchedulePoint(16);
+    connect(point16, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point16, SLOT(updateUnit()));
     showPoint(point16);
     pointList.append(point16);
-    point17 = new schedulepoint(17);
-    connect(point17, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point17 = new SchedulePoint(17);
+    connect(point17, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point17, SLOT(updateUnit()));
     showPoint(point17);
     pointList.append(point17);
-    point18 = new schedulepoint(18);
-    connect(point18, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point18 = new SchedulePoint(18);
+    connect(point18, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point18, SLOT(updateUnit()));
     showPoint(point18);
     pointList.append(point18);
-    point19 = new schedulepoint(19);
-    connect(point19, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point19 = new SchedulePoint(19);
+    connect(point19, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point19, SLOT(updateUnit()));
     showPoint(point19);
     pointList.append(point19);
-    point20 = new schedulepoint(20);
-    connect(point20, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point20 = new SchedulePoint(20);
+    connect(point20, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point20, SLOT(updateUnit()));
     showPoint(point20);
     pointList.append(point20);
-    point21 = new schedulepoint(21);
-    connect(point21, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point21 = new SchedulePoint(21);
+    connect(point21, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point21, SLOT(updateUnit()));
     showPoint(point21);
     pointList.append(point21);
-    point22 = new schedulepoint(22);
-    connect(point22, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point22 = new SchedulePoint(22);
+    connect(point22, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point22, SLOT(updateUnit()));
     showPoint(point22);
     pointList.append(point22);
-    point23 = new schedulepoint(23);
-    connect(point23, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point23 = new SchedulePoint(23);
+    connect(point23, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point23, SLOT(updateUnit()));
     showPoint(point23);
     pointList.append(point23);
-    point24 = new schedulepoint(24);
-    connect(point24, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point24 = new SchedulePoint(24);
+    connect(point24, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point24, SLOT(updateUnit()));
     showPoint(point24);
     pointList.append(point24);
-    point25 = new schedulepoint(25);
-    connect(point25, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point25 = new SchedulePoint(25);
+    connect(point25, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point25, SLOT(updateUnit()));
     showPoint(point25);
     pointList.append(point25);
-    point26 = new schedulepoint(26);
-    connect(point26, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point26 = new SchedulePoint(26);
+    connect(point26, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point26, SLOT(updateUnit()));
     showPoint(point26);
     pointList.append(point26);
-    point27 = new schedulepoint(27);
-    connect(point27, SIGNAL(clicked(schedulepoint *)), this, SLOT(showButtons(schedulepoint *)));
+    point27 = new SchedulePoint(27);
+    connect(point27, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
     connect(this, SIGNAL(valueChanged()), point27, SLOT(updateUnit()));
     showPoint(point27);
     pointList.append(point27);
@@ -301,7 +301,7 @@ void schedulescreen::addSchedulePoints()
 
 }
 
-void schedulescreen::showPoint(schedulepoint *point)
+void ScheduleScreen::showPoint(SchedulePoint *point)
 {
     // show point based on unique ID
     point->setPos(QPoint(35.025 + (85 * (point->getID() % 4)),
@@ -309,7 +309,7 @@ void schedulescreen::showPoint(schedulepoint *point)
     scene->addItem(point);
 }
 
-void schedulescreen::shiftLeft()
+void ScheduleScreen::shiftLeft()
 {
     // shift buttons left and shift visible points left in this column unless
     // left edge of graphics view has been reached
@@ -327,7 +327,7 @@ void schedulescreen::shiftLeft()
 
 }
 
-void schedulescreen::shiftRight()
+void ScheduleScreen::shiftRight()
 {
     // shift buttons right and shift visible points right in this column unless
     // right edge of graphics view has been reached
@@ -345,49 +345,49 @@ void schedulescreen::shiftRight()
 
 }
 
-void schedulescreen::shiftButtonsLeft()
+void ScheduleScreen::shiftButtonsLeft()
 {
     // shift all 4 arrow buttons left
     shiftVerticalButtonsLeft();
     shiftHorizontalButtonsLeft();
 }
 
-void schedulescreen::shiftButtonsRight()
+void ScheduleScreen::shiftButtonsRight()
 {
     // shift all 4 arrow buttons right
     shiftVerticalButtonsRight();
     shiftHorizontalButtonsRight();
 }
 
-void schedulescreen::shiftVerticalButtonsRight()
+void ScheduleScreen::shiftVerticalButtonsRight()
 {
     // shift up and down buttons right
     proxyUpButton->moveBy(3.4,0);
     proxyDownButton->moveBy(3.4,0);
 }
 
-void schedulescreen::shiftVerticalButtonsLeft()
+void ScheduleScreen::shiftVerticalButtonsLeft()
 {
     // shift up and down buttons left
     proxyUpButton->moveBy(-3.4,0);
     proxyDownButton->moveBy(-3.4,0);
 }
 
-void schedulescreen::shiftHorizontalButtonsRight()
+void ScheduleScreen::shiftHorizontalButtonsRight()
 {
     // shift left and right buttons right
     proxyLeftButton->moveBy(3.4,0);
     proxyRightButton->moveBy(3.4,0);
 }
 
-void schedulescreen::shiftHorizontalButtonsLeft()
+void ScheduleScreen::shiftHorizontalButtonsLeft()
 {
     // shift left and right buttons left
     proxyLeftButton->moveBy(-3.4,0);
     proxyRightButton->moveBy(-3.4,0);
 }
 
-void schedulescreen::increaseTemp()
+void ScheduleScreen::increaseTemp()
 {
     // increase temp of all visible buttons in this colummn
     for(int i=0; i<7; i++) {
@@ -397,7 +397,7 @@ void schedulescreen::increaseTemp()
     }
 }
 
-void schedulescreen::decreaseTemp()
+void ScheduleScreen::decreaseTemp()
 {
     // decrease temp of all visible buttons in this column
     for(int i=0; i<7; i++) {
@@ -407,7 +407,7 @@ void schedulescreen::decreaseTemp()
     }
 }
 
-void schedulescreen::showButtons(schedulepoint *point)
+void ScheduleScreen::showButtons(SchedulePoint *point)
 {
     // show left, right, up, and down buttons in correct position for any input conditions
     int i;
@@ -505,7 +505,7 @@ void schedulescreen::showButtons(schedulepoint *point)
 
 }
 
-void schedulescreen::hideButtons()
+void ScheduleScreen::hideButtons()
 {
     // hide up, down, left, and right buttons
     proxyLeftButton->hide();
@@ -515,7 +515,7 @@ void schedulescreen::hideButtons()
 
 }
 
-void schedulescreen::hidePoints()
+void ScheduleScreen::hidePoints()
 {
     // hide all points
     for(int i=0; i<28; i++) {
@@ -525,7 +525,7 @@ void schedulescreen::hidePoints()
 
 }
 
-void schedulescreen::showPoints(int)
+void ScheduleScreen::showPoints(int)
 {
     // first hide everything
     hidePoints();
@@ -578,7 +578,7 @@ void schedulescreen::showPoints(int)
 
 }
 
-void schedulescreen::blur()
+void ScheduleScreen::blur()
 {
     // add blur to all points outside the current column
     for(int i=0; i<28; i++) {
@@ -591,7 +591,7 @@ void schedulescreen::blur()
     }
 }
 
-void schedulescreen::mousePressEvent(QMouseEvent * /* event */)
+void ScheduleScreen::mousePressEvent(QMouseEvent * /* event */)
 {
     // provide event handler for whole screen, so that user can click off a
     // a column and have all points be displayed
@@ -599,7 +599,7 @@ void schedulescreen::mousePressEvent(QMouseEvent * /* event */)
 
 }
 
-void schedulescreen::removeAllBlur()
+void ScheduleScreen::removeAllBlur()
 {
     // display all points by removing all blur
     for(int i=0; i<28; i++) {

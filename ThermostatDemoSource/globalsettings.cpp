@@ -1,5 +1,6 @@
 #include "globalsettings.h"
 
+#include <QFileInfo>
 #include <QSettings>
 #include <QtDebug>
 
@@ -21,13 +22,13 @@ GlobalSettings* GlobalSettings::getInstance()
     if(m_instance == NULL)
     {
         m_instance = new GlobalSettings;
-        m_instance->readFromFile();
+        m_instance->load();
     }
 
     return m_instance;
 }
 
-bool GlobalSettings::writeToFile()
+bool GlobalSettings::save()
 {
     QSettings settingsObject("ti", "thermostat");
 
@@ -39,7 +40,7 @@ bool GlobalSettings::writeToFile()
 
 }
 
-bool GlobalSettings::readFromFile()
+bool GlobalSettings::load()
 {
     QSettings settingsObject("ti", "thermostat");
 
@@ -47,6 +48,7 @@ bool GlobalSettings::readFromFile()
     setCurrentCity(settingsObject.value("current-city", "Dallas,TX").toString());
     setTemperatureFormat(static_cast<GlobalSettings::TemperatureFormat>(settingsObject.value("temperature-format", GlobalSettings::TempFormatF).toInt()));
     setTimeFormat(static_cast<GlobalSettings::TimeFormat>(settingsObject.value("time-format", GlobalSettings::TimeFormat12h).toInt()));
+    setDataPath(QFileInfo(settingsObject.fileName()).absolutePath());
 
     qDebug() << "Settings loaded...";
     qDebug() << proxyHost();
@@ -100,4 +102,14 @@ void GlobalSettings::setTimeFormat(TimeFormat timeFormat)
 GlobalSettings::TimeFormat GlobalSettings::timeFormat()
 {
     return m_timeFormat;
+}
+
+void GlobalSettings::setDataPath(QString dataPath)
+{
+    m_dataPath = dataPath;
+}
+
+QString GlobalSettings::dataPath()
+{
+    return m_dataPath;
 }

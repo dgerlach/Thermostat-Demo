@@ -1,6 +1,6 @@
 #include "weatherwidget.h"
 
-weatherwidget::weatherwidget(QWidget *parent) :
+WeatherWidget::WeatherWidget(QWidget *parent) :
         QWidget(parent)
 {
     // set initial clock time in case no web access
@@ -80,6 +80,7 @@ weatherwidget::weatherwidget(QWidget *parent) :
     statusMovie = new QMovie(":/Images/ajax-loader.gif");
     statusMovieLabel->setMovie(statusMovie);
     statusLabel = new QLabel("Connecting...");
+    statusLabel->setObjectName("statusLabel");
     statusMovie->start();
     QHBoxLayout *statusLayout = new QHBoxLayout;
     statusLayout->addWidget(statusMovieLabel);
@@ -98,21 +99,21 @@ weatherwidget::weatherwidget(QWidget *parent) :
 
 }
 
-void weatherwidget::setCurrentTemp(QString temperature)
+void WeatherWidget::setCurrentTemp(QString temperature)
 {
     // provide text for current temp label
     currentTemp->setText(temperature + "°");
 
 }
 
-QString weatherwidget::getCurrentTemp()
+QString WeatherWidget::getCurrentTemp()
 {
     // return current temp string
     return currentTemp->text();
 
 }
 
-void weatherwidget::setCurrentIcon(QString icon)
+void WeatherWidget::setCurrentIcon(QString icon)
 {
     // set icon for current weather conditions
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
@@ -195,7 +196,7 @@ void weatherwidget::setCurrentIcon(QString icon)
 
 }
 
-void weatherwidget::setDay1Icon(QString icon)
+void WeatherWidget::setDay1Icon(QString icon)
 {
     // set icon for day 1 of forecast
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
@@ -253,7 +254,7 @@ void weatherwidget::setDay1Icon(QString icon)
 
 }
 
-void weatherwidget::setDay2Icon(QString icon)
+void WeatherWidget::setDay2Icon(QString icon)
 {
     // set icon for day 2 of forecast
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
@@ -312,7 +313,7 @@ void weatherwidget::setDay2Icon(QString icon)
 
 }
 
-void weatherwidget::setDay3Icon(QString icon)
+void WeatherWidget::setDay3Icon(QString icon)
 {
     // set icon for day 3 of forecast
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
@@ -370,97 +371,97 @@ void weatherwidget::setDay3Icon(QString icon)
 
 }
 
-void weatherwidget::setDay1(QString day)
+void WeatherWidget::setDay1(QString day)
 {
     // set day 1 abbreviation (i.e. Wed)
     day1Label->setText(day);
 }
 
-void weatherwidget::setDay2(QString day)
+void WeatherWidget::setDay2(QString day)
 {
     // set day 2 abbreviation
     day2Label->setText(day);
 }
 
-void weatherwidget::setDay3(QString day)
+void WeatherWidget::setDay3(QString day)
 {
     // set day 3 abbreviation
     day3Label->setText(day);
 }
 
-void weatherwidget::setDay1High(QString high)
+void WeatherWidget::setDay1High(QString high)
 {
     // set day 1 high
     day1High->setText(high + "°");
 }
 
-void weatherwidget::setDay2High(QString high)
+void WeatherWidget::setDay2High(QString high)
 {
     // set day 2 high
     day2High->setText(high + "°");
 }
 
-void weatherwidget::setDay3High(QString high)
+void WeatherWidget::setDay3High(QString high)
 {
     // set day 3 high
     day3High->setText(high + "°");
 }
 
-void weatherwidget::setDay1Low(QString low)
+void WeatherWidget::setDay1Low(QString low)
 {
     // set day 1 low
     day1Low->setText(low + "°");
 }
 
-void weatherwidget::setDay2Low(QString low)
+void WeatherWidget::setDay2Low(QString low)
 {
     // set day 2 low
     day2Low->setText(low + "°");
 }
 
-void weatherwidget::setDay3Low(QString low)
+void WeatherWidget::setDay3Low(QString low)
 {
     // set day 3 low
     day3Low->setText(low + "°");
 }
 
-QString weatherwidget::getDay1High()
+QString WeatherWidget::getDay1High()
 {
     // return day 1 high
     return day1High->text();
 }
 
-QString weatherwidget::getDay2High()
+QString WeatherWidget::getDay2High()
 {
     // return day 2 high
     return day2High->text();
 }
 
-QString weatherwidget::getDay3High()
+QString WeatherWidget::getDay3High()
 {
     // return day 3 high
     return day3High->text();
 }
 
-QString weatherwidget::getDay1Low()
+QString WeatherWidget::getDay1Low()
 {
     // return day 1 low
     return day1Low->text();
 }
 
-QString weatherwidget::getDay2Low()
+QString WeatherWidget::getDay2Low()
 {
     // return day 2 low
     return day2Low->text();
 }
 
-QString weatherwidget::getDay3Low()
+QString WeatherWidget::getDay3Low()
 {
     // return day 3 low
     return day3Low->text();
 }
 
-void weatherwidget::setCity(QString city)
+void WeatherWidget::setCity(QString city)
 {
     // set city from string passed form setting screen
     // format city string correctly to display properly
@@ -503,28 +504,29 @@ void weatherwidget::setCity(QString city)
 
 }
 
-void weatherwidget::setClock(QTime webClock)
+void WeatherWidget::setClock(QTime webClock)
 {
     // set clock that is used to display night icons
     *clock = webClock;
 }
 
 
-void weatherwidget::setStatusUpdated()
+void WeatherWidget::setStatusUpdated()
 {
-    statusMovie->stop();
     statusMovieLabel->setVisible(false);
+    statusMovie->stop();
     statusLabel->setText("Updated");
 }
 
-void weatherwidget::setStatusUpdating()
+void WeatherWidget::setStatusUpdating()
 {
     //statusMovie->setFileName(":/Images/ajax-loader.gif");
+    statusMovieLabel->setVisible(true);
     statusMovie->start();
     statusLabel->setText("Updating...");
 }
 
-void weatherwidget::setStatusFailed()
+void WeatherWidget::setStatusFailed()
 {
     statusMovie->stop();
     statusMovieLabel->setVisible(false);

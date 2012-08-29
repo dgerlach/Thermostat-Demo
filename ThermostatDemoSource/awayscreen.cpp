@@ -3,7 +3,7 @@
 #include "settingscreen.h"
 #include "globalsettings.h"
 
-awayscreen::awayscreen(QWidget *parent) :
+AwayScreen::AwayScreen(QWidget *parent) :
     QWidget(parent)
 {
     // the away screen provides the user an AWAY MODE with the tap of a button
@@ -26,9 +26,9 @@ awayscreen::awayscreen(QWidget *parent) :
     ecoLabel->setObjectName("ecoLabel");
     ecoLabel->setAlignment(Qt::AlignTop);
 
-    // provides current temp - same value as listed in mainwindow adjust dynamically
+    // provides current temp - same value as listed in MainWindow adjust dynamically
     currentTempLabel = new QLabel;
-    currentTempLabel->setText(QString::number(thermostatwidget::currentTempStatic)+"°");
+    currentTempLabel->setText(QString::number(ThermostatWidget::currentTempStatic)+"°");
     currentTempLabel->setAlignment(Qt::AlignHCenter);
     currentTempLabel->setObjectName("currentTemp");
     currentTempLabel->setMargin(0);
@@ -107,14 +107,14 @@ awayscreen::awayscreen(QWidget *parent) :
     setLayout(mainLayout);
 }
 
-void awayscreen::updateCurrentTemp()
+void AwayScreen::updateCurrentTemp()
 {
     // updates current temp in away screen based on current temp in main window
     // connects to 10 second update timer within thermostat widget
-    currentTempLabel->setText(QString::number(thermostatwidget::currentTempStatic)+"°");
+    currentTempLabel->setText(QString::number(ThermostatWidget::currentTempStatic)+"°");
 }
 
-void awayscreen::updateUnit()
+void AwayScreen::updateUnit()
 {
     // provides for Fahrenheit/Celsius conversion
     int FInt, CInt;

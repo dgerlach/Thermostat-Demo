@@ -4,11 +4,11 @@
 #include <QtGui>
 #include "schedulepoint.h"
 
-class schedulescreen : public QWidget
+class ScheduleScreen : public QWidget
 {
     Q_OBJECT
 public:
-    explicit schedulescreen(QWidget *parent = 0);
+    explicit ScheduleScreen(QWidget *parent = 0);
     
 signals:
     void valueChanged();
@@ -19,7 +19,7 @@ public slots:
     void shiftRight();
     void increaseTemp();
     void decreaseTemp();
-    void showButtons(schedulepoint *);
+    void showButtons(SchedulePoint *);
     void showPoints(int);
     void removeAllBlur();
 
@@ -40,37 +40,37 @@ private:
     QGraphicsProxyWidget *proxyRightButton;
     QGraphicsProxyWidget *proxyUpButton;
     QGraphicsProxyWidget *proxyDownButton;
-    QList <schedulepoint *> pointList;
-    schedulepoint *point0;
-    schedulepoint *point1;
-    schedulepoint *point2;
-    schedulepoint *point3;
-    schedulepoint *point4;
-    schedulepoint *point5;
-    schedulepoint *point6;
-    schedulepoint *point7;
-    schedulepoint *point8;
-    schedulepoint *point9;
-    schedulepoint *point10;
-    schedulepoint *point11;
-    schedulepoint *point12;
-    schedulepoint *point13;
-    schedulepoint *point14;
-    schedulepoint *point15;
-    schedulepoint *point16;
-    schedulepoint *point17;
-    schedulepoint *point18;
-    schedulepoint *point19;
-    schedulepoint *point20;
-    schedulepoint *point21;
-    schedulepoint *point22;
-    schedulepoint *point23;
-    schedulepoint *point24;
-    schedulepoint *point25;
-    schedulepoint *point26;
-    schedulepoint *point27;
-    schedulepoint *currentPoint;
-    void showPoint(schedulepoint *);
+    QList <SchedulePoint *> pointList;
+    SchedulePoint *point0;
+    SchedulePoint *point1;
+    SchedulePoint *point2;
+    SchedulePoint *point3;
+    SchedulePoint *point4;
+    SchedulePoint *point5;
+    SchedulePoint *point6;
+    SchedulePoint *point7;
+    SchedulePoint *point8;
+    SchedulePoint *point9;
+    SchedulePoint *point10;
+    SchedulePoint *point11;
+    SchedulePoint *point12;
+    SchedulePoint *point13;
+    SchedulePoint *point14;
+    SchedulePoint *point15;
+    SchedulePoint *point16;
+    SchedulePoint *point17;
+    SchedulePoint *point18;
+    SchedulePoint *point19;
+    SchedulePoint *point20;
+    SchedulePoint *point21;
+    SchedulePoint *point22;
+    SchedulePoint *point23;
+    SchedulePoint *point24;
+    SchedulePoint *point25;
+    SchedulePoint *point26;
+    SchedulePoint *point27;
+    SchedulePoint *currentPoint;
+    void showPoint(SchedulePoint *);
     void hidePoints();
     void hideButtons();
     void shiftVerticalButtonsLeft();

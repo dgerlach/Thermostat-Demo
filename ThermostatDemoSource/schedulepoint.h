@@ -9,11 +9,11 @@
 
 class GlobalSettings;
 
-class schedulepoint : public QObject, public QGraphicsItem {
+class SchedulePoint : public QObject, public QGraphicsItem {
     Q_OBJECT
 public:
-    explicit schedulepoint(int);
-    ~schedulepoint();
+    explicit SchedulePoint(int);
+    ~SchedulePoint();
     void setText(const QString &text);
     QRectF boundingRect() const;
     QPainterPath shape() const;
@@ -48,7 +48,7 @@ private:
     GlobalSettings* m_globalSettings;
     
 signals:
-    void clicked(schedulepoint *);
+    void clicked(SchedulePoint *);
 
 
     

@@ -6,11 +6,11 @@
 #include "schedulescreen.h"
 #include "settingscreen.h"
 
-class optionswidget : public QWidget
+class OptionsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit optionswidget(QWidget *parent = 0);
+    explicit OptionsWidget(QWidget *parent = 0);
     
 signals:
     void valueChanged();
@@ -23,9 +23,9 @@ private:
     QPushButton *settingsButton;
     QPushButton *calendarButton;
     QPushButton *awayButton;
-    awayscreen *awayScreen;
-    schedulescreen *scheduleScreen;
-    settingscreen *settingScreen;
+    AwayScreen *awayScreen;
+    ScheduleScreen *scheduleScreen;
+    SettingScreen *settingScreen;
 };
 
 #endif // OPTIONSWIDGET_H

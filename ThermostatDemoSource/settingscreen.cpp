@@ -1,10 +1,11 @@
 #include "settingscreen.h"
 #include "mainwindow.h"
 #include "globalsettings.h"
+#include "qkeyboardlineedit.h"
 
 #include <QtGui>
 
-settingscreen::settingscreen(QWidget *parent) :
+SettingScreen::SettingScreen(QWidget *parent) :
     QWidget(parent)
 {
     m_globalSettings = GlobalSettings::getInstance();
@@ -13,7 +14,7 @@ settingscreen::settingscreen(QWidget *parent) :
     QLabel *title = new QLabel("Select your CURRENT SETTINGS");
 
     // create return button
-    QPushButton *backButton = new QPushButton();
+    QPushButton *backButton = new QPushButton((this));
     backButton->setIcon(QIcon(":/Images/glossy-blue-orb-icon-arrowback.png"));
     backButton->setIconSize(QSize(40,40));
     backButton->setFocusPolicy(Qt::NoFocus);
@@ -21,7 +22,7 @@ settingscreen::settingscreen(QWidget *parent) :
     connect(backButton,SIGNAL(clicked()),this,SLOT(close()));
 
     // create button to select Fahrenheit
-    FButton = new QPushButton("°F");
+    FButton = new QPushButton("°F", (this));
     FButton->setObjectName("FButton");
     FButton->setCheckable(true);
     FButton->setChecked(true);
@@ -29,7 +30,7 @@ settingscreen::settingscreen(QWidget *parent) :
     connect(FButton, SIGNAL(clicked()), this, SLOT(unitIsF()));
 
     // create button to select Celsius
-    CButton = new QPushButton("°C");
+    CButton = new QPushButton("°C", (this));
     CButton->setObjectName("CButton");
     CButton->setCheckable(true);
     CButton->setFocusPolicy(Qt::NoFocus);
@@ -67,7 +68,7 @@ settingscreen::settingscreen(QWidget *parent) :
     connect(cityBox, SIGNAL(activated(QString)), this, SLOT(changeCity(QString)));
 
     // create city label
-    QLabel *cityLabel = new QLabel("City: ");
+    QLabel *cityLabel = new QLabel("City: ", (this));
 
     // create layout
     QHBoxLayout *unitLayout = new QHBoxLayout;
@@ -103,7 +104,7 @@ settingscreen::settingscreen(QWidget *parent) :
     setLayout(mainLayout);
 }
 
-void settingscreen::unitIsF()
+void SettingScreen::unitIsF()
 {
     // mark F button as down and enable C button to be clicked
     CButton->setDisabled(false);
@@ -113,7 +114,7 @@ void settingscreen::unitIsF()
     FButton->setDisabled(true);
 }
 
-void settingscreen::unitIsC()
+void SettingScreen::unitIsC()
 {
     // mark C button as down and enable F button to be clicked
     FButton->setDisabled(false);
@@ -125,7 +126,7 @@ void settingscreen::unitIsC()
 
 }
 
-void settingscreen::changeCity(QString city)
+void SettingScreen::changeCity(QString city)
 {
     m_globalSettings->setCurrentCity(city);
     emit cityChanged(city);

@@ -12,8 +12,8 @@ public:
 
     static GlobalSettings* getInstance();
 
-    bool writeToFile();
-    bool readFromFile();
+    bool save();
+    bool load();
 
     void setProxyInfo(QString proxyHost, qint16 proxyPort);
     QString proxyHost();
@@ -28,6 +28,9 @@ public:
     void setTimeFormat(TimeFormat timeFormat);
     TimeFormat timeFormat();
 
+    void setDataPath(QString dataPath);
+    QString dataPath();
+
 private:
     GlobalSettings();
 
@@ -39,6 +42,7 @@ private:
 
     //app info
     QString m_currentCity;
+    QString m_dataPath;
 
     TemperatureFormat m_temperatureFormat;
     TimeFormat m_timeFormat;

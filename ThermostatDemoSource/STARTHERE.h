@@ -48,34 +48,34 @@
             This keyboard was looped in from another application and was
             not written by me personally.  It is the only part of the application
             that uses a .ui file created using Qt Designer.
-        - awayscreen: provides the screen that defines the thermostat's function
+        - AwayScreen: provides the screen that defines the thermostat's function
             when in AWAY MODE
-        - mainwindow: this base class provides the main screen. It acts as a
-            container for the themostatwidget, weatherwidget, and optionswidget
+        - MainWindow: this base class provides the main screen. It acts as a
+            container for the themostatwidget, WeatherWidget, and OptionsWidget
         - openingscreen: provides the initial setup dialog.  It asks for internet
             and proxy settings.  If a proxy is required, control is passed to
             the proxysetupdialog class.  If not, control is passed straight to
             the mainwindow
         - proxysetupdialog: this class allows the user to enter proxy information
             if necessary
-        - optionswidget: this class provides a container for the 3 options buttons
-            allowing the user to pass control to the awayscreen, schedulescreen,
-            or settingscreen
-        - schedulescreen: this is by far the most complex class. It is the only
+        - OptionsWidget: this class provides a container for the 3 options buttons
+            allowing the user to pass control to the AwayScreen, ScheduleScreen,
+            or SettingScreen
+        - ScheduleScreen: this is by far the most complex class. It is the only
             one which implements a graphics view in the place of traditional
             widgets.  It allows the user to set a weekly schedule
-        - settingscreen: this class allows the user to pick between a set of
+        - SettingScreen: this class allows the user to pick between a set of
             predefined cities across the world and alternate between Celsius
             and Fahrenheit
-        - schedulepoint: this class defines each of the 28 individual time points
-            within the schedulescreen.  It is the only class derived from a
+        - SchedulePoint: this class defines each of the 28 individual time points
+            within the ScheduleScreen.  It is the only class derived from a
             graphics item rather than a widget
-        - thermostatwidget: this class provides the widget that allows the user
+        - ThermostatWidget: this class provides the widget that allows the user
             to change the setpoint temperature and monitors the current indoor
             temperature
-        - weatherwidget: this class provides the current outdoor temperature and
+        - WeatherWidget: this class provides the current outdoor temperature and
             weather conditions along with a 3 day forecast
-        - webdata: this class is the only one that does not provide a ui element.
+        - WebData: this class is the only one that does not provide a ui element.
             This class is reponsible for providing the underlying web functionality
   More information can be found within each class definition.
 
@@ -99,16 +99,16 @@
             size leaving lots of open space on larger screens.  A mechanism should
             be provided that allows the widgets to grow and shrink with the screen
             size
-        - add 24 hour time option to settingscreen: just as the user can alternate
+        - add 24 hour time option to SettingScreen: just as the user can alternate
             between Celsius and Fahrenheit, he or she should be able to change to a
             24 hour clock.  This is more difficult than it sounds.  Before trying to
             do this, study the way the C/F shift is implemented.  It requires
             communication between several classes and will also require exploring
             the QTime API
         - have temperature buttons change colors: an easy way to get introduced to
-            using Qt graphics would be to provide a function within schedulepoint
+            using Qt graphics would be to provide a function within SchedulePoint
             that causes the points to get more red as the set temperature is
             increased and more blue as it is decreased
-        - add functionality to buttons at bottom of mainwindow (i.e. have energy
+        - add functionality to buttons at bottom of MainWindow (i.e. have energy
             Button pop up a screen with a dial that shows current consumption)
 

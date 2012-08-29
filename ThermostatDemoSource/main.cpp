@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     app.setStyleSheet(file.readAll());
 
     // create opening dialog for internet and proxy settings
-    mainwindow *w = new mainwindow;
+    MainWindow *w = new MainWindow;
     w->showFullScreen();
 
     // enter application loop

@@ -5,11 +5,11 @@
 
 class GlobalSettings;
 
-class settingscreen : public QWidget
+class SettingScreen : public QWidget
 {
     Q_OBJECT
 public:
-    explicit settingscreen(QWidget *parent = 0);
+    explicit SettingScreen(QWidget *parent = 0);
     static bool unit;
     
 signals:

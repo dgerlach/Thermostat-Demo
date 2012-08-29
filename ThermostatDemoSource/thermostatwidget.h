@@ -5,11 +5,11 @@
 
 class GlobalSettings;
 
-class thermostatwidget : public QWidget
+class ThermostatWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit thermostatwidget(QWidget *parent = 0);
+    explicit ThermostatWidget(QWidget *parent = 0);
     static int currentTempStatic;
     QLabel *currentTemp;
 

@@ -7,11 +7,11 @@
 
 class QLabel;
 
-class weatherwidget : public QWidget
+class WeatherWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit weatherwidget(QWidget *parent = 0);
+    explicit WeatherWidget(QWidget *parent = 0);
     void setCurrentTemp(QString);
     void setCurrentIcon(QString);
     void setDay1Icon(QString);
