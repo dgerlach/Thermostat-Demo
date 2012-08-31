@@ -22,7 +22,7 @@ public slots:
     void updateUnit();
     void changeCity(QString);
     void closeEvent(QCloseEvent *);
-    void getWebData();
+    void setWebData(WeatherData* weatherData);
     void webDataFailed();
 
 private:

@@ -4,6 +4,7 @@
 #include "optionswidget.h"
 #include "settingscreen.h"
 #include "globalsettings.h"
+#include "weatherdata.h"
 
 #include <QtGui>
 
@@ -25,24 +26,24 @@ MainWindow::MainWindow(QWidget *parent) :
     setStyleSheet("mainwindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");
 
     // remove cursor (i.e. mouse pointer) throughout application
-    qApp->setOverrideCursor( QCursor( Qt::BlankCursor ) );
+    //qApp->setOverrideCursor( QCursor( Qt::BlankCursor ) );
 
     // create weather widget
     weatherWidget = new WeatherWidget;
     weatherWidget->setObjectName("weatherWidget");
-    weatherWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+    weatherWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     weatherWidget->setAttribute(Qt::WA_StyledBackground,true);
 
     // create thermostat widget
     ThermostatWidget *thermostatWidget = new ThermostatWidget;
     thermostatWidget->setObjectName("thermostatWidget");
-    thermostatWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+    thermostatWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     thermostatWidget->setAttribute(Qt::WA_StyledBackground,true);
 
     // create options widget
     OptionsWidget *optionsWidget = new OptionsWidget;
     optionsWidget->setObjectName("optionsWidget");
-    optionsWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+    optionsWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     optionsWidget->setAttribute(Qt::WA_StyledBackground,true);
     // connect 10 second timer that causes current temp to follow setpoint to pass signal through options widget
     connect(thermostatWidget, SIGNAL(timeout()), optionsWidget, SIGNAL(currentTempChanged()));
@@ -80,21 +81,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create screen layout
     QVBoxLayout *leftLayout = new QVBoxLayout;
-    leftLayout->addStretch();
     leftLayout->addWidget(optionsWidget);
     leftLayout->addWidget(thermostatWidget);
-    leftLayout->addStretch();
-    leftLayout->setAlignment(optionsWidget,Qt::AlignCenter);
+    leftLayout->setStretchFactor(optionsWidget, 1);
+    leftLayout->setStretchFactor(thermostatWidget, 3);
+
 
     QHBoxLayout *middleLayout = new QHBoxLayout;
-    middleLayout->addStretch();
+    middleLayout->addSpacing(6);
     middleLayout->addLayout(leftLayout);
     middleLayout->addSpacing(6);
     middleLayout->addWidget(weatherWidget);
-    middleLayout->addStretch();
     middleLayout->addWidget(closeButton);
     middleLayout->addSpacing(6);
     middleLayout->setAlignment(closeButton,Qt::AlignTop);
+
+
 
     QHBoxLayout *bottomLayout = new QHBoxLayout;
     bottomLayout->addWidget(energyButton);
@@ -103,10 +105,21 @@ MainWindow::MainWindow(QWidget *parent) :
     bottomLayout->setSpacing(0);
     bottomLayout->setMargin(0);
 
+    QWidget *w = new QWidget;
+    w->setMaximumSize(800, 450);
+    w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    w->setLayout(middleLayout);
+    QHBoxLayout* box = new QHBoxLayout;
+    box->addWidget(w);
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(middleLayout);
+    mainLayout->addStretch(0);
+    mainLayout->addLayout(box);
+    mainLayout->setStretchFactor(box, 2);
+    mainLayout->addStretch(0);
     mainLayout->addLayout(bottomLayout);
-    mainLayout->setContentsMargins(0,6,0,0);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setAlignment(w,Qt::AlignCenter);
     mainLayout->setAlignment(bottomLayout,Qt::AlignBottom);
 
     // connect Celsius/Fahrenheit change signals
@@ -119,13 +132,17 @@ MainWindow::MainWindow(QWidget *parent) :
     // create web data object and set all dynamic properties based on web data
     webData = new WebData;
 
+    connect(webData, SIGNAL(dataAvailable(WeatherData*)), this, SLOT(setWebData(WeatherData*)));
+    connect(webData, SIGNAL(networkTimeout()), this, SLOT(webDataFailed()));
+
     //first set based on local cache so user sees something!
     webData->loadLocalData();
-    getWebData();
+
+    clock = QTime::currentTime();
 
     clockTimer = new QTimer(this);
     connect(clockTimer,SIGNAL(timeout()),this,SLOT(updateClock()));
-    clockTimer->start(60000); // makes the clock tick every 60 seconds
+    clockTimer->start(10000); // makes the clock tick every 60 seconds
 
     changeCity(m_globalSettings->currentCity());
 
@@ -157,7 +174,7 @@ void MainWindow::paintEvent(QPaintEvent *)
 void MainWindow::updateClock()
 {
     // make clock tick
-    clock = clock.addSecs(60);
+    clock = QTime::currentTime();
     timeButton->setText(clock.toString("h:mm AP"));
 
 }
@@ -234,155 +251,28 @@ void MainWindow::energySaving(bool setpointReached)
 
 void MainWindow::updateUnit()
 {
-    // provide Celius/Fahrenheit conversions for weather widget
-    int FInt, CInt;
-    float FFloat, CFloat;
-    QString FString, CString;
 
-    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {
-        // true means F
-        // we want Fahrenheit, but currently in Celsius
-        CString = weatherWidget->getCurrentTemp();
-        CString.chop(1);
-        CFloat = CString.toFloat();
-        FInt = (int)((CFloat*1.8)+32);
-        FString = QString::number(FInt);
-        weatherWidget->setCurrentTemp(FString);
-
-        CString = weatherWidget->getDay1Low();
-        CString.chop(1);
-        CFloat = CString.toFloat();
-        FInt = (int)((CFloat*1.8)+32);
-        FString = QString::number(FInt);
-        weatherWidget->setDay1Low(FString);
-
-        CString = weatherWidget->getDay2Low();
-        CString.chop(1);
-        CFloat = CString.toFloat();
-        FInt = (int)((CFloat*1.8)+32);
-        FString = QString::number(FInt);
-        weatherWidget->setDay2Low(FString);
-
-        CString = weatherWidget->getDay3Low();
-        CString.chop(1);
-        CFloat = CString.toFloat();
-        FInt = (int)((CFloat*1.8)+32);
-        FString = QString::number(FInt);
-        weatherWidget->setDay3Low(FString);
-
-        CString = weatherWidget->getDay1High();
-        CString.chop(1);
-        CFloat = CString.toFloat();
-        FInt = (int)((CFloat*1.8)+32);
-        FString = QString::number(FInt);
-        weatherWidget->setDay1High(FString);
-
-        CString = weatherWidget->getDay2High();
-        CString.chop(1);
-        CFloat = CString.toFloat();
-        FInt = (int)((CFloat*1.8)+32);
-        FString = QString::number(FInt);
-        weatherWidget->setDay2High(FString);
-
-        CString = weatherWidget->getDay3High();
-        CString.chop(1);
-        CFloat = CString.toFloat();
-        FInt = (int)((CFloat*1.8)+32);
-        FString = QString::number(FInt);
-        weatherWidget->setDay3High(FString);
-
-
-
-    } else {
-        // false means C
-        // we want Celsius, but currently in Fahrenheit
-        FString = weatherWidget->getCurrentTemp();
-        FString.chop(1); // removes degree symbol at end
-        FFloat = FString.toFloat();
-        CInt = (int)((FFloat - 32) * 5)/9;
-        CString = QString::number(CInt);
-        weatherWidget->setCurrentTemp(CString);
-
-        FString = weatherWidget->getDay1Low();
-        FString.chop(1); // removes degree symbol at end
-        FFloat = FString.toFloat();
-        CInt = (int)((FFloat - 32) * 5)/9;
-        CString = QString::number(CInt);
-        weatherWidget->setDay1Low(CString);
-
-        FString = weatherWidget->getDay2Low();
-        FString.chop(1); // removes degree symbol at end
-        FFloat = FString.toFloat();
-        CInt = (int)((FFloat - 32) * 5)/9;
-        CString = QString::number(CInt);
-        weatherWidget->setDay2Low(CString);
-
-        FString = weatherWidget->getDay3Low();
-        FString.chop(1); // removes degree symbol at end
-        FFloat = FString.toFloat();
-        CInt = (int)((FFloat - 32) * 5)/9;
-        CString = QString::number(CInt);
-        weatherWidget->setDay3Low(CString);
-
-        FString = weatherWidget->getDay1High();
-        FString.chop(1); // removes degree symbol at end
-        FFloat = FString.toFloat();
-        CInt = (int)((FFloat - 32) * 5)/9;
-        CString = QString::number(CInt);
-        weatherWidget->setDay1High(CString);
-
-        FString = weatherWidget->getDay2High();
-        FString.chop(1); // removes degree symbol at end
-        FFloat = FString.toFloat();
-        CInt = (int)((FFloat - 32) * 5)/9;
-        CString = QString::number(CInt);
-        weatherWidget->setDay2High(CString);
-
-        FString = weatherWidget->getDay3High();
-        FString.chop(1); // removes degree symbol at end
-        FFloat = FString.toFloat();
-        CInt = (int)((FFloat - 32) * 5)/9;
-        CString = QString::number(CInt);
-        weatherWidget->setDay3High(CString);
-    }
 }
 
 void MainWindow::changeCity(QString city)
 {
-    qDebug() << city;
     // get new city information and pass it to WebData to send
     // a new request and get updated information for that city
-    weatherWidget->setCity(city);
     weatherWidget->setStatusUpdating();
     webData->changeCity(city);
-    connect(webData, SIGNAL(dataAvailable()), this, SLOT(getWebData()));
-    connect(webData, SIGNAL(networkTimeout()), this, SLOT(webDataFailed()));
+
 }
 
-void MainWindow::getWebData()
+void MainWindow::setWebData(WeatherData* weatherData)
 {
-    // pull a new set of important web information
-    dateButton->setText(webData->date());
-    timeButton->setText(webData->time());
-    clock = webData->clockObject();
-
-    setBackground(webData->currentIcon());
-
-    weatherWidget->setClock(clock);
-    weatherWidget->setCurrentTemp(webData->temp());
-    weatherWidget->setCurrentIcon(webData->currentIcon());
-    weatherWidget->setDay1Icon(webData->day1Icon());
-    weatherWidget->setDay2Icon(webData->day2Icon());
-    weatherWidget->setDay3Icon(webData->day3Icon());
-    weatherWidget->setDay1(webData->day1());
-    weatherWidget->setDay2(webData->day2());
-    weatherWidget->setDay3(webData->day3());
-    weatherWidget->setDay1High(webData->day1High());
-    weatherWidget->setDay1Low(webData->day1Low());
-    weatherWidget->setDay2High(webData->day2High());
-    weatherWidget->setDay2Low(webData->day2Low());
-    weatherWidget->setDay3High(webData->day3High());
-    weatherWidget->setDay3Low(webData->day3Low());
+    //TODO: STUFF
+    if(!weatherData)
+    {
+        webDataFailed();
+        return;
+    }
+    setBackground(weatherData->icon());
+    weatherWidget->setWeatherData(weatherData);
     weatherWidget->setStatusUpdated();
 }
 

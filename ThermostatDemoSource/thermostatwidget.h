@@ -24,6 +24,7 @@ private slots:
     void increaseTemp();
     void decreaseTemp();
     void update();
+    void resizeEvent(QResizeEvent *);
 
 private:
     int currentTempInt;

@@ -22,7 +22,12 @@ SOURCES += main.cpp \
     keyboard/keyboard.cpp \
     settingscreen.cpp \
     globalsettings.cpp \
-    qkeyboardlineedit.cpp
+    qkeyboardlineedit.cpp \
+    weatherdata.cpp \
+    forecastdata.cpp \
+    forecastdatawidget.cpp \
+    utilities.cpp \
+    weatherdatawidget.cpp
 
 HEADERS  += \
     weatherwidget.h \
@@ -37,7 +42,12 @@ HEADERS  += \
     settingscreen.h \
     STARTHERE.h \
     globalsettings.h \
-    qkeyboardlineedit.h
+    qkeyboardlineedit.h \
+    weatherdata.h \
+    forecastdata.h \
+    forecastdatawidget.h \
+    utilities.h \
+    weatherdatawidget.h
 
 RESOURCES += \
     thermostatdemo.qrc

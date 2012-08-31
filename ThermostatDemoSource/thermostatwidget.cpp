@@ -23,6 +23,9 @@ ThermostatWidget::ThermostatWidget(QWidget *parent) :
     decreaseTempButton->setFocusPolicy(Qt::NoFocus);
 
     currentTemp->setObjectName("currentTemp");
+
+    currentTemp->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
     setpointTemp->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     increaseTempButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     decreaseTempButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -50,6 +53,13 @@ ThermostatWidget::ThermostatWidget(QWidget *parent) :
     connect(updateTimer, SIGNAL(timeout()), this, SIGNAL(timeout()));
     updateTimer->start(10000);
 
+}
+
+void ThermostatWidget::resizeEvent(QResizeEvent *e)
+{
+    //scale the temperature size
+    currentTemp->setStyleSheet("font-size:"+QString::number(this->size().height()/2)+"px");
+    e->accept();
 }
 
 void ThermostatWidget::increaseTemp()

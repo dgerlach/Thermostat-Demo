@@ -2,6 +2,9 @@
 #include "settingscreen.h"
 #include "globalsettings.h"
 
+#include "weatherdata.h"
+#include "forecastdata.h"
+
 #include <QtDebug>
 #include <QTime>
 
@@ -42,7 +45,6 @@ void WebData::responseReceived()
     if(reply->error() == QNetworkReply::NoError)
     {
         QByteArray xmlData = reply->readAll();
-        qDebug () << xmlData;
         writeToCache(&xmlData);
         parseXML(&xmlData);
     }
@@ -71,13 +73,7 @@ void WebData::loadLocalData()
 
 void WebData::parseXML(QByteArray* xmlData)
 {
-    // clear all previous data
-    currentDate.clear();
-    currentTime.clear();
-    forecastIconList.clear();
-    weekdayList.clear();
-    forecastTempList.clear();
-
+    WeatherData *weatherData = NULL;
     QBuffer xmlBuffer(xmlData);
 
     // create XML reader on the document held in reply
@@ -91,33 +87,32 @@ void WebData::parseXML(QByteArray* xmlData)
         reader.readNext();
         if (reader.isStartElement()) {
             QString name = reader.name().toString();
-            if (name == "local_time_rfc822") {
-                QString currentDateTime = reader.readElementText();
-                QStringList splitCurrentDateTime = currentDateTime.split(" ");
+            //qDebug() << name;
+            if (name == "current_observation") {
+                weatherData = parseWeatherData(reader);
+            }
+            else if (name == "simpleforecast") {
+                while(!reader.hasError() && !reader.atEnd())
+                {
+                    reader.readNext();
+                    name = reader.name().toString();
+                    if(name == "forecastday")
+                    {
 
-                for (int i = 0; i < 3; ++i) {
-                    currentDate.append(splitCurrentDateTime.at(i).toLocal8Bit().constData());
-                    currentDate.append(" ");
+
+                        ForecastData *forecastData = parseForecastData(reader);
+                        weatherData->addForecastDay(forecastData);
+                        qDebug() << "FORECAST";
+                        qDebug() << "day: " << forecastData->day();
+                        qDebug() << "high: " << forecastData->highTemp();
+                        qDebug() << "icon: " << forecastData->icon();
+                        qDebug() << "low: " << forecastData->lowTemp();
+
+                    }
+                    if(name == "simpleforecast" && reader.isEndElement())
+                        break;
                 }
-                currentTime.append(splitCurrentDateTime.at(4));
-                QStringList timeList = currentTime.split(":");
-                // create accurate QTime object
-                clock.setHMS(timeList.at(0).toInt(),timeList.at(1).toInt(),timeList.at(2).toInt());
 
-            }
-            else if (name == "temp_f") {
-                QString temp = reader.readElementText();
-                QStringList tempList = temp.split(".");
-                currentTemp = tempList.at(0);
-            }
-            else if (name == "icon") {
-                forecastIconList.append(reader.readElementText());
-            }
-            else if (name == "weekday_short") {
-                weekdayList.append(reader.readElementText());
-            }
-            else if (name == "fahrenheit") {
-                forecastTempList.append(reader.readElementText());
             }
         }
     }
@@ -129,8 +124,113 @@ void WebData::parseXML(QByteArray* xmlData)
         qDebug() << "Reached end of XML document" << endl;
     }
 
-    emit dataAvailable();
+    qDebug() << "DONE!";
+    qDebug() << weatherData->currentCity();
+    qDebug() << weatherData->currentTemp();
+    qDebug() << weatherData->icon();
+    qDebug() << weatherData->localTime().toString("ddd, dd MMM yyyy HH:mm:ss");
+
+
+    emit dataAvailable(weatherData);
     xmlBuffer.close();
+}
+
+WeatherData* WebData::parseWeatherData(QXmlStreamReader& reader)
+{
+    WeatherData *weatherData = new WeatherData;
+
+    while(!reader.hasError() && !reader.atEnd())
+    {
+        reader.readNext();
+        QString name = reader.name().toString();
+
+        if (name == "local_time_rfc822") {
+            QString rfc822TimeString = reader.readElementText();
+            int timezoneIndex = rfc822TimeString.lastIndexOf(" ");
+            QDateTime dateTime = QDateTime::fromString(rfc822TimeString.left(timezoneIndex), "ddd, dd MMM yyyy HH:mm:ss");
+            dateTime.setTimeSpec(Qt::OffsetFromUTC);
+            dateTime.setUtcOffset(rfc822TimeString.mid(timezoneIndex+1,2).toInt()*3600);
+            weatherData->setLocalTime(dateTime);
+
+        }
+        else if (name == "temp_f") {
+            //weird Qt thing, have to convert to float to avoid a zero then cast to int????
+            weatherData->setCurrentTemp((int)(reader.readElementText().toFloat()+0.5));
+        }
+        else if (name == "icon") {
+            weatherData->setIcon(reader.readElementText());
+        }
+        else if (name == "display_location") {
+            while(!reader.hasError() && !reader.atEnd())
+            {
+                reader.readNext();
+                name = reader.name().toString();
+                if(name == "full")
+                    weatherData->setCurrentCity(reader.readElementText());
+                if(name == "display_location" && reader.isEndElement())
+                    break;
+            }
+        }
+        else if(name == "current_observation" && reader.isEndElement())
+            break;
+    }
+
+    //set the current time so we know when this occurred
+    weatherData->setLastUpdated(QDateTime::currentDateTime());
+
+    return weatherData;
+}
+
+ForecastData* WebData::parseForecastData(QXmlStreamReader& reader)
+{
+    ForecastData *forecastData = new ForecastData;
+
+    while(!reader.hasError() && !reader.atEnd())
+    {
+        reader.readNext();
+        QString name = reader.name().toString();
+
+        if (name == "icon") {
+            forecastData->setIcon(reader.readElementText());
+        }
+        else if (name == "high") {
+            while(!reader.hasError() && !reader.atEnd())
+            {
+                reader.readNext();
+                name = reader.name().toString();
+                if(name == "fahrenheit")
+                    forecastData->setHighTemp((int)(reader.readElementText().toFloat()+0.5));
+                if(name == "high" && reader.isEndElement())
+                    break;
+            }
+        }
+        else if (name == "low") {
+            while(!reader.hasError() && !reader.atEnd())
+            {
+                reader.readNext();
+                name = reader.name().toString();
+                if(name == "fahrenheit")
+                    forecastData->setLowTemp((int)(reader.readElementText().toFloat()+0.5));
+                if(name == "low" && reader.isEndElement())
+                    break;
+            }
+        }
+        else if (name == "date") {
+            while(!reader.hasError() && !reader.atEnd())
+            {
+                reader.readNext();
+                name = reader.name().toString();
+                if(name == "weekday_short")
+                    forecastData->setDay(reader.readElementText());
+                if(name == "date" && reader.isEndElement())
+                    break;
+            }
+        }
+        else if(name == "forecastday" && reader.isEndElement())
+            break;
+    }
+
+    return forecastData;
 }
 
 //FUNCTION writeToCache
@@ -210,101 +310,6 @@ bool WebData::readFromCache(QByteArray *xmlData, QString alternateCacheFile)
     return true;
 }
 
-QString WebData::date()
-{
-    // return current date in provided city
-    return currentDate;
-}
-
-QString WebData::time()
-{
-    // return local time in provided city
-    return clock.toString("h:mm AP");
-}
-
-QString WebData::temp()
-{
-    // return current temp in Celsius or Fehrenheit
-    return unitConversion(currentTemp);
-}
-
-QString WebData::currentIcon()
-{
-    // return string for what current icon should be
-    return forecastIconList.at(0);
-}
-
-QString WebData::day1Icon()
-{
-    // return string for what day 1 icon should be
-    return forecastIconList.at(1);
-}
-
-QString WebData::day2Icon()
-{
-    // return string for what day 2 icon should be
-    return forecastIconList.at(3);
-}
-
-QString WebData::day3Icon()
-{
-    // return string for what day 3 icon should be
-    return forecastIconList.at(5);
-}
-
-QString WebData::day1()
-{
-    // return day 1 abbreviation (i.e. Wed)
-    return weekdayList.at(0);
-}
-
-QString WebData::day2()
-{
-    // return day 2 abbreviation
-    return weekdayList.at(1);
-}
-
-QString WebData::day3()
-{
-    // return day 3 abbreviation
-    return weekdayList.at(2);
-}
-
-QString WebData::day1High()
-{
-    // return day 1 high
-    return unitConversion(forecastTempList.at(0));
-}
-
-QString WebData::day1Low()
-{
-    // return day 1 low
-    return unitConversion(forecastTempList.at(1));
-}
-
-QString WebData::day2High()
-{
-    // return day 2 high
-    return unitConversion(forecastTempList.at(2));
-}
-
-QString WebData::day2Low()
-{
-    // return day 2 low
-    return unitConversion(forecastTempList.at(3));
-}
-
-QString WebData::day3High()
-{
-    // return day 3 high
-    return unitConversion(forecastTempList.at(4));
-}
-
-QString WebData::day3Low()
-{
-    // return day 3 low
-    return unitConversion(forecastTempList.at(5));
-}
 
 QTime WebData::clockObject()
 {

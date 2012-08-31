@@ -6,39 +6,24 @@
 #include <QUrl>
 
 class GlobalSettings;
+class ForecastData;
+class WeatherData;
 
 class WebData : public QObject
 {
     Q_OBJECT
 public:
     explicit WebData(QObject *parent = 0);
-    QString date();
-    QString time();
-    QString temp();
-    QString currentIcon();
-    QString day1Icon();
-    QString day2Icon();
-    QString day3Icon();
-    QString day1();
-    QString day2();
-    QString day3();
-    QString day1High();
-    QString day1Low();
-    QString day2High();
-    QString day2Low();
-    QString day3High();
-    QString day3Low();
     QTime clockObject();
 
     void changeCity(QString);
 
     bool writeToCache(QByteArray *xmlData);
     bool readFromCache(QByteArray *xmlData, QString alternateCacheFile = "");
-
     void loadLocalData();
     
 signals:
-    void dataAvailable();
+    void dataAvailable(WeatherData* weatherData);
     void networkTimeout();
     
 public slots:
@@ -49,6 +34,9 @@ private slots:
 
 
 private:
+    WeatherData* parseWeatherData(QXmlStreamReader& reader);
+    ForecastData* parseForecastData(QXmlStreamReader& reader);
+
     QNetworkAccessManager *manager;
     QNetworkRequest request;
     QNetworkReply *reply;
