@@ -2,6 +2,8 @@
 #include "thermostatwidget.h"
 #include "settingscreen.h"
 #include "globalsettings.h"
+#include "utilities.h"
+#include "mainwindow.h"
 
 AwayScreen::AwayScreen(QWidget *parent) :
     QWidget(parent)
@@ -10,7 +12,12 @@ AwayScreen::AwayScreen(QWidget *parent) :
     // it is meant to be used for long periods of away time (i.e. vacation)
     // it is called from the mainwindow
 
+    m_currentTemp = NULL;
+
     m_globalSettings = GlobalSettings::getInstance();
+
+    m_upperBound = 84;
+    m_lowerBound = 60;
 
     // title
     awayLabel = new QLabel("System is using energy saving AWAY MODE");
@@ -28,7 +35,7 @@ AwayScreen::AwayScreen(QWidget *parent) :
 
     // provides current temp - same value as listed in MainWindow adjust dynamically
     currentTempLabel = new QLabel;
-    currentTempLabel->setText(QString::number(ThermostatWidget::currentTempStatic)+"°");
+    currentTempLabel->setText("");
     currentTempLabel->setAlignment(Qt::AlignHCenter);
     currentTempLabel->setObjectName("currentTemp");
     currentTempLabel->setMargin(0);
@@ -47,13 +54,13 @@ AwayScreen::AwayScreen(QWidget *parent) :
 
     // upper bound control widget
     upperBound = new QSpinBox;
-    upperBound->setValue(84);
+    upperBound->setValue(m_upperBound);
     upperBound->setSuffix("°");
     upperBound->findChild<QLineEdit*>()->setReadOnly(true);
 
     // lower bound control widget
     lowerBound = new QSpinBox;
-    lowerBound->setValue(60);
+    lowerBound->setValue(m_lowerBound);
     lowerBound->setSuffix("°");
     lowerBound->findChild<QLineEdit*>()->setReadOnly(true);
 
@@ -111,37 +118,18 @@ void AwayScreen::updateCurrentTemp()
 {
     // updates current temp in away screen based on current temp in main window
     // connects to 10 second update timer within thermostat widget
-    currentTempLabel->setText(QString::number(ThermostatWidget::currentTempStatic)+"°");
+    currentTempLabel->setText(formatTemperatureString(*m_currentTemp, m_globalSettings->temperatureFormat()));
 }
 
 void AwayScreen::updateUnit()
 {
-    // provides for Fahrenheit/Celsius conversion
-    int FInt, CInt;
-    float FFloat, CFloat;
-    QString FString, CString;
+    upperBound->setValue(formatTemperature(m_upperBound, m_globalSettings->temperatureFormat()));
+    lowerBound->setValue(formatTemperature(m_lowerBound, m_globalSettings->temperatureFormat()));
 
-    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {
-        // true means F
-        // we want Fahrenheit, but currently in Celsius
-        CString = currentTempLabel->text();
-        CString.chop(1);  // removes degree symbol
-        CFloat = CString.toFloat();
-        FInt = (int)((CFloat*1.8)+32);
-        FString = QString::number(FInt);
-        currentTempLabel->setText(FString+"°");
-        lowerBound->setValue((lowerBound->value()*1.8)+32);
-        upperBound->setValue((upperBound->value()*1.8)+32);
-    } else {
-        // false means C
-        // we want Celsius, but currently in Fahrenheit
-        FString = currentTempLabel->text();
-        FString.chop(1);  // removes degree symbol
-        FFloat = FString.toFloat();
-        CInt = (int)(((FFloat - 32) * 5)/9);
-        CString = QString::number(CInt);
-        currentTempLabel->setText(CString+"°");
-        lowerBound->setValue(((lowerBound->value() - 32) * 5)/9);
-        upperBound->setValue(((upperBound->value() - 32) * 5)/9);
-    }
+    updateCurrentTemp();
+}
+
+void AwayScreen::setCurrentTempPtr(int *currentTempPointer)
+{
+    m_currentTemp = currentTempPointer;
 }

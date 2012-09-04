@@ -15,6 +15,7 @@ public:
 
 public slots:
     void updateUnit();
+    void setCurrentTempPtr(int * currentTemp);
     
 signals:
     void timeout();
@@ -27,7 +28,7 @@ private slots:
     void resizeEvent(QResizeEvent *);
 
 private:
-    int currentTempInt;
+    int *currentTempInt;
     int setpointTempInt;
     QLabel *setpointTemp;
     QPushButton *increaseTempButton;

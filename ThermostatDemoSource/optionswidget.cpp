@@ -3,6 +3,7 @@
 #include "thermostatwidget.h"
 #include "schedulescreen.h"
 #include "settingscreen.h"
+#include "mainwindow.h"
 
 OptionsWidget::OptionsWidget(QWidget *parent) :
     QWidget(parent)
@@ -48,6 +49,7 @@ OptionsWidget::OptionsWidget(QWidget *parent) :
     connect(awayButton,SIGNAL(clicked()),awayScreen,SLOT(showFullScreen()));
     connect(this, SIGNAL(currentTempChanged()), awayScreen, SLOT(updateCurrentTemp()));
     connect(settingScreen, SIGNAL(valueChanged()), awayScreen, SLOT(updateUnit()));
+
 
     // create layout
     QHBoxLayout *optionsLayout = new QHBoxLayout;

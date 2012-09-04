@@ -19,10 +19,12 @@ SettingScreen::SettingScreen(QWidget *parent) :
     backButton->setIconSize(QSize(40,40));
     backButton->setFocusPolicy(Qt::NoFocus);
     backButton->setObjectName("backButton");
-    connect(backButton,SIGNAL(clicked()),this,SLOT(close()));
+    connect(backButton,SIGNAL(clicked()),this,SLOT(commitChanges()));
+    connect(backButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
 
     // create button to select Fahrenheit
     FButton = new QPushButton("°F", (this));
+    //FButton->setMaximumWidth(150);
     FButton->setObjectName("FButton");
     FButton->setCheckable(true);
     FButton->setChecked(true);
@@ -31,6 +33,7 @@ SettingScreen::SettingScreen(QWidget *parent) :
 
     // create button to select Celsius
     CButton = new QPushButton("°C", (this));
+    //CButton->setMaximumWidth(150);
     CButton->setObjectName("CButton");
     CButton->setCheckable(true);
     CButton->setFocusPolicy(Qt::NoFocus);
@@ -58,11 +61,6 @@ SettingScreen::SettingScreen(QWidget *parent) :
     cityBox->addItem("Moscow,Russia");
     cityBox->addItem("Mexico City,Mexico");
     cityBox->addItem("Johannesburg,South Africa");
-
-    int index = cityBox->findText(m_globalSettings->currentCity());
-
-    if(index>-1)
-        cityBox->setCurrentIndex(index);
 
     // when city is changed, create chain of events to send to web request and update main screen
     connect(cityBox, SIGNAL(activated(QString)), this, SLOT(changeCity(QString)));
@@ -92,6 +90,20 @@ SettingScreen::SettingScreen(QWidget *parent) :
     topLayout->addStretch();
     topLayout->addWidget(backButton);
 
+    QLabel *m_proxyHostLabel = new QLabel("Proxy Host: ", this);
+    QLabel *m_proxyPortLabel = new QLabel("Proxy Port: ", this);
+    m_proxyHostLineEdit = new QKeyboardLineEdit;
+    m_proxyPortLineEdit = new QKeyboardLineEdit;
+    QFormLayout* proxyLayout = new QFormLayout;
+
+    proxyLayout->addRow(m_proxyHostLabel, m_proxyHostLineEdit);
+    proxyLayout->addRow(m_proxyPortLabel, m_proxyPortLineEdit);
+    m_proxyHostLineEdit->setMaximumWidth(300);
+    m_proxyPortLineEdit->setMaximumWidth(80);
+    proxyLayout->setFormAlignment(Qt::AlignCenter);
+
+
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(topLayout);
     mainLayout->addStretch();
@@ -99,10 +111,33 @@ SettingScreen::SettingScreen(QWidget *parent) :
     mainLayout->addStretch();
     mainLayout->addLayout(unitLayout);
     mainLayout->addStretch();
+    mainLayout->addLayout(proxyLayout);
+    mainLayout->setAlignment(proxyLayout, Qt::AlignCenter);
+    mainLayout->addStretch();
 
     // show layout
     setLayout(mainLayout);
+
+    //populate the current settings
+
+    int index = cityBox->findText(m_globalSettings->currentCity());
+    if(index>-1)
+        cityBox->setCurrentIndex(index);
+
+    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatC)
+        unitIsC();
+    else
+        unitIsF();
+
+    qDebug() << m_globalSettings->proxyHost();
+    m_proxyHostLineEdit->setText(m_globalSettings->proxyHost());
+
+    //to prevent a zero from showing up
+    if(QString::number(m_globalSettings->proxyPort()) != 0)
+        m_proxyPortLineEdit->setText(QString::number(m_globalSettings->proxyPort()));
 }
+
+
 
 void SettingScreen::unitIsF()
 {
@@ -111,6 +146,7 @@ void SettingScreen::unitIsF()
     // unit: true means F & false means C
     m_globalSettings->setTemperatureFormat(GlobalSettings::TempFormatF);
     CButton->setChecked(false);
+    FButton->setChecked(true);
     FButton->setDisabled(true);
 }
 
@@ -121,6 +157,7 @@ void SettingScreen::unitIsC()
     // unit: true means F & false means C
     m_globalSettings->setTemperatureFormat(GlobalSettings::TempFormatC);
     FButton->setChecked(false);
+    CButton->setChecked(true);
     CButton->setDisabled(true);
 
 
@@ -130,4 +167,10 @@ void SettingScreen::changeCity(QString city)
 {
     m_globalSettings->setCurrentCity(city);
     emit cityChanged(city);
+}
+
+void SettingScreen::commitChanges()
+{
+    m_globalSettings->setProxyInfo(m_proxyHostLineEdit->text(),m_proxyPortLineEdit->text().toInt());
+    close();
 }

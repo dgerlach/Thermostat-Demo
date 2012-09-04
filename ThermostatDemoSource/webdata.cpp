@@ -21,7 +21,7 @@ WebData::WebData(QObject *parent) :
 
 void WebData::configureProxy()
 {
-    // check and see if proxy settings are necessary
+    // check to see if proxy settings are necessary
     if(m_globalSettings->proxyHost() != "") {
         QNetworkProxy proxy;
         proxy.setType(QNetworkProxy::HttpProxy);
@@ -29,6 +29,8 @@ void WebData::configureProxy()
         proxy.setPort(m_globalSettings->proxyPort());
         manager->setProxy(proxy);
     }
+    else
+        manager->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
 }
 
 //FUNCTION: responseReceived()
@@ -63,9 +65,8 @@ void WebData::loadLocalData()
     QByteArray xmlData;
 
     bool result = readFromCache(&xmlData);
-
+    //if we can't read from the cache file, read from the one included in the qrc!
     if(!result)
-        //if we can't read from the cache file, read from the one included in the qrc!
         readFromCache(&xmlData, ":/data/cache.xml");
 
     parseXML(&xmlData);
@@ -98,16 +99,8 @@ void WebData::parseXML(QByteArray* xmlData)
                     name = reader.name().toString();
                     if(name == "forecastday")
                     {
-
-
                         ForecastData *forecastData = parseForecastData(reader);
                         weatherData->addForecastDay(forecastData);
-                        qDebug() << "FORECAST";
-                        qDebug() << "day: " << forecastData->day();
-                        qDebug() << "high: " << forecastData->highTemp();
-                        qDebug() << "icon: " << forecastData->icon();
-                        qDebug() << "low: " << forecastData->lowTemp();
-
                     }
                     if(name == "simpleforecast" && reader.isEndElement())
                         break;
@@ -123,12 +116,6 @@ void WebData::parseXML(QByteArray* xmlData)
     else if (reader.atEnd()) {
         qDebug() << "Reached end of XML document" << endl;
     }
-
-    qDebug() << "DONE!";
-    qDebug() << weatherData->currentCity();
-    qDebug() << weatherData->currentTemp();
-    qDebug() << weatherData->icon();
-    qDebug() << weatherData->localTime().toString("ddd, dd MMM yyyy HH:mm:ss");
 
 
     emit dataAvailable(weatherData);

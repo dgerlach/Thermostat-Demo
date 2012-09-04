@@ -21,7 +21,7 @@ public:
     void setWeatherData(WeatherData* weatherData);
 
 signals:
-
+    void valueChanged();
 public slots:
     void setStatusUpdated();
     void setStatusUpdating();

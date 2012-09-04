@@ -52,12 +52,11 @@ void ForecastDataWidget::updateData()
     m_lowTemp->setText(formatTemperatureString(m_data->lowTemp(), m_globalSettings->temperatureFormat()));
     m_day->setText(m_data->day());
     m_iconPixmap->load(iconNameToPixmap(m_data->icon()));
-    m_iconHolderLabel->setPixmap(m_iconPixmap->scaledToWidth(32));
 }
 
 void ForecastDataWidget::scaleContents()
 {
-    int scaleFactor =this->size().height();
+    int scaleFactor =this->height();
     m_highTemp->setStyleSheet("font-size:"+QString::number((int)(0.55*scaleFactor))+"px;");
     m_lowTemp->setStyleSheet("font-size:"+QString::number((int)(0.55*scaleFactor))+"px;");
     m_day->setStyleSheet("font-size:"+QString::number((int)(.55*scaleFactor))+"px;");

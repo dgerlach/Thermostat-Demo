@@ -12,9 +12,13 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
     // set initial clock time in case no web access
     clock = new QTime(16,18);
     weatherDataWidget = new WeatherDataWidget(this);
+    connect(this, SIGNAL(valueChanged()), weatherDataWidget, SLOT(updateData()));
 
     for(int a =0; a< 3; a++)
+    {
         forecastDataWidget[a] = new ForecastDataWidget(this);
+        connect(this, SIGNAL(valueChanged()), forecastDataWidget[a], SLOT(updateData()));
+    }
 
 
     //create status layout
@@ -35,10 +39,11 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
     mainLayout->addWidget(weatherDataWidget, 2);
     for(int a =0;a<3; a++)
         mainLayout->addWidget(forecastDataWidget[a], 1);
-    mainLayout->setSpacing(0);
+    mainLayout->setSpacing(1);
     mainLayout->addLayout(statusLayout, 0);
     mainLayout->setAlignment(statusLayout, Qt::AlignBottom);
 
+    qDebug() << "WW HIEHGT" << height();
     // show layout
     setLayout(mainLayout);
 }

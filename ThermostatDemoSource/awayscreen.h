@@ -11,6 +11,7 @@ class AwayScreen : public QWidget
 public:
     explicit AwayScreen(QWidget *parent = 0);
     
+    void setCurrentTempPtr(int* currentTempPointer);
 signals:
     
 public slots:
@@ -23,6 +24,11 @@ private:
     QLabel *currentTempLabel;
     QSpinBox *upperBound;
     QSpinBox *lowerBound;
+
+    int m_upperBound;
+    int m_lowerBound;
+
+    int *m_currentTemp;
 
     GlobalSettings* m_globalSettings;
 };

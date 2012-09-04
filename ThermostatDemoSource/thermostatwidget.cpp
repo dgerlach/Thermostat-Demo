@@ -1,8 +1,8 @@
 #include "thermostatwidget.h"
 #include "settingscreen.h"
 #include "globalsettings.h"
+#include "utilities.h"
 
-int ThermostatWidget::currentTempStatic;
 
 ThermostatWidget::ThermostatWidget(QWidget *parent) :
     QWidget(parent)
@@ -11,9 +11,7 @@ ThermostatWidget::ThermostatWidget(QWidget *parent) :
 
     // create new thermostat widget with default values in case internet options are disabled
     setpointReached = false;
-    currentTempInt = 72;
-    currentTempStatic = 72;
-    currentTemp = new QLabel(QString::number(currentTempInt)+"°");
+    currentTemp = new QLabel("72°");
     setpointTempInt = 72;
     setpointTemp = new QLabel("");
     setpointTemp->setMinimumWidth(77);
@@ -52,7 +50,6 @@ ThermostatWidget::ThermostatWidget(QWidget *parent) :
     connect(updateTimer,SIGNAL(timeout()),this,SLOT(update()));
     connect(updateTimer, SIGNAL(timeout()), this, SIGNAL(timeout()));
     updateTimer->start(10000);
-
 }
 
 void ThermostatWidget::resizeEvent(QResizeEvent *e)
@@ -66,13 +63,13 @@ void ThermostatWidget::increaseTemp()
 {
     // provide function to increase current setpoint
     setpointTempInt++;
-    if (setpointTempInt == currentTempInt) {
+    if (setpointTempInt == *currentTempInt) {
         // setpoint should disappear when reached
         setpointTemp->setText("");
         setpointReached = true;
         emit setpointIsReached(setpointReached);
     } else {
-        setpointTemp->setText(QString::number(setpointTempInt)+"°");
+        setpointTemp->setText(formatTemperatureString(setpointTempInt, m_globalSettings->temperatureFormat()));
         setpointReached = false;
         emit setpointIsReached(setpointReached);
     }
@@ -82,13 +79,13 @@ void ThermostatWidget::decreaseTemp()
 {
     // provid functino to decrease current setpoint
     setpointTempInt--;
-    if (setpointTempInt == currentTempInt) {
+    if (setpointTempInt == *currentTempInt) {
         // setpoint should disappear when reached
         setpointTemp->setText("");
         setpointReached = true;
         emit setpointIsReached(setpointReached);
     } else {
-        setpointTemp->setText(QString::number(setpointTempInt)+"°");
+        setpointTemp->setText(formatTemperatureString(setpointTempInt, m_globalSettings->temperatureFormat()));
         setpointReached = false;
         emit setpointIsReached(setpointReached);
     }
@@ -97,16 +94,15 @@ void ThermostatWidget::decreaseTemp()
 void ThermostatWidget::update()
 {
     // when timer fires (every 10 seconds), have current temperature approach setpoint temperature by one degree
-    if (currentTempInt < setpointTempInt) {
-        currentTempInt++;
+    if (*currentTempInt < setpointTempInt) {
+        (*currentTempInt)++;
     }
-    if (currentTempInt > setpointTempInt) {
-        currentTempInt--;
+    if (*currentTempInt > setpointTempInt) {
+        (*currentTempInt)--;
     }
-    currentTempStatic = currentTempInt;
-    currentTemp->setText(QString::number(currentTempInt)+"°");
+    currentTemp->setText(formatTemperatureString(*currentTempInt, m_globalSettings->temperatureFormat()));
     // if setpoint is reached, have setpoint disappear
-    if (setpointTempInt == currentTempInt) {
+    if (setpointTempInt == *currentTempInt) {
         setpointTemp->setText("");
         setpointReached = true;
         emit setpointIsReached(setpointReached);
@@ -115,20 +111,13 @@ void ThermostatWidget::update()
 
 void ThermostatWidget::updateUnit()
 {
-    // provide switch between Fahrenheit and Celsius based on current settings
-    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {
-        // true means F
-        // we want Fahrenheit, but currently in Celsius
-        currentTempInt = ((currentTempInt*1.8)+32);
-        setpointTempInt = ((setpointTempInt*1.8)+32);
-    } else {
-        // false means C
-        // we want Celsius, but currently in Fahrenheit
-        currentTempInt = ((currentTempInt - 32) * 5)/9;
-        setpointTempInt = ((setpointTempInt - 32) * 5)/9;
-    }
-    currentTempStatic = currentTempInt;
-    currentTemp->setText(QString::number(currentTempInt)+"°");
-    setpointTemp->setText(QString::number(setpointTempInt)+"°");
+    currentTemp->setText(formatTemperatureString(*currentTempInt, m_globalSettings->temperatureFormat()));
+    setpointTemp->setText(formatTemperatureString(setpointTempInt, m_globalSettings->temperatureFormat()));
     update();
+}
+
+void ThermostatWidget::setCurrentTempPtr(int *currentTemp)
+{
+    currentTempInt = currentTemp;
+    updateUnit();
 }

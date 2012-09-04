@@ -136,6 +136,7 @@ void Keyboard::keyboardHandler()
 void Keyboard::setLineEdit(QLineEdit * line)
 {
     outputLineEdit = line;
+    ui->lineEdit->setText(line->text());
 }
 
 Keyboard::~Keyboard()
@@ -256,6 +257,7 @@ void Keyboard::on_enterButton_clicked()
     outputText="";
     ui->lineEdit->setText(outputText);
     close();
+    emit(closed());
 }
 
 void Keyboard::on_lineEdit_textChanged(const QString &arg1)

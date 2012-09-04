@@ -13,13 +13,13 @@
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
-
-    setObjectName("MainWindow");
     // the MainWindow provides the container for the ThermostatWidget, WeatherWidget, and OptionsWidget
     // it is also provides much of the interface between WebData and the widgets that require web updates
     // it is set to initial hard-coded values first, and only updated from the web if internet options
     // have been allowed
+    setObjectName("MainWindow");
 
+    //get a handle to the global settings singleton
     m_globalSettings = GlobalSettings::getInstance();
 
     // sets initial weather background
@@ -27,6 +27,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // remove cursor (i.e. mouse pointer) throughout application
     //qApp->setOverrideCursor( QCursor( Qt::BlankCursor ) );
+
+    //set a default temp for the thermostat
+    m_currentThermostatTemp = 72;
+
+    // create web data object
+    webData = new WebData;
+
+    //connect the signals for asynchronous data transfer
+    connect(webData, SIGNAL(dataAvailable(WeatherData*)), this, SLOT(setWebData(WeatherData*)));
+    connect(webData, SIGNAL(networkTimeout()), this, SLOT(webDataFailed()));
 
     // create weather widget
     weatherWidget = new WeatherWidget;
@@ -39,16 +49,20 @@ MainWindow::MainWindow(QWidget *parent) :
     thermostatWidget->setObjectName("thermostatWidget");
     thermostatWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     thermostatWidget->setAttribute(Qt::WA_StyledBackground,true);
+    thermostatWidget->setCurrentTempPtr(&m_currentThermostatTemp);
 
     // create options widget
     OptionsWidget *optionsWidget = new OptionsWidget;
+    optionsWidget->awayScreen->setCurrentTempPtr(&m_currentThermostatTemp);
     optionsWidget->setObjectName("optionsWidget");
     optionsWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     optionsWidget->setAttribute(Qt::WA_StyledBackground,true);
+
     // connect 10 second timer that causes current temp to follow setpoint to pass signal through options widget
     connect(thermostatWidget, SIGNAL(timeout()), optionsWidget, SIGNAL(currentTempChanged()));
     // connect new city name signal to the MainWindow function changeCity()
     connect(optionsWidget, SIGNAL(cityChanged(QString)), this, SLOT(changeCity(QString)));
+    connect(optionsWidget, SIGNAL(valueChanged()), webData, SLOT(configureProxy()));
 
     // create energy button
     energyButton = new QPushButton("48kW");
@@ -125,24 +139,19 @@ MainWindow::MainWindow(QWidget *parent) :
     // connect Celsius/Fahrenheit change signals
     connect(optionsWidget, SIGNAL(valueChanged()), this, SLOT(updateUnit()));
     connect(optionsWidget, SIGNAL(valueChanged()), thermostatWidget, SLOT(updateUnit()));
+    connect(optionsWidget, SIGNAL(valueChanged()), weatherWidget, SIGNAL(valueChanged()));
 
     // show layout
     setLayout(mainLayout);
 
-    // create web data object and set all dynamic properties based on web data
-    webData = new WebData;
-
-    connect(webData, SIGNAL(dataAvailable(WeatherData*)), this, SLOT(setWebData(WeatherData*)));
-    connect(webData, SIGNAL(networkTimeout()), this, SLOT(webDataFailed()));
-
     //first set based on local cache so user sees something!
     webData->loadLocalData();
 
-    clock = QTime::currentTime();
+    dateTime = QDateTime::currentDateTime();
 
     clockTimer = new QTimer(this);
     connect(clockTimer,SIGNAL(timeout()),this,SLOT(updateClock()));
-    clockTimer->start(10000); // makes the clock tick every 60 seconds
+    clockTimer->start(1000);
 
     changeCity(m_globalSettings->currentCity());
 
@@ -174,17 +183,18 @@ void MainWindow::paintEvent(QPaintEvent *)
 void MainWindow::updateClock()
 {
     // make clock tick
-    clock = QTime::currentTime();
-    timeButton->setText(clock.toString("h:mm AP"));
+    dateTime = QDateTime::currentDateTime();
+    timeButton->setText(dateTime.time().toString("h:mm AP"));
+    dateButton->setText(dateTime.date().toString("ddd, MMM d"));
 
 }
 
-void MainWindow::setBackground(QString icon)
+void MainWindow::setBackground(QString icon, QTime localTime)
 {
     // set the MainWindow background based on the current conditions
 
     if (icon == "partlysunny" || icon == "mostlycloudy" ) {
-        if(clock.hour() < 5 || clock.hour() > 20) {
+        if(localTime.hour() < 5 || localTime.hour() > 20) {
             setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
         } else {
             setStyleSheet("MainWindow {border-image: url(:/Images/mostlycloudy.jpg)}");
@@ -194,7 +204,7 @@ void MainWindow::setBackground(QString icon)
         setStyleSheet("MainWindow {border-image: url(:/Images/fog.jpg)}");
     }
     else if (icon == "hazy") {
-        if(clock.hour() < 5 || clock.hour() > 20) {
+        if(localTime.hour() < 5 || localTime.hour() > 20) {
             setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
         } else {
             setStyleSheet("MainWindow {border-image: url(:/Images/hazy.jpg)}");
@@ -214,7 +224,7 @@ void MainWindow::setBackground(QString icon)
         setStyleSheet("MainWindow {border-image: url(:/Images/snow.jpg)}");
     }
     else if (icon == "clear" || icon == "sunny") {
-        if(clock.hour() < 5 || clock.hour() > 20) {
+        if(localTime.hour() < 5 || localTime.hour() > 20) {
             setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
         } else {
             setStyleSheet("MainWindow {border-image: url(:/Images/clear_sky.jpg)}");
@@ -222,7 +232,7 @@ void MainWindow::setBackground(QString icon)
     }
     else if (icon == "mostlysunny" || icon == "partlycloudy" ||
              icon == "unknown") {
-        if(clock.hour() < 5 || clock.hour() > 20) {
+        if(localTime.hour() < 5 || localTime.hour() > 20) {
             setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
         } else {
             setStyleSheet("MainWindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");
@@ -265,13 +275,13 @@ void MainWindow::changeCity(QString city)
 
 void MainWindow::setWebData(WeatherData* weatherData)
 {
-    //TODO: STUFF
+
     if(!weatherData)
     {
         webDataFailed();
         return;
     }
-    setBackground(weatherData->icon());
+    setBackground(weatherData->icon(), weatherData->localTime().time());
     weatherWidget->setWeatherData(weatherData);
     weatherWidget->setStatusUpdated();
 }

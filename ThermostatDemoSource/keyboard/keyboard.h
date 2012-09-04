@@ -17,6 +17,9 @@ public:
     ~Keyboard();
     QPushButton *enterButton;
     
+signals:
+    void closed();
+
 private slots:
     void keyboardHandler();
     void on_shift_clicked();

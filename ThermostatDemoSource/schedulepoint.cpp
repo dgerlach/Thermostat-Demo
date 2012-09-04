@@ -2,6 +2,7 @@
 #include "schedulescreen.h"
 #include "settingscreen.h"
 #include "globalsettings.h"
+#include "utilities.h"
 
 #include <QtGui>
 
@@ -13,9 +14,9 @@ SchedulePoint::SchedulePoint(int seqNumber)
     ID = seqNumber;
     myBackgroundColor = Qt::blue;
     temp = 72;
-    myText = QString::number(temp)+QString("°");
     setFlags(ItemIsSelectable);
     location=0;
+    updateUnit();
 }
 
 SchedulePoint::~SchedulePoint()
@@ -110,16 +111,14 @@ void SchedulePoint::increaseTemp()
 {
     // provide a slot to increase point temperature
     temp++;
-    myText = QString::number(temp)+QString("°");
-    update();
+    updateUnit();
 }
 
 void SchedulePoint::decreaseTemp()
 {
     // provide a slot to decrease temperature
     temp--;
-    myText = QString::number(temp)+QString("°");
-    update();
+    updateUnit();
 }
 
 int SchedulePoint::getID()
@@ -157,16 +156,6 @@ QString SchedulePoint::time()
 
 void SchedulePoint::updateUnit()
 {
-    // provide switch between celsius and fahrenheit
-    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF) {
-        // true means F
-        // we want Fahrenheit, but currently in Celsius
-        temp = (temp*1.8)+32;
-    } else {
-        // false means C
-        // we want Celsius, but currently in Fahrenheit
-        temp = ((temp - 32) * 5) / 9;
-    }
-    myText = QString::number(temp)+QString("°");
+    myText = formatTemperatureString(temp, m_globalSettings->temperatureFormat());
     update();
 }

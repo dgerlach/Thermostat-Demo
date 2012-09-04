@@ -4,6 +4,7 @@
 #include <QtGui>
 
 class GlobalSettings;
+class QKeyboardLineEdit;
 
 class SettingScreen : public QWidget
 {
@@ -20,10 +21,14 @@ public slots:
     void unitIsF();
     void unitIsC();
     void changeCity(QString city);
+    void commitChanges();
 
 private:
     QPushButton *FButton;
     QPushButton *CButton;
+
+    QKeyboardLineEdit* m_proxyHostLineEdit;
+    QKeyboardLineEdit* m_proxyPortLineEdit;
 
     GlobalSettings* m_globalSettings;
     

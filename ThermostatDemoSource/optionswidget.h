@@ -11,6 +11,10 @@ class OptionsWidget : public QWidget
     Q_OBJECT
 public:
     explicit OptionsWidget(QWidget *parent = 0);
+
+    AwayScreen *awayScreen;
+    ScheduleScreen *scheduleScreen;
+    SettingScreen *settingScreen;
     
 signals:
     void valueChanged();
@@ -23,9 +27,7 @@ private:
     QPushButton *settingsButton;
     QPushButton *calendarButton;
     QPushButton *awayButton;
-    AwayScreen *awayScreen;
-    ScheduleScreen *scheduleScreen;
-    SettingScreen *settingScreen;
+
 };
 
 #endif // OPTIONSWIDGET_H

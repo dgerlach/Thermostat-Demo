@@ -13,6 +13,7 @@ WeatherDataWidget::WeatherDataWidget(QWidget *parent) :
     m_currentTemp = new QLabel();
     m_currentCity = new QLabel();
     m_currentIconHolderLabel = new QLabel();
+    m_currentIconHolderLabel->setScaledContents(true);
     m_currentIconPixmap = new QPixmap();
 
     // create current layout
@@ -43,15 +44,18 @@ void WeatherDataWidget::updateData()
     m_currentTemp->setText(formatTemperatureString(m_data->currentTemp(), m_globalSettings->temperatureFormat()));
     m_currentCity->setText(m_data->currentCity());
     m_currentIconPixmap->load(iconNameToPixmap(m_data->icon()));
-    m_currentIconHolderLabel->setPixmap(m_currentIconPixmap->scaledToHeight(32));
 }
 
 void WeatherDataWidget::scaleContents()
 {
-    int scaleFactor = this->size().height();
+    int scaleFactor = this->height();
+    qDebug() << m_currentIconPixmap->height();
+    qDebug() << m_currentIconHolderLabel->height();
+    qDebug() << scaleFactor;
     m_currentTemp->setStyleSheet("font-size:"+QString::number((int)(.6*scaleFactor))+"px;");
     m_currentCity->setStyleSheet("font-size:"+QString::number((int)(.2*scaleFactor))+"px;");
     m_currentIconHolderLabel->setPixmap(m_currentIconPixmap->scaledToHeight(scaleFactor));
+    qDebug() << height();
 }
 
 QString WeatherDataWidget::iconNameToPixmap(QString icon)

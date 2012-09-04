@@ -13,6 +13,7 @@ class MainWindow : public QWidget
 public:
     explicit MainWindow(QWidget *parent = 0);
 
+    int m_currentThermostatTemp;
 protected:
     void paintEvent(QPaintEvent *);
     
@@ -32,9 +33,10 @@ private:
     QPushButton *dateButton;
     QPushButton *closeButton;
     QTimer *clockTimer;
-    QTime clock;
-    void setBackground(QString);
+    QDateTime dateTime;
+    void setBackground(QString, QTime);
     WeatherWidget *weatherWidget;
+
 
 
     GlobalSettings* m_globalSettings;

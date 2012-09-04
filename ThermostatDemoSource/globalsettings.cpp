@@ -56,6 +56,7 @@ bool GlobalSettings::load()
     qDebug() << currentCity();
     qDebug() << temperatureFormat();
     qDebug() << timeFormat();
+    qDebug() << dataPath();
 
 }
 
