@@ -2,7 +2,7 @@
 
 //FUNCTION: formatTemperature
 //  int temp - temperature value in F
-//  GlobalSettings::TemperatureFormat -
+//  GlobalSettings::TemperatureFormat - enum that determines output format
 //all temperatures are stored internally as fahrenheit so return number if no format conversion
 //needed, otherwise convert to celsius
 int formatTemperature(int temp, GlobalSettings::TemperatureFormat tempFormat)
@@ -13,6 +13,12 @@ int formatTemperature(int temp, GlobalSettings::TemperatureFormat tempFormat)
         return temp;
 }
 
+//FUNCTION: formatTemperature
+//  int temp - temperature value in F
+//  GlobalSettings::TemperatureFormat - enum that determines output format
+//  bool includeUnits - specifies whether or not to include degree symbol
+//all temperatures are stored internally as fahrenheit so return number if no format conversion
+//needed, otherwise convert to celsius. returns as string
 QString formatTemperatureString(int temp, GlobalSettings::TemperatureFormat tempFormat, bool includeUnits)
 {
     QString tempString = QString::number(formatTemperature(temp, tempFormat));

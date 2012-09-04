@@ -11,6 +11,7 @@ public:
     enum TimeFormat { TimeFormat12h, TimeFormat24h };
 
     static GlobalSettings* getInstance();
+    ~GlobalSettings();
 
     bool save();
     bool load();

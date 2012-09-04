@@ -8,6 +8,11 @@
 WeatherWidget::WeatherWidget(QWidget *parent) :
         QWidget(parent)
 {
+
+    setObjectName("weatherWidget");
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    setAttribute(Qt::WA_StyledBackground,true);
+
     m_weatherData = NULL;
     // set initial clock time in case no web access
     clock = new QTime(16,18);

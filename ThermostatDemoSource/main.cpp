@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     file.open(QFile::ReadOnly);
     app.setStyleSheet(file.readAll());
 
-    // create opening dialog for internet and proxy settings
+    // create main window and show
     MainWindow *w = new MainWindow;
     w->showFullScreen();
 

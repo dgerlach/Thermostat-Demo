@@ -9,6 +9,11 @@ OptionsWidget::OptionsWidget(QWidget *parent) :
     QWidget(parent)
 {
     int optionButtonIconSize = 50;
+
+    setObjectName("optionsWidget");
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    setAttribute(Qt::WA_StyledBackground,true);
+
     // create settings button
     settingsButton = new QPushButton();
     settingsButton->setIcon(QIcon(":/Images/glossy-blue-orb-icon-gears.png"));

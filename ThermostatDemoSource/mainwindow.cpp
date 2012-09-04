@@ -40,29 +40,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create weather widget
     weatherWidget = new WeatherWidget;
-    weatherWidget->setObjectName("weatherWidget");
-    weatherWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    weatherWidget->setAttribute(Qt::WA_StyledBackground,true);
 
     // create thermostat widget
-    ThermostatWidget *thermostatWidget = new ThermostatWidget;
-    thermostatWidget->setObjectName("thermostatWidget");
-    thermostatWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    thermostatWidget->setAttribute(Qt::WA_StyledBackground,true);
+    thermostatWidget = new ThermostatWidget;
     thermostatWidget->setCurrentTempPtr(&m_currentThermostatTemp);
 
     // create options widget
-    OptionsWidget *optionsWidget = new OptionsWidget;
+    optionsWidget = new OptionsWidget;
     optionsWidget->awayScreen->setCurrentTempPtr(&m_currentThermostatTemp);
-    optionsWidget->setObjectName("optionsWidget");
-    optionsWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    optionsWidget->setAttribute(Qt::WA_StyledBackground,true);
 
     // connect 10 second timer that causes current temp to follow setpoint to pass signal through options widget
     connect(thermostatWidget, SIGNAL(timeout()), optionsWidget, SIGNAL(currentTempChanged()));
     // connect new city name signal to the MainWindow function changeCity()
     connect(optionsWidget, SIGNAL(cityChanged(QString)), this, SLOT(changeCity(QString)));
     connect(optionsWidget, SIGNAL(valueChanged()), webData, SLOT(configureProxy()));
+
+    // connect Celsius/Fahrenheit change signals
+    connect(optionsWidget, SIGNAL(valueChanged()), thermostatWidget, SLOT(updateUnit()));
+    connect(optionsWidget, SIGNAL(valueChanged()), weatherWidget, SIGNAL(valueChanged()));
+
+    // make energy button change when setpoint is reached
+    connect(thermostatWidget, SIGNAL(setpointIsReached(bool)),this,SLOT(energySaving(bool)));
 
     // create energy button
     energyButton = new QPushButton("48kW");
@@ -93,14 +91,40 @@ MainWindow::MainWindow(QWidget *parent) :
     closeButton->setFocusPolicy(Qt::NoFocus);
     connect(closeButton,SIGNAL(clicked()),this, SLOT(close()));
 
-    // create screen layout
+    //layout all of the widgets we just instatiated
+    createScreenLayout();
+
+    //set clock to  local system time
+    dateTime = QDateTime::currentDateTime();
+
+    //start a timer to attempt to update the clock every second
+    clockTimer = new QTimer(this);
+    connect(clockTimer,SIGNAL(timeout()),this,SLOT(updateClock()));
+    clockTimer->start(1000);
+
+
+    //first set based on local cache so user sees something!
+    webData->loadLocalData();
+
+    //call the changecity function which dispatches a network request for api weather data.
+    changeCity(m_globalSettings->currentCity());
+}
+
+//FUNCTION: createScreenLayout
+//
+//all code to generate the main layout for the MainWindow is here.
+//
+
+void MainWindow::createScreenLayout()
+{
+    // create left portion of the layout holding the options buttons and thermostat control
     QVBoxLayout *leftLayout = new QVBoxLayout;
     leftLayout->addWidget(optionsWidget);
     leftLayout->addWidget(thermostatWidget);
     leftLayout->setStretchFactor(optionsWidget, 1);
     leftLayout->setStretchFactor(thermostatWidget, 3);
 
-
+    // combine the previous layout with the weatherwidget and the close button
     QHBoxLayout *middleLayout = new QHBoxLayout;
     middleLayout->addSpacing(6);
     middleLayout->addLayout(leftLayout);
@@ -110,8 +134,7 @@ MainWindow::MainWindow(QWidget *parent) :
     middleLayout->addSpacing(6);
     middleLayout->setAlignment(closeButton,Qt::AlignTop);
 
-
-
+    //combine the previous nested layout with the date time and energy buttons
     QHBoxLayout *bottomLayout = new QHBoxLayout;
     bottomLayout->addWidget(energyButton);
     bottomLayout->addWidget(dateButton);
@@ -119,46 +142,35 @@ MainWindow::MainWindow(QWidget *parent) :
     bottomLayout->setSpacing(0);
     bottomLayout->setMargin(0);
 
-    QWidget *w = new QWidget;
-    w->setMaximumSize(800, 450);
-    w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    w->setLayout(middleLayout);
-    QHBoxLayout* box = new QHBoxLayout;
-    box->addWidget(w);
+    //it is easier to define size constraints for a widget so
+    //we will encapsulate everything in sizeLimiterWidget
 
+    QWidget *sizeLimiterWidget = new QWidget;
+    sizeLimiterWidget->setMaximumSize(800, 450);
+    sizeLimiterWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizeLimiterWidget->setLayout(middleLayout);
+    QHBoxLayout* contentsBox = new QHBoxLayout;
+    contentsBox->addWidget(sizeLimiterWidget);
+
+    //build the main layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(0);
-    mainLayout->addLayout(box);
-    mainLayout->setStretchFactor(box, 2);
+    mainLayout->addLayout(contentsBox);
+    mainLayout->setStretchFactor(contentsBox, 2);
     mainLayout->addStretch(0);
     mainLayout->addLayout(bottomLayout);
     mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->setAlignment(w,Qt::AlignCenter);
+    mainLayout->setAlignment(sizeLimiterWidget,Qt::AlignCenter);
     mainLayout->setAlignment(bottomLayout,Qt::AlignBottom);
-
-    // connect Celsius/Fahrenheit change signals
-    connect(optionsWidget, SIGNAL(valueChanged()), this, SLOT(updateUnit()));
-    connect(optionsWidget, SIGNAL(valueChanged()), thermostatWidget, SLOT(updateUnit()));
-    connect(optionsWidget, SIGNAL(valueChanged()), weatherWidget, SIGNAL(valueChanged()));
 
     // show layout
     setLayout(mainLayout);
-
-    //first set based on local cache so user sees something!
-    webData->loadLocalData();
-
-    dateTime = QDateTime::currentDateTime();
-
-    clockTimer = new QTimer(this);
-    connect(clockTimer,SIGNAL(timeout()),this,SLOT(updateClock()));
-    clockTimer->start(1000);
-
-    changeCity(m_globalSettings->currentCity());
-
-
-    // make energy button change when setpoint is reached
-    connect(thermostatWidget, SIGNAL(setpointIsReached(bool)),this,SLOT(energySaving(bool)));
 }
+
+//FUNCTION: closeEvent
+//
+//Reimplemented closeEvent handle just to allow the app to save the settings before exiting
+//
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
@@ -259,10 +271,11 @@ void MainWindow::energySaving(bool setpointReached)
 
 }
 
-void MainWindow::updateUnit()
-{
-
-}
+//FUNCTION: changeCity
+//
+//  sends a web request through the webdata class to get weather data for the city
+//  passed. returns immediately. the webdata class invokes setWebData slot on success
+//  or webDataFailed otherwise.
 
 void MainWindow::changeCity(QString city)
 {
@@ -272,6 +285,12 @@ void MainWindow::changeCity(QString city)
     webData->changeCity(city);
 
 }
+
+//FUNCTION: setWebData
+//
+//  slot invoked by the webdata class on transfer of data across the network that handles
+//  setting an appropriate background for the mainwidget and passing the parsed data along
+//  to the weatherwidget
 
 void MainWindow::setWebData(WeatherData* weatherData)
 {
@@ -285,6 +304,11 @@ void MainWindow::setWebData(WeatherData* weatherData)
     weatherWidget->setWeatherData(weatherData);
     weatherWidget->setStatusUpdated();
 }
+
+//FUNCTION: webDataFailed
+//
+//  slot invoked by the webdata class on an unsuccessful attempt at fetching weather data
+//  from the network. tells the weather widget to alert the user of the failure.
 
 void MainWindow::webDataFailed()
 {

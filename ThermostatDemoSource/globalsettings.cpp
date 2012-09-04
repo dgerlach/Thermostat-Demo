@@ -17,6 +17,11 @@ GlobalSettings::GlobalSettings()
 {
 }
 
+GlobalSettings::~GlobalSettings()
+{
+    delete m_instance;
+}
+
 GlobalSettings* GlobalSettings::getInstance()
 {
     if(m_instance == NULL)

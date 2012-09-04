@@ -3,9 +3,12 @@
 
 #include <QtGui>
 #include "webdata.h"
-#include "weatherwidget.h"
+
 
 class GlobalSettings;
+class OptionsWidget;
+class ThermostatWidget;
+class WeatherWidget;
 
 class MainWindow : public QWidget
 {
@@ -20,7 +23,6 @@ protected:
 signals:
     
 public slots:
-    void updateUnit();
     void changeCity(QString);
     void closeEvent(QCloseEvent *);
     void setWebData(WeatherData* weatherData);
@@ -36,10 +38,14 @@ private:
     QDateTime dateTime;
     void setBackground(QString, QTime);
     WeatherWidget *weatherWidget;
+    OptionsWidget *optionsWidget;
+    ThermostatWidget *thermostatWidget;
 
 
 
     GlobalSettings* m_globalSettings;
+
+    void createScreenLayout();
 
 private slots:
     void updateClock();

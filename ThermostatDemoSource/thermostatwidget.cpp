@@ -9,6 +9,10 @@ ThermostatWidget::ThermostatWidget(QWidget *parent) :
 {
     m_globalSettings = GlobalSettings::getInstance();
 
+    setObjectName("thermostatWidget");
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    setAttribute(Qt::WA_StyledBackground,true);
+
     // create new thermostat widget with default values in case internet options are disabled
     setpointReached = false;
     currentTemp = new QLabel("72°");
