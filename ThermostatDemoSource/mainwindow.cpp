@@ -5,6 +5,7 @@
 #include "settingscreen.h"
 #include "globalsettings.h"
 #include "weatherdata.h"
+#include "utilities.h"
 
 #include <QtGui>
 
@@ -64,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // connect Celsius/Fahrenheit change signals
     connect(optionsWidget, SIGNAL(valueChanged()), thermostatWidget, SLOT(updateUnit()));
     connect(optionsWidget, SIGNAL(valueChanged()), weatherWidget, SIGNAL(valueChanged()));
+    connect(optionsWidget, SIGNAL(valueChanged()), this, SLOT(updateClock()));
 
     // make energy button change when setpoint is reached
     connect(thermostatWidget, SIGNAL(setpointIsReached(bool)),this,SLOT(energySaving(bool)));
@@ -202,7 +204,7 @@ void MainWindow::updateClock()
 {
     // make clock tick
     dateTime = QDateTime::currentDateTime();
-    timeButton->setText(dateTime.time().toString("h:mm AP"));
+    timeButton->setText(formatTimeString(dateTime.time(), m_globalSettings->timeFormat()));
     dateButton->setText(dateTime.date().toString("ddd, MMM d"));
 
 }

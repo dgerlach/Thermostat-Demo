@@ -2,12 +2,15 @@
 
 #include "forecastdata.h"
 #include "forecastdatawidget.h"
+#include "globalsettings.h"
 #include "weatherdata.h"
 #include "weatherdatawidget.h"
+#include "utilities.h"
 
 WeatherWidget::WeatherWidget(QWidget *parent) :
         QWidget(parent)
 {
+    m_globalSettings = GlobalSettings::getInstance();
 
     setObjectName("weatherWidget");
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -25,6 +28,7 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
         connect(this, SIGNAL(valueChanged()), forecastDataWidget[a], SLOT(updateData()));
     }
 
+    connect(this, SIGNAL(valueChanged()), this, SLOT(updateData()));
 
     //create status layout
     statusMovieLabel = new QLabel;
@@ -116,9 +120,14 @@ void WeatherWidget::setStatusUpdated()
     statusMovieLabel->setVisible(false);
     statusMovie->stop();
     if(m_weatherData)
-        statusLabel->setText("Updated on " + m_weatherData->lastUpdated().toString("MMM d 'at' h:mm AP"));
+    {
+        QString updatedString = m_weatherData->lastUpdated().toString("MMM d 'at' ") + formatTimeString(m_weatherData->lastUpdated().time(), m_globalSettings->timeFormat());
+        statusLabel->setText("Updated on " + updatedString);
+    }
     else
         statusLabel->setText("Updated");
+
+    m_currentStatus = WeatherWidget::UpdateSuccess;
 }
 
 void WeatherWidget::setStatusUpdating()
@@ -127,6 +136,8 @@ void WeatherWidget::setStatusUpdating()
     statusMovieLabel->setVisible(true);
     statusMovie->start();
     statusLabel->setText("Updating...");
+
+    m_currentStatus = WeatherWidget::Updating;
 }
 
 void WeatherWidget::setStatusFailed()
@@ -134,4 +145,12 @@ void WeatherWidget::setStatusFailed()
     statusMovie->stop();
     statusMovieLabel->setVisible(false);
     statusLabel->setText("Update Failed");
+
+    m_currentStatus = WeatherWidget::UpdateFailed;
+}
+
+void WeatherWidget::updateData()
+{
+    if(m_currentStatus == WeatherWidget::UpdateSuccess)
+        setStatusUpdated();
 }

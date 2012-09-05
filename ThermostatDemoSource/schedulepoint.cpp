@@ -150,8 +150,8 @@ QString SchedulePoint::time()
     // output the current time represnted by this point's location
     int hours = ((15/3.4)*(this->pos().x()+12.7)) / 60;
     int minutes = (int)((15/3.4)*(this->pos().x()+12.7)) % 60;
-    QTime *time = new QTime(hours, minutes);
-    return time->toString("h:mm AP");
+    QTime time(hours, minutes);
+    return formatTimeString(time, m_globalSettings->timeFormat());
 }
 
 void SchedulePoint::updateUnit()

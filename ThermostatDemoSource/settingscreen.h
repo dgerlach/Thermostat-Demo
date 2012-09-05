@@ -18,14 +18,21 @@ signals:
     void cityChanged(QString);
     
 public slots:
-    void unitIsF();
-    void unitIsC();
+    void setTempFormatF();
+    void setTempFormatC();
+
+    void setTimeFormat12h();
+    void setTimeFormat24h();
+
     void changeCity(QString city);
     void commitChanges();
 
 private:
     QPushButton *FButton;
     QPushButton *CButton;
+
+    QPushButton *Button12h;
+    QPushButton *Button24h;
 
     QKeyboardLineEdit* m_proxyHostLineEdit;
     QKeyboardLineEdit* m_proxyPortLineEdit;

@@ -9,6 +9,7 @@ class QLabel;
 class WeatherData;
 class WeatherDataWidget;
 class ForecastDataWidget;
+class GlobalSettings;
 
 class WeatherWidget : public QWidget
 {
@@ -20,6 +21,8 @@ public:
 
     void setWeatherData(WeatherData* weatherData);
 
+    enum CurrentStatus { Updating, UpdateSuccess, UpdateFailed };
+
 signals:
     void valueChanged();
 public slots:
@@ -27,7 +30,7 @@ public slots:
     void setStatusUpdating();
     void setStatusFailed();
 
-    //void resizeEvent(QResizeEvent *);
+    void updateData();
 
 
 protected:
@@ -41,6 +44,10 @@ private:
     WeatherDataWidget* weatherDataWidget;
     ForecastDataWidget* forecastDataWidget[3];
     WeatherData* m_weatherData;
+
+    GlobalSettings *m_globalSettings;
+
+    CurrentStatus m_currentStatus;
 };
 
 #endif // WEATHERWIDGET_H

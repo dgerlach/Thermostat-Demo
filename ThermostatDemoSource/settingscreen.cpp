@@ -27,9 +27,8 @@ SettingScreen::SettingScreen(QWidget *parent) :
     //FButton->setMaximumWidth(150);
     FButton->setObjectName("FButton");
     FButton->setCheckable(true);
-    FButton->setChecked(true);
     FButton->setFocusPolicy(Qt::NoFocus);
-    connect(FButton, SIGNAL(clicked()), this, SLOT(unitIsF()));
+    connect(FButton, SIGNAL(clicked()), this, SLOT(setTempFormatF()));
 
     // create button to select Celsius
     CButton = new QPushButton("°C", (this));
@@ -37,7 +36,21 @@ SettingScreen::SettingScreen(QWidget *parent) :
     CButton->setObjectName("CButton");
     CButton->setCheckable(true);
     CButton->setFocusPolicy(Qt::NoFocus);
-    connect(CButton, SIGNAL(clicked()), this, SLOT(unitIsC()));
+    connect(CButton, SIGNAL(clicked()), this, SLOT(setTempFormatC()));
+
+    // create button to select 12h time format
+    Button12h = new QPushButton("12h", (this));
+    Button12h->setObjectName("Button12h");
+    Button12h->setCheckable(true);
+    Button12h->setFocusPolicy(Qt::NoFocus);
+    connect(Button12h, SIGNAL(clicked()), this, SLOT(setTimeFormat12h()));
+
+    // create button to select 24h time format
+    Button24h = new QPushButton("24h", (this));
+    Button24h->setObjectName("Button24h");
+    Button24h->setCheckable(true);
+    Button24h->setFocusPolicy(Qt::NoFocus);
+    connect(Button24h, SIGNAL(clicked()), this, SLOT(setTimeFormat24h()));
 
     // when either button is clicked, tell the rest of the program to switch between C/F
     connect(FButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
@@ -77,6 +90,15 @@ SettingScreen::SettingScreen(QWidget *parent) :
     unitLayout->setSpacing(0);
     unitLayout->setContentsMargins(0,0,0,0);
 
+    // create layout
+    QHBoxLayout *timeFormatLayout = new QHBoxLayout;
+    timeFormatLayout->addSpacing(100);
+    timeFormatLayout->addWidget(Button12h);
+    timeFormatLayout->addWidget(Button24h);
+    timeFormatLayout->addSpacing(100);
+    timeFormatLayout->setSpacing(0);
+    timeFormatLayout->setContentsMargins(0,0,0,0);
+
     QHBoxLayout *cityLayout = new QHBoxLayout;
     cityLayout->addStretch();
     cityLayout->addWidget(cityLabel);
@@ -111,6 +133,8 @@ SettingScreen::SettingScreen(QWidget *parent) :
     mainLayout->addStretch();
     mainLayout->addLayout(unitLayout);
     mainLayout->addStretch();
+    mainLayout->addLayout(timeFormatLayout);
+    mainLayout->addStretch();
     mainLayout->addLayout(proxyLayout);
     mainLayout->setAlignment(proxyLayout, Qt::AlignCenter);
     mainLayout->addStretch();
@@ -125,11 +149,15 @@ SettingScreen::SettingScreen(QWidget *parent) :
         cityBox->setCurrentIndex(index);
 
     if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatC)
-        unitIsC();
+        setTempFormatC();
     else
-        unitIsF();
+        setTempFormatF();
 
-    qDebug() << m_globalSettings->proxyHost();
+    if(m_globalSettings->timeFormat() == GlobalSettings::TimeFormat24h)
+        setTimeFormat24h();
+    else
+        setTimeFormat12h();
+
     m_proxyHostLineEdit->setText(m_globalSettings->proxyHost());
 
     //to prevent a zero from showing up
@@ -139,28 +167,40 @@ SettingScreen::SettingScreen(QWidget *parent) :
 
 
 
-void SettingScreen::unitIsF()
+void SettingScreen::setTempFormatF()
 {
-    // mark F button as down and enable C button to be clicked
     CButton->setDisabled(false);
-    // unit: true means F & false means C
     m_globalSettings->setTemperatureFormat(GlobalSettings::TempFormatF);
     CButton->setChecked(false);
     FButton->setChecked(true);
     FButton->setDisabled(true);
 }
 
-void SettingScreen::unitIsC()
+void SettingScreen::setTempFormatC()
 {
-    // mark C button as down and enable F button to be clicked
     FButton->setDisabled(false);
-    // unit: true means F & false means C
     m_globalSettings->setTemperatureFormat(GlobalSettings::TempFormatC);
     FButton->setChecked(false);
     CButton->setChecked(true);
     CButton->setDisabled(true);
+}
 
+void SettingScreen::setTimeFormat12h()
+{
+    Button24h->setDisabled(false);
+    m_globalSettings->setTimeFormat(GlobalSettings::TimeFormat12h);
+    Button24h->setChecked(false);
+    Button12h->setChecked(true);
+    Button12h->setDisabled(true);
+}
 
+void SettingScreen::setTimeFormat24h()
+{
+    Button12h->setDisabled(false);
+    m_globalSettings->setTimeFormat(GlobalSettings::TimeFormat24h);
+    Button12h->setChecked(false);
+    Button24h->setChecked(true);
+    Button24h->setDisabled(true);
 }
 
 void SettingScreen::changeCity(QString city)
@@ -172,5 +212,6 @@ void SettingScreen::changeCity(QString city)
 void SettingScreen::commitChanges()
 {
     m_globalSettings->setProxyInfo(m_proxyHostLineEdit->text(),m_proxyPortLineEdit->text().toInt());
+    emit(valueChanged());
     close();
 }

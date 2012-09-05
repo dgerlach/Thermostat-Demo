@@ -4,6 +4,8 @@
 #include <QtGui>
 #include "schedulepoint.h"
 
+class GlobalSettings;
+
 class ScheduleScreen : public QWidget
 {
     Q_OBJECT
@@ -22,6 +24,7 @@ public slots:
     void showButtons(SchedulePoint *);
     void showPoints(int);
     void removeAllBlur();
+    void updateData();
 
 private:
     QCheckBox *MondayButton;
@@ -54,6 +57,15 @@ private:
     void shiftButtonsRight();
     QLabel *currentTime;
     void blur();
+
+    // create time markings
+    QLabel *hour4;
+    QLabel *hour8;
+    QLabel *hour12;
+    QLabel *hour16;
+    QLabel *hour20;
+
+    GlobalSettings* m_globalSettings;
 
 protected:
     void mousePressEvent(QMouseEvent */* event */);

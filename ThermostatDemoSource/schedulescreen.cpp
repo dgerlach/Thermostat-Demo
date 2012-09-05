@@ -1,17 +1,23 @@
 #include "schedulescreen.h"
 #include "schedulepoint.h"
+#include "globalsettings.h"
+#include "utilities.h"
 
 #include "QtDebug"
 
 ScheduleScreen::ScheduleScreen(QWidget *parent) :
     QWidget(parent)
 {
+    //get an instance of the global configuration
+    m_globalSettings = GlobalSettings::getInstance();
+
     // seqNumber will track the number of points that have been created
     seqNumber = 0;
 
     // allow user to click off points to remove blur and see all
     connect(this, SIGNAL(clicked()), this, SLOT(removeAllBlur()));
-
+    //allow valueChanged signal to trigger updateData() slot
+    connect(this, SIGNAL(valueChanged()), this, SLOT(updateData()));
     // create title
     QLabel *title = new QLabel("Set your WEEKLY SCHEDULE");
     title->setObjectName("title");
@@ -77,11 +83,11 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     SundayButton->setChecked(true);
 
     // create time markings
-    QLabel *hour4 = new QLabel("4AM");
-    QLabel *hour8 = new QLabel("8AM");
-    QLabel *hour12 = new QLabel("Noon");
-    QLabel *hour16 = new QLabel("4PM");
-    QLabel *hour20 = new QLabel("8PM");
+    hour4 = new QLabel("");
+    hour8 = new QLabel("");
+    hour12 = new QLabel("");
+    hour16 = new QLabel("");
+    hour20 = new QLabel("");
 
     // create days layout
     QVBoxLayout *daysButtonLayout = new QVBoxLayout;
@@ -99,13 +105,13 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
 
     // create time layout
     QHBoxLayout *timeLayout = new QHBoxLayout;
-    timeLayout->addSpacing(110);
+    timeLayout->addSpacing(134);
     timeLayout->addWidget(hour4);
-    timeLayout->addSpacing(24);
+    timeLayout->addSpacing(10);
     timeLayout->addWidget(hour8);
-    timeLayout->addSpacing(20);
+    timeLayout->addSpacing(16);
     timeLayout->addWidget(hour12);
-    timeLayout->addSpacing(24);
+    timeLayout->addSpacing(14);
     timeLayout->addWidget(hour16);
     timeLayout->addSpacing(24);
     timeLayout->addWidget(hour20);
@@ -145,6 +151,18 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
 
     // show final layout
     setLayout(mainLayout);
+
+    updateData();
+}
+
+void ScheduleScreen::updateData()
+{
+    hour4->setText(formatTimeString(QTime(4,0), m_globalSettings->timeFormat(), false));
+    hour8->setText(formatTimeString(QTime(8,0), m_globalSettings->timeFormat(), false));
+    hour12->setText("Noon");
+    hour16->setText(formatTimeString(QTime(16,0), m_globalSettings->timeFormat(), false));
+    hour20->setText(formatTimeString(QTime(20,0), m_globalSettings->timeFormat(), false));
+
 }
 
 void ScheduleScreen::addSchedulePoints()

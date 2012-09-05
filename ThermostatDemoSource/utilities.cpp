@@ -32,3 +32,13 @@ QString formatTemperatureString(int temp, GlobalSettings::TemperatureFormat temp
     }
     return tempString;
 }
+
+QString formatTimeString(QTime time, GlobalSettings::TimeFormat timeFormat, bool includeAMPM)
+{
+    if(timeFormat == GlobalSettings::TimeFormat24h)
+        return time.toString("hh:mm");
+    else if( timeFormat == GlobalSettings::TimeFormat12h && !includeAMPM )
+        return time.toString("h:mm AP").left(5);
+    else
+        return time.toString("h:mm AP");
+}
