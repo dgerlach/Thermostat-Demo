@@ -10,6 +10,12 @@
 
 #include <QtDebug>
 
+/***********************************************************************************************************
+* MainWindow
+*   Main Widget that holds all the child widgets and handles their layouts. Also coordinates loading of
+*   data from the web for the weather widget from the webdata class.
+************************************************************************************************************/
+
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
@@ -112,7 +118,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 //FUNCTION: createScreenLayout
 //
-//all code to generate the main layout for the MainWindow is here.
+//  all code to generate the main layout for the MainWindow is here.
 //
 
 void MainWindow::createScreenLayout()
@@ -169,7 +175,7 @@ void MainWindow::createScreenLayout()
 
 //FUNCTION: closeEvent
 //
-//Reimplemented closeEvent handle just to allow the app to save the settings before exiting
+//  Reimplemented closeEvent handler just to allow the app to save the settings before exiting
 //
 
 void MainWindow::closeEvent(QCloseEvent *e)

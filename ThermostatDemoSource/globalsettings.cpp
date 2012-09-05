@@ -10,17 +10,25 @@
 *   Also handles reading and writing of files using QSettings API to allow for standardized file formats
 ************************************************************************************************************/
 
-
+//initialization of static instance variable
 GlobalSettings* GlobalSettings::m_instance = NULL;
 
+//private constructor so class must be instantiated through getInstance function
 GlobalSettings::GlobalSettings()
 {
 }
 
+//destructor handles deleting of the instance variable
 GlobalSettings::~GlobalSettings()
 {
     delete m_instance;
 }
+
+//FUNCTION: getInstance()
+//
+//  Checks to see if static instance member variable points to anything,
+//  if not, creates instance of settings class, loads the data from a file,
+//  then returns the pointer to the instance
 
 GlobalSettings* GlobalSettings::getInstance()
 {
@@ -32,6 +40,11 @@ GlobalSettings* GlobalSettings::getInstance()
 
     return m_instance;
 }
+
+//FUNCTION: save()
+//
+//  Uses standard QSettings Qt API to store the settings in a file that is easily
+//  user editable.
 
 bool GlobalSettings::save()
 {
@@ -45,6 +58,11 @@ bool GlobalSettings::save()
 
 }
 
+//FUNCTION: load()
+//
+//  Uses QSettings API to load config values from a previously written file and also can set default values if
+//  no configuration file is present
+
 bool GlobalSettings::load()
 {
     QSettings settingsObject("ti", "thermostat");
@@ -56,12 +74,12 @@ bool GlobalSettings::load()
     setDataPath(QFileInfo(settingsObject.fileName()).absolutePath());
 
     qDebug() << "Settings loaded...";
-    qDebug() << proxyHost();
-    qDebug() << proxyPort();
-    qDebug() << currentCity();
-    qDebug() << temperatureFormat();
-    qDebug() << timeFormat();
-    qDebug() << dataPath();
+    qDebug() << "Proxy Host: " << proxyHost();
+    qDebug() << "Proxy Port: " << proxyPort();
+    qDebug() << "Current City: " << currentCity();
+    qDebug() << "Temperature Format: " << temperatureFormat();
+    qDebug() << "Time Format: " << timeFormat();
+    qDebug() << "Data Path: " << dataPath();
 
 }
 
@@ -70,6 +88,7 @@ void GlobalSettings::setProxyInfo(QString proxyHost, qint16 proxyPort)
     m_proxyHost = proxyHost;
     m_proxyPort = proxyPort;
 }
+
 void GlobalSettings::setCurrentCity(QString currentCity)
 {
     m_currentCity = currentCity;
