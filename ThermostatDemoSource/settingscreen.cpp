@@ -57,7 +57,7 @@ SettingScreen::SettingScreen(QWidget *parent) :
     connect(CButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
 
     // create box to contain all possible cities
-    QComboBox *cityBox = new QComboBox;
+    cityBox = new QComboBox;
     cityBox->setFocusPolicy(Qt::NoFocus);
     cityBox->addItem("Dallas,TX");
     cityBox->addItem("Tokyo,Japan");
@@ -74,9 +74,6 @@ SettingScreen::SettingScreen(QWidget *parent) :
     cityBox->addItem("Moscow,Russia");
     cityBox->addItem("Mexico City,Mexico");
     cityBox->addItem("Johannesburg,South Africa");
-
-    // when city is changed, create chain of events to send to web request and update main screen
-    connect(cityBox, SIGNAL(activated(QString)), this, SLOT(changeCity(QString)));
 
     // create city label
     QLabel *cityLabel = new QLabel("City: ", (this));
@@ -165,8 +162,6 @@ SettingScreen::SettingScreen(QWidget *parent) :
         m_proxyPortLineEdit->setText(QString::number(m_globalSettings->proxyPort()));
 }
 
-
-
 void SettingScreen::setTempFormatF()
 {
     CButton->setDisabled(false);
@@ -203,15 +198,14 @@ void SettingScreen::setTimeFormat24h()
     Button24h->setDisabled(true);
 }
 
-void SettingScreen::changeCity(QString city)
-{
-    m_globalSettings->setCurrentCity(city);
-    emit cityChanged(city);
-}
-
 void SettingScreen::commitChanges()
 {
     m_globalSettings->setProxyInfo(m_proxyHostLineEdit->text(),m_proxyPortLineEdit->text().toInt());
     emit(valueChanged());
+
+    QString city = cityBox->currentText();
+    m_globalSettings->setCurrentCity(city);
+    emit cityChanged(city);
+
     close();
 }

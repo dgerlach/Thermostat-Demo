@@ -24,10 +24,11 @@ public slots:
     void setTimeFormat12h();
     void setTimeFormat24h();
 
-    void changeCity(QString city);
     void commitChanges();
 
 private:
+    QComboBox *cityBox;
+
     QPushButton *FButton;
     QPushButton *CButton;
 

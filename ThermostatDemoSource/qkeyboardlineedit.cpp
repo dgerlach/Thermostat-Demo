@@ -24,8 +24,7 @@ void QKeyboardLineEdit::mousePressEvent(QMouseEvent *e)
         m_keyboardWidget = new Keyboard;
         connect(m_keyboardWidget, SIGNAL(closed()), this, SLOT(keyboardClosed()));
         m_keyboardWidget->setLineEdit(this);
-        m_keyboardWidget->show();
-
+        m_keyboardWidget->showMaximized();
     }
     if(m_isBeingEdited && m_keyboardWidget)
         qApp->setActiveWindow(m_keyboardWidget);
