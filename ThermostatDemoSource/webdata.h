@@ -31,6 +31,7 @@ public slots:
 private slots:
     void parseXML(QByteArray *xmlData);
     void responseReceived();
+    void handleNetworkTimeout();
 
 
 private:
@@ -48,7 +49,8 @@ private:
     QStringList forecastIconList;
     QStringList weekdayList;
     QStringList forecastTempList;
-    QString unitConversion(QString);
+
+    QTimer m_networkTimer;
 
     GlobalSettings *m_globalSettings;
 

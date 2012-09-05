@@ -44,6 +44,8 @@ void WebData::configureProxy()
 
 void WebData::responseReceived()
 {
+    m_networkTimer.stop();
+
     if(reply->error() == QNetworkReply::NoError)
     {
         QByteArray xmlData = reply->readAll();
@@ -52,6 +54,7 @@ void WebData::responseReceived()
     }
     else
     {
+        qDebug() << reply->errorString();
         loadLocalData();
         emit networkTimeout();
     }
@@ -319,23 +322,18 @@ void WebData::changeCity(QString city)
     // receive document and parse it
     request.setUrl(QUrl(cityUrl));
 
+    //set up timer to check for network timeout
+    connect(&m_networkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
+    m_networkTimer.start(30000);
+
+    //make actual network request
     reply = manager->get(request);
     connect(reply,SIGNAL(finished()),this,SLOT(responseReceived()));
 }
 
-QString WebData::unitConversion(QString currentValue)
+void WebData::handleNetworkTimeout()
 {
-    // check to see if setting is Farhenheit or Celsius and make proper conversion
-    // values are read in as Fahrenheit, so only need to convert to Celsius if necessary
-    int FInt, CInt;
-
-    if(!(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatF)) {
-        // false means C
-        // we want Celsius, but currently in Fahrenheit
-        FInt = currentValue.toInt();
-        CInt = ((FInt - 32) * 5)/9;
-        return QString::number(CInt);
-    } else {
-        return currentValue;
-    }
+    m_networkTimer.stop();
+    reply->abort();
+    emit(networkTimeout());
 }
