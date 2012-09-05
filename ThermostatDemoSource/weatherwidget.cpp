@@ -38,8 +38,10 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
     statusLabel->setObjectName("statusLabel");
     statusMovie->start();
     QHBoxLayout *statusLayout = new QHBoxLayout;
+    statusLayout->addStretch(0);
     statusLayout->addWidget(statusMovieLabel);
     statusLayout->addWidget(statusLabel);
+    statusLayout->addStretch(0);
 
     // create final layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -52,7 +54,6 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
     mainLayout->addLayout(statusLayout, 0);
     mainLayout->setAlignment(statusLayout, Qt::AlignBottom);
 
-    qDebug() << "WW HIEHGT" << height();
     // show layout
     setLayout(mainLayout);
 }
@@ -67,7 +68,7 @@ void WeatherWidget::setCity(QString city)
         cityShort.resize(9);
     }
     QString countryShort;
-    countryShort.clear();
+
     if(cityList.at(1).size() < 3) {
         countryShort = cityList.at(1);
     } else if (cityList.at(1) == "Japan") {
