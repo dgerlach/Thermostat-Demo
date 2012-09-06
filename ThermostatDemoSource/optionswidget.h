@@ -18,7 +18,7 @@ public:
     
 signals:
     void valueChanged();
-    void cityChanged(QString);
+    void cityChanged();
     void currentTempChanged();
 
 public slots:

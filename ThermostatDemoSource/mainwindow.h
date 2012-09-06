@@ -23,7 +23,7 @@ protected:
 signals:
     
 public slots:
-    void changeCity(QString);
+    void loadWebData();
     void closeEvent(QCloseEvent *);
     void setWebData(WeatherData* weatherData);
     void webDataFailed();

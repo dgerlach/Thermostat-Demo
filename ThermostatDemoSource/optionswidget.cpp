@@ -28,7 +28,7 @@ OptionsWidget::OptionsWidget(QWidget *parent) :
     // pass C/F value from settings screen to options widget and out to main window
     connect(settingScreen, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()));
     // pass new city string value from settings screen to options widget and out to main window
-    connect(settingScreen, SIGNAL(cityChanged(QString)), this, SIGNAL(cityChanged(QString)));
+    connect(settingScreen, SIGNAL(cityChanged()), this, SIGNAL(cityChanged()));
 
     // create new calender button
     calendarButton = new QPushButton();

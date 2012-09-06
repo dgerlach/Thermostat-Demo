@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create weather widget
     weatherWidget = new WeatherWidget;
+    connect(weatherWidget, SIGNAL(webReloadRequested()), this, SLOT(loadWebData()));
 
     // create thermostat widget
     thermostatWidget = new ThermostatWidget;
@@ -59,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // connect 10 second timer that causes current temp to follow setpoint to pass signal through options widget
     connect(thermostatWidget, SIGNAL(timeout()), optionsWidget, SIGNAL(currentTempChanged()));
     // connect new city name signal to the MainWindow function changeCity()
-    connect(optionsWidget, SIGNAL(cityChanged(QString)), this, SLOT(changeCity(QString)));
+    connect(optionsWidget, SIGNAL(cityChanged()), this, SLOT(loadWebData()));
     connect(optionsWidget, SIGNAL(valueChanged()), webData, SLOT(configureProxy()));
 
     // connect Celsius/Fahrenheit change signals
@@ -115,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent) :
     webData->loadLocalData();
 
     //call the changecity function which dispatches a network request for api weather data.
-    changeCity(m_globalSettings->currentCity());
+    loadWebData();
 }
 
 //FUNCTION: createScreenLayout
@@ -285,12 +286,12 @@ void MainWindow::energySaving(bool setpointReached)
 //  passed. returns immediately. the webdata class invokes setWebData slot on success
 //  or webDataFailed otherwise.
 
-void MainWindow::changeCity(QString city)
+void MainWindow::loadWebData()
 {
     // get new city information and pass it to WebData to send
     // a new request and get updated information for that city
     weatherWidget->setStatusUpdating();
-    webData->changeCity(city);
+    webData->changeCity(m_globalSettings->currentCity());
 
 }
 

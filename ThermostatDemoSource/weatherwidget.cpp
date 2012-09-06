@@ -155,3 +155,12 @@ void WeatherWidget::updateData()
     if(m_currentStatus == WeatherWidget::UpdateSuccess)
         setStatusUpdated();
 }
+
+void WeatherWidget::mousePressEvent(QMouseEvent *e)
+{
+    if(m_currentStatus == WeatherWidget::UpdateFailed)
+        emit(webReloadRequested());
+    else if(m_currentStatus == WeatherWidget::UpdateSuccess && m_weatherData->lastUpdated().addSecs(10) < QDateTime::currentDateTime())
+        emit webReloadRequested();
+    e->accept();
+}

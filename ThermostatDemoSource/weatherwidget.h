@@ -25,12 +25,16 @@ public:
 
 signals:
     void valueChanged();
+    void webReloadRequested();
+
 public slots:
     void setStatusUpdated();
     void setStatusUpdating();
     void setStatusFailed();
 
     void updateData();
+
+    void mousePressEvent(QMouseEvent *);
 
 
 protected:
