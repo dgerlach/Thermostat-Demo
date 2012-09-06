@@ -18,10 +18,8 @@ GlobalSettings::GlobalSettings()
 {
 }
 
-//destructor handles deleting of the instance variable
 GlobalSettings::~GlobalSettings()
 {
-    delete m_instance;
 }
 
 //FUNCTION: getInstance()
