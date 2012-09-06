@@ -52,6 +52,7 @@ void ForecastDataWidget::updateData()
     m_lowTemp->setText(formatTemperatureString(m_data->lowTemp(), m_globalSettings->temperatureFormat()));
     m_day->setText(m_data->day());
     m_iconPixmap->load(iconNameToPixmap(m_data->icon()));
+    QTimer::singleShot(0, this, SLOT(scaleContents()));
 }
 
 void ForecastDataWidget::scaleContents()

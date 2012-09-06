@@ -45,6 +45,7 @@ void WeatherDataWidget::updateData()
     m_currentTemp->setText(formatTemperatureString(m_data->currentTemp(), m_globalSettings->temperatureFormat()));
     m_currentCity->setText(m_data->currentCity());
     m_currentIconPixmap->load(iconNameToPixmap(m_data->icon()));
+    QTimer::singleShot(0, this, SLOT(scaleContents()));
 }
 
 void WeatherDataWidget::scaleContents()
