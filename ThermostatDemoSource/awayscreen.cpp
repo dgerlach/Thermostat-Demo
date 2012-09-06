@@ -1,6 +1,5 @@
 #include "awayscreen.h"
 #include "thermostatwidget.h"
-#include "settingscreen.h"
 #include "globalsettings.h"
 #include "utilities.h"
 #include "mainwindow.h"
@@ -23,6 +22,14 @@ AwayScreen::AwayScreen(QWidget *parent) :
     awayLabel = new QLabel("System is using energy saving AWAY MODE");
     awayLabel->setAlignment(Qt::AlignHCenter);
     awayLabel->setObjectName("awayLabel");
+
+    // button to return to main screen
+    QPushButton *backButton = new QPushButton();
+    backButton->setIcon(QIcon(":/Images/glossy-blue-orb-icon-arrowback.png"));
+    backButton->setIconSize(QSize(40,40));
+    backButton->setFocusPolicy(Qt::NoFocus);
+    backButton->setObjectName("backButton");
+    connect(backButton,SIGNAL(clicked()),this,SLOT(close()));
 
     // green leaf
     ecoLabel = new QLabel();
@@ -91,23 +98,19 @@ AwayScreen::AwayScreen(QWidget *parent) :
     QVBoxLayout *rightLayout = new QVBoxLayout;
     rightLayout->addWidget(awayLabel);
     rightLayout->insertSpacing(1,10);
-    rightLayout->addLayout(centerLayout);
+
 
     // combines existing layout with green leaf
     QHBoxLayout *topLayout = new QHBoxLayout;
     topLayout->addWidget(ecoLabel);
+    topLayout->addStretch();
     topLayout->addLayout(rightLayout);
+    topLayout->addStretch();
+    topLayout->addWidget(backButton);
 
-    // button to return to main screen
-    QPushButton *backButton = new QPushButton("I'm Back!");
-    backButton->setFocusPolicy(Qt::NoFocus);
-    connect(backButton,SIGNAL(clicked()),this,SLOT(close()));
-
-    // adds back button to provide final layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(topLayout);
-    mainLayout->insertSpacing(2,10);
-    mainLayout->addWidget(backButton);
+    mainLayout->addLayout(centerLayout);
     mainLayout->setAlignment(centerLayout,Qt::AlignHCenter);
 
     // show final layout

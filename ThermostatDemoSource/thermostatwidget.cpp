@@ -1,5 +1,4 @@
 #include "thermostatwidget.h"
-#include "settingscreen.h"
 #include "globalsettings.h"
 #include "utilities.h"
 

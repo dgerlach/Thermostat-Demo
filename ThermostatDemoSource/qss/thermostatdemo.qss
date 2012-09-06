@@ -159,6 +159,14 @@ AwayScreen > QPushButton {
 	radius: 1.35, stop: 0 black, stop: 1 rgb(100,100,100));
 }
 
+AwayScreen > QPushButton#backButton {
+        background: rgba(0,0,0,0);
+        margin: 0;
+        border: 0;
+        padding: 4px 4px;
+
+}
+
 ScheduleScreen {
 	background: black;
 }
@@ -205,8 +213,6 @@ ScheduleScreen > QPushButton {
 	background: rgba(0,0,0,0);
 	margin: 0;
 	padding: 4px 4px;
-	height: 20px;
-	width: 23px;
 }
 
 ScheduleScreen > QGraphicsView {
@@ -247,8 +253,7 @@ SettingScreen > QPushButton#backButton {
 	margin: 0;
 	border: 0;
 	padding: 4px 4px;
-	height: 20px;
-	width: 23px;
+
 }
 
 SettingScreen > QPushButton {

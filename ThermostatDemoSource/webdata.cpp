@@ -1,5 +1,4 @@
 #include "webdata.h"
-#include "settingscreen.h"
 #include "globalsettings.h"
 
 #include "weatherdata.h"
