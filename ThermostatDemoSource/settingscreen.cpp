@@ -205,7 +205,7 @@ void SettingScreen::commitChanges()
 
     QString city = cityBox->currentText();
     m_globalSettings->setCurrentCity(city);
-    emit cityChanged(city);
+    emit cityChanged();
 
     close();
 }

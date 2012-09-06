@@ -51,9 +51,9 @@ void WeatherDataWidget::updateData()
 void WeatherDataWidget::scaleContents()
 {
     int scaleFactor = this->height();
-    m_currentTemp->setStyleSheet("font-size:"+QString::number((int)(.6*scaleFactor))+"px;");
-    m_currentCity->setStyleSheet("font-size:"+QString::number((int)(.2*scaleFactor))+"px;");
-    m_currentIconHolderLabel->setPixmap(m_currentIconPixmap->scaledToHeight(scaleFactor));
+    m_currentTemp->setStyleSheet("font-size:"+QString::number((int)(.48*scaleFactor))+"px;");
+    m_currentCity->setStyleSheet("font-size:"+QString::number((int)(.16*scaleFactor))+"px;");
+    m_currentIconHolderLabel->setPixmap(m_currentIconPixmap->scaledToHeight(.9*scaleFactor));
 }
 
 QString WeatherDataWidget::iconNameToPixmap(QString icon)

@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(webData, SIGNAL(networkTimeout()), this, SLOT(webDataFailed()));
 
     // create weather widget
-    weatherWidget = new WeatherWidget;
+    weatherWidget = new WeatherWidget(this);
     connect(weatherWidget, SIGNAL(webReloadRequested()), this, SLOT(loadWebData()));
 
     // create thermostat widget
@@ -141,6 +141,8 @@ void MainWindow::createScreenLayout()
     middleLayout->addWidget(weatherWidget);
     middleLayout->addWidget(closeButton);
     middleLayout->addSpacing(6);
+    middleLayout->setStretchFactor(leftLayout, 1);
+    middleLayout->setStretchFactor(weatherWidget, 0);
     middleLayout->setAlignment(closeButton,Qt::AlignTop);
 
     //combine the previous nested layout with the date time and energy buttons

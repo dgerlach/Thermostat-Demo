@@ -46,7 +46,7 @@ private:
     QLabel *statusMovieLabel;
     QMovie *statusMovie;
     WeatherDataWidget* weatherDataWidget;
-    ForecastDataWidget* forecastDataWidget[3];
+    ForecastDataWidget* forecastDataWidget;
     WeatherData* m_weatherData;
 
     GlobalSettings *m_globalSettings;

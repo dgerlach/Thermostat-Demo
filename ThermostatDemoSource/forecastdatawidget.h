@@ -6,7 +6,20 @@
 class ForecastData;
 class GlobalSettings;
 class QLabel;
-class QHBoxLayout;
+class QGridLayout;
+
+
+//this class just groups together the widgets that belong to each row so they can easily be managed with an array
+class ForecastDataWidgetGroup
+{
+public:
+    QLabel *highTemp;
+    QLabel *lowTemp;
+    QLabel *day;
+    QLabel *iconHolderLabel;
+    QPixmap *iconPixmap;
+};
+
 
 class ForecastDataWidget : public QWidget
 {
@@ -18,20 +31,18 @@ signals:
     
 public slots:
     void updateData();
-    void setData(ForecastData* data);
+    void setData(QList<ForecastData* > data);
     void scaleContents();
 
 private:
-    QLabel *m_highTemp;
-    QLabel *m_lowTemp;
-    QLabel *m_day;
-    QLabel *m_iconHolderLabel;
-    QPixmap *m_iconPixmap;
-    ForecastData *m_data;
+    ForecastDataWidgetGroup m_forecastDataWidgetGroup[3];
+
+    QList<ForecastData *>m_data;
     GlobalSettings* m_globalSettings;
-    QHBoxLayout* widgetLayout;
+    QGridLayout* widgetLayout;
 
     QString iconNameToPixmap(QString icon);
 };
+
 
 #endif // FORECASTDATAWIDGET_H

@@ -13,7 +13,7 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
     m_globalSettings = GlobalSettings::getInstance();
 
     setObjectName("weatherWidget");
-    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    setFixedWidth(parent->width()/1.7);
     setAttribute(Qt::WA_StyledBackground,true);
 
     m_weatherData = NULL;
@@ -22,11 +22,8 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
     weatherDataWidget = new WeatherDataWidget(this);
     connect(this, SIGNAL(valueChanged()), weatherDataWidget, SLOT(updateData()));
 
-    for(int a =0; a< 3; a++)
-    {
-        forecastDataWidget[a] = new ForecastDataWidget(this);
-        connect(this, SIGNAL(valueChanged()), forecastDataWidget[a], SLOT(updateData()));
-    }
+    forecastDataWidget = new ForecastDataWidget(this);
+    connect(this, SIGNAL(valueChanged()), forecastDataWidget, SLOT(updateData()));
 
     connect(this, SIGNAL(valueChanged()), this, SLOT(updateData()));
 
@@ -47,9 +44,9 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
     //mainLayout->addLayout(currentHLayout);
-    mainLayout->addWidget(weatherDataWidget, 2);
-    for(int a =0;a<3; a++)
-        mainLayout->addWidget(forecastDataWidget[a], 1);
+    mainLayout->addWidget(weatherDataWidget, 3);
+    mainLayout->addWidget(forecastDataWidget, 5);
+
     mainLayout->setSpacing(1);
     mainLayout->addLayout(statusLayout, 0);
     mainLayout->setAlignment(statusLayout, Qt::AlignBottom);
@@ -108,12 +105,8 @@ void WeatherWidget::setWeatherData(WeatherData *weatherData)
     weatherDataWidget->setData(weatherData);
     weatherDataWidget->updateData();
 
-    for(int a=1;a<=3;a++)
-    {
-        forecastDataWidget[a-1]->setData(weatherData->forecastData().at(a));
-        forecastDataWidget[a-1]->updateData();
-    }
-
+    forecastDataWidget->setData(weatherData->forecastData());
+    forecastDataWidget->updateData();
 }
 
 void WeatherWidget::setStatusUpdated()
