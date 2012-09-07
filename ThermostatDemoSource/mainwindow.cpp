@@ -142,7 +142,7 @@ void MainWindow::createScreenLayout()
     middleLayout->addWidget(closeButton);
     middleLayout->addSpacing(6);
     middleLayout->setStretchFactor(leftLayout, 1);
-    middleLayout->setStretchFactor(weatherWidget, 0);
+    middleLayout->setStretchFactor(weatherWidget, 1);
     middleLayout->setAlignment(closeButton,Qt::AlignTop);
 
     //combine the previous nested layout with the date time and energy buttons
@@ -167,7 +167,7 @@ void MainWindow::createScreenLayout()
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(0);
     mainLayout->addLayout(contentsBox);
-    mainLayout->setStretchFactor(contentsBox, 2);
+    mainLayout->setStretchFactor(contentsBox, 0);
     mainLayout->addStretch(0);
     mainLayout->addLayout(bottomLayout);
     mainLayout->setContentsMargins(0,0,0,0);

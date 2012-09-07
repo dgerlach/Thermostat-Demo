@@ -13,7 +13,7 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
     m_globalSettings = GlobalSettings::getInstance();
 
     setObjectName("weatherWidget");
-    setFixedWidth(parent->width()/1.7);
+    setMaximumWidth(parent->width()/1.7);
     setAttribute(Qt::WA_StyledBackground,true);
 
     m_weatherData = NULL;

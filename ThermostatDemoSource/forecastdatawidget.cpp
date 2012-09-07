@@ -21,7 +21,7 @@ ForecastDataWidget::ForecastDataWidget(QWidget *parent) :
     QWidget(parent)
 {
     m_globalSettings = GlobalSettings::getInstance();
-    widgetLayout = new QGridLayout;
+    widgetLayout = new QGridLayout(this) ;
 
     for(int a = 0;a<FORECAST_DAYS;a++)
     {
@@ -30,10 +30,13 @@ ForecastDataWidget::ForecastDataWidget(QWidget *parent) :
         m_forecastDataWidgetGroup[a].day = new QLabel("");
         m_forecastDataWidgetGroup[a].iconHolderLabel= new QLabel();
         m_forecastDataWidgetGroup[a].iconPixmap = new QPixmap();
-        m_forecastDataWidgetGroup[a].iconHolderLabel->setPixmap(*m_forecastDataWidgetGroup[a].iconPixmap);
+        //m_forecastDataWidgetGroup[a].iconHolderLabel->setPixmap(*m_forecastDataWidgetGroup[a].iconPixmap);
 
         m_forecastDataWidgetGroup[a].day->setMargin(0);
 
+        m_forecastDataWidgetGroup[a].highTemp->setMargin(0);
+        m_forecastDataWidgetGroup[a].lowTemp->setMargin(0);
+        m_forecastDataWidgetGroup[a].iconHolderLabel->setMargin(0);
 
         widgetLayout->addWidget(m_forecastDataWidgetGroup[a].day, a, 0);
 
@@ -44,11 +47,25 @@ ForecastDataWidget::ForecastDataWidget(QWidget *parent) :
 
     }
 
-    widgetLayout->setSpacing(3);
-    widgetLayout->setContentsMargins(5,1,5,1);
+    widgetLayout->setHorizontalSpacing(0);
+    widgetLayout->setVerticalSpacing(0);
+    widgetLayout->setMargin(0);
 
-    setStyleSheet("color:#ffffff;background-color: none;padding:0px;");
-    setLayout(widgetLayout);
+
+    widgetLayout->setContentsMargins(0,0,0,0);
+    qDebug() << "LAYOUT INFO";
+    qDebug() << widgetLayout->verticalSpacing();
+    qDebug() << widgetLayout->horizontalSpacing();
+    qDebug() << widgetLayout->sizeHint();
+
+
+    QHBoxLayout* l = new QHBoxLayout(this);
+    l->setSpacing(0);
+    l->setContentsMargins(0,0,0,0);
+    l->addLayout(widgetLayout);
+
+    setStyleSheet("color:#ffffff;background-color: none;padding:0px;spacing:0px;");
+    setLayout(l);
     QTimer::singleShot(0, this, SLOT(scaleContents()));
 
 }

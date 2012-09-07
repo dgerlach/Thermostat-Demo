@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     QFile file(":/qss/thermostatdemo.qss");
     file.open(QFile::ReadOnly);
     app.setStyleSheet(file.readAll());
-
+    file.close();
     // create main window and show
     MainWindow *w = new MainWindow;
     w->showFullScreen();
