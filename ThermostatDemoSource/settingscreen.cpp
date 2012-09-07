@@ -5,6 +5,9 @@
 
 #include <QtGui>
 
+#define MAXIMUM_CONTENT_HEIGHT 450
+#define MAXIMUM_CONTENT_WIDTH 800
+
 SettingScreen::SettingScreen(QWidget *parent) :
     QWidget(parent)
 {
@@ -22,6 +25,146 @@ SettingScreen::SettingScreen(QWidget *parent) :
     connect(backButton,SIGNAL(clicked()),this,SLOT(commitChanges()));
     connect(backButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
 
+    QHBoxLayout *topLayout = new QHBoxLayout;
+    topLayout->addSpacing(40);
+    topLayout->addStretch();
+    topLayout->addWidget(title);
+    topLayout->addStretch();
+    topLayout->addWidget(backButton);
+
+    QTabWidget* mainTabWidget = new QTabWidget(this);
+    mainTabWidget->setFocusPolicy(Qt::NoFocus);
+
+    mainTabWidget->addTab(buildGeneralSettingsWidget(), "General");
+    mainTabWidget->addTab(buildFormatSettingsWidget(), "Format");
+    mainTabWidget->addTab(buildNetworkSettingsWidget(), "Network");
+//    mainTabWidget->addTab(buildGeneralSettingsWidget(), QIcon(":/Images/glossy-blue-orb-icon-arrowback.png"),"General");
+//    mainTabWidget->addTab(buildFormatSettingsWidget(), QIcon(":/Images/glossy-blue-orb-icon-arrowback.png"),"Format");
+//    mainTabWidget->addTab(buildNetworkSettingsWidget(), QIcon(":/Images/glossy-blue-orb-icon-arrowback.png"),"Network");
+//
+    mainTabWidget->setIconSize(QSize(40,40));
+    mainTabWidget->setTabPosition(QTabWidget::West);
+    mainTabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mainTabWidget->setMaximumSize(MAXIMUM_CONTENT_HEIGHT, MAXIMUM_CONTENT_WIDTH);
+
+    QHBoxLayout* contentsBox = new QHBoxLayout;
+    contentsBox->addWidget(mainTabWidget);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(topLayout);
+    mainLayout->addStretch();
+    mainLayout->addLayout(contentsBox);
+    mainLayout->setStretchFactor(contentsBox, 0);
+    mainLayout->addStretch(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setAlignment(contentsBox,Qt::AlignCenter);
+
+
+    // show layout
+    setLayout(mainLayout);
+
+    //populate the current settings
+
+    int index = cityBox->findText(m_globalSettings->currentCity());
+    if(index>-1)
+        cityBox->setCurrentIndex(index);
+
+    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatC)
+        setTempFormatC();
+    else
+        setTempFormatF();
+
+    if(m_globalSettings->timeFormat() == GlobalSettings::TimeFormat24h)
+        setTimeFormat24h();
+    else
+        setTimeFormat12h();
+
+    m_proxyHostLineEdit->setText(m_globalSettings->proxyHost());
+
+    //to prevent a zero from showing up
+    if(QString::number(m_globalSettings->proxyPort()) != 0)
+        m_proxyPortLineEdit->setText(QString::number(m_globalSettings->proxyPort()));
+}
+
+QWidget* SettingScreen::buildNetworkSettingsWidget()
+{
+    QWidget* networkSettingsWidget = new QWidget(this);
+    networkSettingsWidget->setStyle(this->style());
+
+
+    QLabel *m_proxyHostLabel = new QLabel("Proxy Host: ", this);
+    QLabel *m_proxyPortLabel = new QLabel("Proxy Port: ", this);
+    m_proxyHostLineEdit = new QKeyboardLineEdit;
+    m_proxyPortLineEdit = new QKeyboardLineEdit;
+
+    QFormLayout* proxyLayout = new QFormLayout;
+    proxyLayout->addRow(m_proxyHostLabel, m_proxyHostLineEdit);
+    proxyLayout->addRow(m_proxyPortLabel, m_proxyPortLineEdit);
+    m_proxyHostLineEdit->setMaximumWidth(300);
+    m_proxyPortLineEdit->setMaximumWidth(80);
+    proxyLayout->setFormAlignment(Qt::AlignCenter);
+
+    QVBoxLayout* proxyVBoxLayout = new QVBoxLayout(this);
+    proxyVBoxLayout->addStretch();
+    proxyVBoxLayout->addLayout(proxyLayout);
+
+    QGroupBox* proxySettingsGroupBox = new QGroupBox("Proxy Settings");
+
+    proxySettingsGroupBox->setLayout(proxyVBoxLayout);
+
+    QVBoxLayout *networkSettingsLayout = new QVBoxLayout(this);
+    networkSettingsLayout->addWidget(proxySettingsGroupBox);
+    networkSettingsLayout->addStretch();
+
+    networkSettingsWidget->setLayout(networkSettingsLayout);
+
+    return networkSettingsWidget;
+}
+
+QWidget* SettingScreen::buildGeneralSettingsWidget()
+{
+    // create box to contain all possible cities
+    cityBox = new QComboBox;
+    cityBox->setFocusPolicy(Qt::NoFocus);
+    cityBox->addItem("Dallas,TX");
+    cityBox->addItem("Tokyo,Japan");
+    cityBox->addItem("Chicago,IL");
+    cityBox->addItem("Hong Kong,China");
+    cityBox->addItem("Munich,Germany");
+    cityBox->addItem("Taipei,Taiwan");
+    cityBox->addItem("San Jose,CA");
+    cityBox->addItem("Shanghai,China");
+    cityBox->addItem("New York,NY");
+    cityBox->addItem("Bangalore,India");
+    cityBox->addItem("Sao Paulo,Brazil");
+    cityBox->addItem("Seoul,South Korea");
+    cityBox->addItem("Moscow,Russia");
+    cityBox->addItem("Mexico City,Mexico");
+    cityBox->addItem("Johannesburg,South Africa");
+
+
+    QVBoxLayout *cityLayout = new QVBoxLayout;
+    cityLayout->addStretch();
+    cityLayout->addWidget(cityBox);
+    cityLayout->addStretch();
+
+    QWidget* generalSettingsWidget = new QWidget(this);
+
+    QGroupBox* generalSettingsGroupBox = new QGroupBox("City");
+
+    generalSettingsGroupBox->setLayout(cityLayout);
+
+    QVBoxLayout *generalSettingsLayout = new QVBoxLayout(this);
+    generalSettingsLayout->addWidget(generalSettingsGroupBox);
+    generalSettingsLayout->addStretch();
+
+    generalSettingsWidget->setLayout(generalSettingsLayout);
+
+    return generalSettingsWidget;
+}
+
+QWidget* SettingScreen::buildFormatSettingsWidget()
+{
     // create button to select Fahrenheit
     FButton = new QPushButton("°F", (this));
     //FButton->setMaximumWidth(150);
@@ -56,27 +199,7 @@ SettingScreen::SettingScreen(QWidget *parent) :
     connect(FButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
     connect(CButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
 
-    // create box to contain all possible cities
-    cityBox = new QComboBox;
-    cityBox->setFocusPolicy(Qt::NoFocus);
-    cityBox->addItem("Dallas,TX");
-    cityBox->addItem("Tokyo,Japan");
-    cityBox->addItem("Chicago,IL");
-    cityBox->addItem("Hong Kong,China");
-    cityBox->addItem("Munich,Germany");
-    cityBox->addItem("Taipei,Taiwan");
-    cityBox->addItem("San Jose,CA");
-    cityBox->addItem("Shanghai,China");
-    cityBox->addItem("New York,NY");
-    cityBox->addItem("Bangalore,India");
-    cityBox->addItem("Sao Paulo,Brazil");
-    cityBox->addItem("Seoul,South Korea");
-    cityBox->addItem("Moscow,Russia");
-    cityBox->addItem("Mexico City,Mexico");
-    cityBox->addItem("Johannesburg,South Africa");
 
-    // create city label
-    QLabel *cityLabel = new QLabel("City: ", (this));
 
     // create layout
     QHBoxLayout *unitLayout = new QHBoxLayout;
@@ -96,71 +219,23 @@ SettingScreen::SettingScreen(QWidget *parent) :
     timeFormatLayout->setSpacing(0);
     timeFormatLayout->setContentsMargins(0,0,0,0);
 
-    QHBoxLayout *cityLayout = new QHBoxLayout;
-    cityLayout->addStretch();
-    cityLayout->addWidget(cityLabel);
-    cityLayout->addWidget(cityBox);
-    cityLayout->addStretch();
+    QGroupBox *tempFormatGroupBox = new QGroupBox("Temperature", this);
+    QGroupBox *timeFormatGroupBox = new QGroupBox("Time Format", this);
 
-    QHBoxLayout *topLayout = new QHBoxLayout;
-    topLayout->addSpacing(40);
-    topLayout->addStretch();
-    topLayout->addWidget(title);
-    topLayout->addStretch();
-    topLayout->addWidget(backButton);
+    tempFormatGroupBox->setLayout(unitLayout);
+    timeFormatGroupBox->setLayout(timeFormatLayout);
 
-    QLabel *m_proxyHostLabel = new QLabel("Proxy Host: ", this);
-    QLabel *m_proxyPortLabel = new QLabel("Proxy Port: ", this);
-    m_proxyHostLineEdit = new QKeyboardLineEdit;
-    m_proxyPortLineEdit = new QKeyboardLineEdit;
-    QFormLayout* proxyLayout = new QFormLayout;
+    QVBoxLayout *formatSettingsLayout = new QVBoxLayout(this);
+    formatSettingsLayout->addWidget(tempFormatGroupBox);
+    formatSettingsLayout->addWidget(timeFormatGroupBox);
 
-    proxyLayout->addRow(m_proxyHostLabel, m_proxyHostLineEdit);
-    proxyLayout->addRow(m_proxyPortLabel, m_proxyPortLineEdit);
-    m_proxyHostLineEdit->setMaximumWidth(300);
-    m_proxyPortLineEdit->setMaximumWidth(80);
-    proxyLayout->setFormAlignment(Qt::AlignCenter);
+    QWidget *formatSettingsWidget = new QWidget(this);
+    formatSettingsWidget->setLayout(formatSettingsLayout);
 
-
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(topLayout);
-    mainLayout->addStretch();
-    mainLayout->addLayout(cityLayout);
-    mainLayout->addStretch();
-    mainLayout->addLayout(unitLayout);
-    mainLayout->addStretch();
-    mainLayout->addLayout(timeFormatLayout);
-    mainLayout->addStretch();
-    mainLayout->addLayout(proxyLayout);
-    mainLayout->setAlignment(proxyLayout, Qt::AlignCenter);
-    mainLayout->addStretch();
-
-    // show layout
-    setLayout(mainLayout);
-
-    //populate the current settings
-
-    int index = cityBox->findText(m_globalSettings->currentCity());
-    if(index>-1)
-        cityBox->setCurrentIndex(index);
-
-    if(m_globalSettings->temperatureFormat() == GlobalSettings::TempFormatC)
-        setTempFormatC();
-    else
-        setTempFormatF();
-
-    if(m_globalSettings->timeFormat() == GlobalSettings::TimeFormat24h)
-        setTimeFormat24h();
-    else
-        setTimeFormat12h();
-
-    m_proxyHostLineEdit->setText(m_globalSettings->proxyHost());
-
-    //to prevent a zero from showing up
-    if(QString::number(m_globalSettings->proxyPort()) != 0)
-        m_proxyPortLineEdit->setText(QString::number(m_globalSettings->proxyPort()));
+    return formatSettingsWidget;
 }
+
+
 
 void SettingScreen::setTempFormatF()
 {

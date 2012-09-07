@@ -1,30 +1,30 @@
 WeatherWidget,ThermostatWidget,OptionsWidget {
-	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
-									  stop: 0 black, stop: 0.01 rgb(100, 100, 100), 
-									  stop: 0.02 black);								  						  
-	border: 2px groove gray;
-	border-radius: 10px;
-	padding: 2px 4px;
-	qproperty-alignment: AlignCenter;
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                                                          stop: 0 black, stop: 0.01 rgb(100, 100, 100),
+                                                                          stop: 0.02 black);
+        border: 2px groove gray;
+        border-radius: 10px;
+        padding: 2px 4px;
+        qproperty-alignment: AlignCenter;
 }
 /*
 OptionsWidget {
-	border: none;
-	background-color: rgba(0,0,0,0);
+        border: none;
+        background-color: rgba(0,0,0,0);
 }
 */
 WeatherWidget > QLabel {
-	color: white;	
-	font-size: 18px;
-	qproperty-alignment: AlignCenter;
+        color: white;
+        font-size: 18px;
+        qproperty-alignment: AlignCenter;
 }
 
 WeatherWidget > QLabel#currentCity {
-	font-size: 14px;
+        font-size: 14px;
 }
 
 WeatherWidget > QLabel#currentTemp {
-	font-size: 36px;
+        font-size: 36px;
 }
 
 WeatherWidget > QLabel#statusLabel {
@@ -32,90 +32,90 @@ WeatherWidget > QLabel#statusLabel {
 }
 
 WeatherWidget:pressed {
-	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
-									  stop: 0 black, stop: 0.03 white, 
-									  stop: 0.05 rgb(100,100,100), stop: 0.1 black);
-	border-style: inset;
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                                                          stop: 0 black, stop: 0.03 white,
+                                                                          stop: 0.05 rgb(100,100,100), stop: 0.1 black);
+        border-style: inset;
 }
 
 ThermostatWidget > QLabel {
-	color: white;
+        color: white;
         font-size: 32px;
-	qproperty-alignment: AlignCenter;
-	padding-right: 10px;
-	padding-left: 10px;
+        qproperty-alignment: AlignCenter;
+        padding-right: 10px;
+        padding-left: 10px;
 }
 
 ThermostatWidget > QLabel#currentTemp {
         font-size: 84px;
-	padding: -5px;
-	margin-right: -30px;
+        padding: -5px;
+        margin-right: -30px;
 }
 
 ThermostatWidget > QPushButton {
-	color: white;
-	font-size: 36px;
-	border: 2px solid #555;
-	border-radius: 11px;
-	padding: 5px;
-	background: qradialgradient(cx: 0.3, cy: -0.4,
-	fx: 0.3, fy: -0.4,
-	radius: 1.35, stop: 0 black, stop: 1 rgb(100,100,100));
-	width: 40px;
-	height: 40px;
-}	
+        color: white;
+        font-size: 36px;
+        border: 2px solid #555;
+        border-radius: 11px;
+        padding: 5px;
+        background: qradialgradient(cx: 0.3, cy: -0.4,
+        fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 black, stop: 1 rgb(100,100,100));
+        width: 40px;
+        height: 40px;
+}
 
 ThermostatWidget > QPushButton:pressed {
-	background: qradialgradient(cx: 0.3, cy: -0.4,
-	fx: 0.3, fy: -0.4,
-	radius: 1.35, stop: 0 black, stop: 1 #888);
+        background: qradialgradient(cx: 0.3, cy: -0.4,
+        fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 black, stop: 1 #888);
 }
 
 OptionsWidget > QPushButton {
-	background: rgba(0,0,0,0);
-	margin: 0;
-	padding: 4px 4px;
+        background: rgba(0,0,0,0);
+        margin: 0;
+        padding: 4px 4px;
 }
 
 #closeButton {
-	background: rgba(0,0,0,0);
-	margin: 0;
-	padding: 1px;
-	height: 10px;
-	width: 10px;
+        background: rgba(0,0,0,0);
+        margin: 0;
+        padding: 1px;
+        height: 10px;
+        width: 10px;
 }
 
 #energyButton {
-	background: green;
-	color: white;
+        background: green;
+        color: white;
 }
 
 #timeButton {
-	background: black;
-	color: white;
+        background: black;
+        color: white;
 }
 
 #dateButton {
-	background: black;
-	color: white;
-	qproperty-alignment: AlignCenter;
+        background: black;
+        color: white;
+        qproperty-alignment: AlignCenter;
 }
 
 AwayScreen {
-	background: black;
+        background: black;
 }
 
 AwayScreen > QLabel {
-	color: white;
-	font-size: 16px;
+        color: white;
+        font-size: 16px;
 }
 
 AwayScreen > QLabel#ecoLabel {
-	width: 30px;
+        width: 30px;
 }
 
 AwayScreen > QLabel#currentTemp {
-	font-size: 100px;
+        font-size: 100px;
 }
 
 AwayScreen > QSpinBox {
@@ -131,8 +131,8 @@ AwayScreen > QSpinBox::up-button {
      subcontrol-position: top right;
      width: 50px;
      border-image: url(:/Images/simple-black-square-icon-arrowup.png) 1;
-     border-bottom-width: -5px; 
-     border-top-width: 0px;  
+     border-bottom-width: -5px;
+     border-top-width: 0px;
      border-right-width: 0px;
      border-left-width: 0px;
 }
@@ -142,21 +142,21 @@ AwayScreen > QSpinBox::down-button {
      subcontrol-position: bottom right;
      width: 50px;
      border-image: url(:/Images/simple-black-square-icon-arrowdown.png) 1;
-     border-top-width: -5px;   
+     border-top-width: -5px;
      border-bottom-width: 0px;
      border-right-width: 0px;
      border-left-width: 0px;
 }
 
 AwayScreen > QPushButton {
-	color: white;
-	font-size: 16px;
-	border: 2px solid #555;
-	border-radius: 11px;
-	padding: 5px;
-	background: qradialgradient(cx: 0.3, cy: -0.4,
-	fx: 0.3, fy: -0.4,
-	radius: 1.35, stop: 0 black, stop: 1 rgb(100,100,100));
+        color: white;
+        font-size: 16px;
+        border: 2px solid #555;
+        border-radius: 11px;
+        padding: 5px;
+        background: qradialgradient(cx: 0.3, cy: -0.4,
+        fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 black, stop: 1 rgb(100,100,100));
 }
 
 AwayScreen > QPushButton#backButton {
@@ -168,149 +168,195 @@ AwayScreen > QPushButton#backButton {
 }
 
 ScheduleScreen {
-	background: black;
+        background: black;
 }
 
 ScheduleScreen > QLabel {
-	color: white;
-	font-size: 12px;
-	margin: 0;
-	padding: 0;
+        color: white;
+        font-size: 12px;
+        margin: 0;
+        padding: 0;
 }
 
 ScheduleScreen > QLabel#title {
-	font-size: 16px;
+        font-size: 16px;
 }
 
 ScheduleScreen > QLabel#currentTime {
-	font-size: 16px;
+        font-size: 16px;
 }
 
 ScheduleScreen > QCheckBox::indicator:checked {
-	image: url(:/Images/simple-black-square-icon-check-box-full.png) 1;
-	height: 32px;
-	width: 32px;
-	margin: 0px;
-	padding: 0px;
-	border: 0px;
+        image: url(:/Images/simple-black-square-icon-check-box-full.png) 1;
+        height: 32px;
+        width: 32px;
+        margin: 0px;
+        padding: 0px;
+        border: 0px;
 }
 
 ScheduleScreen > QCheckBox::indicator:unchecked {
-	image: url(:/Images/simple-black-square-icon-check-box-empty.png) 1;
-	height: 32px;
-	width: 32px;
-	margin: 0px;
-	padding: 0px;
-	border: 0px;
+        image: url(:/Images/simple-black-square-icon-check-box-empty.png) 1;
+        height: 32px;
+        width: 32px;
+        margin: 0px;
+        padding: 0px;
+        border: 0px;
 }
 
 ScheduleScreen > QCheckBox {
-	color: white;
-	spacing: 0px;
+        color: white;
+        spacing: 0px;
 }
 
 ScheduleScreen > QPushButton {
-	background: rgba(0,0,0,0);
-	margin: 0;
-	padding: 4px 4px;
+        background: rgba(0,0,0,0);
+        margin: 0;
+        padding: 4px 4px;
 }
 
 ScheduleScreen > QGraphicsView {
-	background: black;
-	border: 0;
+        background: black;
+        border: 0;
 }
 
 QMessageBox {
-	background: black;
-	spacing: 40px;
+        background: black;
+        spacing: 40px;
 }
 
 QMessageBox > QWidget {
-	color: white;
-	font-size: 16px;
-	padding-top: 45px;
-	padding-bottom: 45px;
-	margin: 15px;
-	border: 15px;
+        color: white;
+        font-size: 16px;
+        padding-top: 45px;
+        padding-bottom: 45px;
+        margin: 15px;
+        border: 15px;
 }
 
 Keyboard {
-	background: black;
-	color: white;
+        background: black;
+        color: white;
 }
 
 SettingScreen {
-	background: black;
+        background: black;
 }
 
-SettingScreen > QLabel {
-	color: white;
-	font-size: 16px;
+SettingScreen QKeyboardLineEdit{
+        color: white;
+        border: 2px solid #999;
+        border-radius: 7px;
 }
 
-SettingScreen > QPushButton#backButton {
-	background: rgba(0,0,0,0);
-	margin: 0;
-	border: 0;
-	padding: 4px 4px;
+SettingScreen QWidget {
+        background: black;
+}
+
+
+SettingScreen QLabel {
+        color: white;
+        font-size: 16px;
+}
+
+SettingScreen QPushButton#backButton {
+        background: rgba(0,0,0,0);
+        margin: 0;
+        border: 0;
+        padding: 4px 4px;
 
 }
 
-SettingScreen > QPushButton {
-	color: white;
-	font-size: 16px;
-	border: 2px solid #555;
-	border-radius: 11px;
-	padding: 5px;
-	background: qradialgradient(cx: 0.3, cy: -0.4,
-	fx: 0.3, fy: -0.4,
-	radius: 1.35, stop: 0 black, stop: 1 rgb(50,50,50));
+SettingScreen QPushButton {
+        color: white;
+        font-size: 16px;
+        border: 2px solid #555;
+        border-radius: 11px;
+        padding: 5px;
+        background: qradialgradient(cx: 0.3, cy: -0.4,
+        fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 black, stop: 1 rgb(50,50,50));
 }
 
-SettingScreen > QPushButton:checked {
-	color: black;
-	background: qradialgradient(cx: 0.3, cy: -0.4,
-	fx: 0.3, fy: -0.4,
-	radius: 1.35, stop: 0 black, stop: 1 white);
+SettingScreen QPushButton:checked {
+        color: black;
+        background: qradialgradient(cx: 0.3, cy: -0.4,
+        fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 black, stop: 1 white);
 }
 
-SettingScreen > QComboBox {
+SettingScreen QComboBox {
     color: white;
     font: 16pt;
     background: qradialgradient(cx: 0.3, cy: -0.4,
-	fx: 0.3, fy: -0.4,
-	radius: 1.35, stop: 0 black, stop: 1 rgb(100,100,100));
-	border: 2px solid #555;
-	border-radius: 11px;
-	padding: 5px;
+        fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 black, stop: 1 rgb(100,100,100));
+        border: 2px solid #555;
+        border-radius: 11px;
+        padding: 5px;
 }
 
 
-SettingScreen > QComboBox:on {
+SettingScreen QComboBox:on {
     color: white;
     font: 16pt;
-	background: qradialgradient(cx: 0.3, cy: -0.4,
-	fx: 0.3, fy: -0.4,
-	radius: 1.35, stop: 0 black, stop: 1 #888);
-	border: 2px solid #555;
-	border-radius: 11px;
-	padding: 5px;
+        background: qradialgradient(cx: 0.3, cy: -0.4,
+        fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 black, stop: 1 #888);
+        border: 2px solid #555;
+        border-radius: 11px;
+        padding: 5px;
 }
 
-SettingScreen > QComboBox::drop-down {
-	background:  rgba(0,0,0,0);
-	padding-right: 10px;
+SettingScreen QComboBox::drop-down {
+        background:  rgba(0,0,0,0);
+        padding-right: 10px;
 }
 
-SettingScreen > QComboBox::down-arrow {
-	border-image: url(:/Images/down-arrow.png);
+SettingScreen QComboBox::down-arrow {
+        border-image: url(:/Images/down-arrow.png);
 }
 
-SettingScreen > QComboBox QAbstractItemView {
+SettingScreen QComboBox QAbstractItemView {
     color: white;
-	border: 2px solid #555;
+        border: 2px solid #555;
     selection-background-color: black;
-	background: qradialgradient(cx: 0.3, cy: -0.4,
-	fx: 0.3, fy: -0.4,
-	radius: 1.35, stop: 0 black, stop: 1 #888);
+        background: qradialgradient(cx: 0.3, cy: -0.4,
+        fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 black, stop: 1 #888);
  }
+
+SettingScreen QGroupBox {
+    color: white;
+    font: 16pt;
+}
+
+SettingScreen QTabBar::tab {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 black, stop: 0.01 rgb(100, 100, 100),
+                                      stop: 0.02 black);
+    border: 2px groove #333;
+    border-radius: 10px;
+    padding: 2px 14px 2px 14px;
+    qproperty-alignment: AlignCenter;
+    color:#999;
+}
+SettingScreen QTabBar::tab:selected {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 black, stop: 0.01 rgb(100, 100, 100),
+                                      stop: 0.02 black);
+    border: 2px groove gray;
+    border-radius: 10px;
+    padding: 2px 14px 2px 14px;
+    qproperty-alignment: AlignCenter;
+    color:white;
+}
+SettingScreen QTabWidget::pane {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 black, stop: 0.01 rgb(100, 100, 100),
+                                      stop: 0.02 black);
+    border: 2px groove gray;
+    border-radius: 10px;
+    padding: 6px;
+    qproperty-alignment: AlignCenter;
+}

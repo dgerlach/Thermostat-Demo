@@ -39,6 +39,10 @@ private:
     QKeyboardLineEdit* m_proxyPortLineEdit;
 
     GlobalSettings* m_globalSettings;
+
+    QWidget* buildNetworkSettingsWidget();
+    QWidget* buildGeneralSettingsWidget();
+    QWidget* buildFormatSettingsWidget();
     
 };
 
