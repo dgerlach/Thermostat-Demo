@@ -21,7 +21,7 @@ ForecastDataWidget::ForecastDataWidget(QWidget *parent) :
     QWidget(parent)
 {
     m_globalSettings = GlobalSettings::getInstance();
-    widgetLayout = new QGridLayout(this) ;
+    widgetLayout = new QGridLayout ;
 
     for(int a = 0;a<FORECAST_DAYS;a++)
     {
@@ -53,13 +53,8 @@ ForecastDataWidget::ForecastDataWidget(QWidget *parent) :
 
 
     widgetLayout->setContentsMargins(0,0,0,0);
-    qDebug() << "LAYOUT INFO";
-    qDebug() << widgetLayout->verticalSpacing();
-    qDebug() << widgetLayout->horizontalSpacing();
-    qDebug() << widgetLayout->sizeHint();
 
-
-    QHBoxLayout* l = new QHBoxLayout(this);
+    QHBoxLayout* l = new QHBoxLayout;
     l->setSpacing(0);
     l->setContentsMargins(0,0,0,0);
     l->addLayout(widgetLayout);
