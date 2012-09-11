@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg network
+QT       += core gui svg network script
 
 
 TARGET = ThermostatDemo
@@ -27,7 +27,10 @@ SOURCES += main.cpp \
     forecastdata.cpp \
     forecastdatawidget.cpp \
     utilities.cpp \
-    weatherdatawidget.cpp
+    weatherdatawidget.cpp \
+    webdataengine/webdataengine.cpp \
+    webdataengine/openweathermapdataengine.cpp \
+    webdataengine/wundergrounddataengine.cpp
 
 HEADERS  += \
     weatherwidget.h \
@@ -47,7 +50,11 @@ HEADERS  += \
     forecastdata.h \
     forecastdatawidget.h \
     utilities.h \
-    weatherdatawidget.h
+    weatherdatawidget.h \
+    main.h \
+    webdataengine/webdataengine.h \
+    webdataengine/openweathermapdataengine.h \
+    webdataengine/wundergrounddataengine.h
 
 RESOURCES += \
     thermostatdemo.qrc
@@ -60,3 +67,5 @@ FORMS += \
 
 target.path += /home/root
 INSTALLS += target
+
+OTHER_FILES +=
