@@ -18,6 +18,7 @@ public:
 
     void changeCity(QString);
     void loadLocalData();
+    QString licenseString();
 
 signals:
     void dataAvailable(WeatherData* weatherData);

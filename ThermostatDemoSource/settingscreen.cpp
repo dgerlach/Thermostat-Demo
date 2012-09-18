@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "globalsettings.h"
 #include "qkeyboardlineedit.h"
+#include "webdataengine/openweathermapdataengine.h"
 
 #include <QtGui>
 
@@ -151,16 +152,26 @@ QWidget* SettingScreen::buildGeneralSettingsWidget()
     QWidget* generalSettingsWidget = new QWidget(this);
 
     QGroupBox* generalSettingsGroupBox = new QGroupBox("City");
+    licenseStringLabel = new QLabel("");
+    licenseStringLabel->setWordWrap(true);
+    licenseStringLabel->setAlignment(Qt::AlignCenter);
 
     generalSettingsGroupBox->setLayout(cityLayout);
 
     QVBoxLayout *generalSettingsLayout = new QVBoxLayout(this);
     generalSettingsLayout->addWidget(generalSettingsGroupBox);
     generalSettingsLayout->addStretch();
+    generalSettingsLayout->addWidget(licenseStringLabel, 0, Qt::AlignCenter);
+    generalSettingsLayout->addStretch();
 
     generalSettingsWidget->setLayout(generalSettingsLayout);
 
     return generalSettingsWidget;
+}
+
+void SettingScreen::setLicenseString(QString licenseString)
+{
+    licenseStringLabel->setText(licenseString);
 }
 
 QWidget* SettingScreen::buildFormatSettingsWidget()

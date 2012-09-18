@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // create options widget
     optionsWidget = new OptionsWidget;
     optionsWidget->awayScreen->setCurrentTempPtr(&m_currentThermostatTemp);
+    optionsWidget->settingScreen->setLicenseString(webData->licenseString());
 
     // connect 10 second timer that causes current temp to follow setpoint to pass signal through options widget
     connect(thermostatWidget, SIGNAL(timeout()), optionsWidget, SIGNAL(currentTempChanged()));
@@ -167,7 +168,7 @@ void MainWindow::createScreenLayout()
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addStretch(0);
     mainLayout->addLayout(contentsBox);
-    mainLayout->setStretchFactor(contentsBox, 0);
+    mainLayout->setStretchFactor(contentsBox, 1);
     mainLayout->addStretch(0);
     mainLayout->addLayout(bottomLayout);
     mainLayout->setContentsMargins(0,0,0,0);
@@ -188,6 +189,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
     m_globalSettings->save();
     delete m_globalSettings;
     e->accept();
+    qApp->quit();
 }
 
 void MainWindow::paintEvent(QPaintEvent *)

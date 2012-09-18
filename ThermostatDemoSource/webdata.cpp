@@ -23,6 +23,7 @@ WebData::WebData(QObject *parent) :
 
     webDataEngine = new OpenWeatherMapDataEngine(manager);
     connect(webDataEngine, SIGNAL(dataAvailable(WeatherData*)), this, SIGNAL(dataAvailable(WeatherData*)));
+    connect(webDataEngine, SIGNAL(networkTimeout()), this, SIGNAL(networkTimeout()));
 
     configureProxy();
 }
@@ -50,4 +51,9 @@ void WebData::changeCity(QString city)
 void WebData::loadLocalData()
 {
     webDataEngine->loadLocalData();
+}
+
+QString WebData::licenseString()
+{
+    return webDataEngine->licenseString();
 }

@@ -10,6 +10,7 @@
 WeatherWidget::WeatherWidget(QWidget *parent) :
         QWidget(parent)
 {
+    //grab an instance of the global settings
     m_globalSettings = GlobalSettings::getInstance();
 
     setObjectName("weatherWidget");
@@ -43,7 +44,6 @@ WeatherWidget::WeatherWidget(QWidget *parent) :
     // create final layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
-    //mainLayout->addLayout(currentHLayout);
     mainLayout->addWidget(weatherDataWidget, 3);
     mainLayout->addWidget(forecastDataWidget, 5);
 

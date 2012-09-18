@@ -41,8 +41,6 @@ private:
     OptionsWidget *optionsWidget;
     ThermostatWidget *thermostatWidget;
 
-
-
     GlobalSettings* m_globalSettings;
 
     void createScreenLayout();

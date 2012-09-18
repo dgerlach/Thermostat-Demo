@@ -11,7 +11,8 @@ class SettingScreen : public QWidget
     Q_OBJECT
 public:
     explicit SettingScreen(QWidget *parent = 0);
-    static bool unit;
+
+    void setLicenseString(QString licenseString);
     
 signals:
     void valueChanged();
@@ -28,6 +29,7 @@ public slots:
 
 private:
     QComboBox *cityBox;
+    QLabel *licenseStringLabel;
 
     QPushButton *FButton;
     QPushButton *CButton;

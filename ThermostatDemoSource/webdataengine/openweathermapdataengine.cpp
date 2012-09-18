@@ -51,7 +51,6 @@ void OpenWeatherMapDataEngine::dispatchRequest()
 
 void OpenWeatherMapDataEngine::handleNetworkTimeout()
 {
-    //todo: deal with resources!
     emit(networkTimeout());
 }
 
@@ -74,7 +73,7 @@ void OpenWeatherMapDataEngine::responseReceived()
     else
     {
         qDebug() << m_reply->errorString();
-        //TODO:loadLocalData();
+        loadLocalData();
         emit networkTimeout();
         //docs say do not delete in the slot so well pass it off to the event loop
         m_reply->deleteLater();
@@ -117,6 +116,13 @@ void OpenWeatherMapDataEngine::dispatchWeatherDataRequests()
 void OpenWeatherMapDataEngine::currentWeatherResponseReceived()
 {
     m_networkTimer.stop();
+
+    if(m_reply->error() != QNetworkReply::NoError)
+    {
+        emit networkTimeout();
+        m_reply->deleteLater();
+        return;
+    }
     m_rawJSONWeatherString = m_reply->readAll();
     parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData);
     m_weatherReceived = true;
@@ -125,6 +131,12 @@ void OpenWeatherMapDataEngine::currentWeatherResponseReceived()
 
 void OpenWeatherMapDataEngine::forecastResponseReceived()
 {
+    if(m_forecastReply->error() != QNetworkReply::NoError)
+    {
+        emit networkTimeout();
+        m_forecastReply->deleteLater();
+        return;
+    }
     m_forecastNetworkTimer.stop();
     m_rawJSONForecastString = m_forecastReply->readAll();
     parseJSONForecastData(&m_rawJSONForecastString, m_weatherData);
@@ -161,11 +173,6 @@ void OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherDa
     weatherData->setCurrentTemp(temp);
     weatherData->setLocalTime(localTime);
     weatherData->setIcon(icon);
-
-    qDebug() << "CUYRRENT";
-    qDebug() << temp;
-    qDebug() << localTime.toString();
-    qDebug() << icon;
 }
 
 void OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherData* weatherData)
@@ -293,8 +300,8 @@ void OpenWeatherMapDataEngine::loadLocalData()
 
     bool result = readFromCache();
     //if we can't read from the cache file, read from the one included in the qrc!
-    //if(!result)
-    //    readFromCache(":/data/cache.dat");
+    if(!result)
+        readFromCache(":/data/cache.dat");
 
     parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData);
     parseJSONForecastData(&m_rawJSONForecastString, m_weatherData);
@@ -326,12 +333,9 @@ bool OpenWeatherMapDataEngine::writeToCache()
 
     QDataStream stream(&cacheFile);
     stream.setVersion(QDataStream::Qt_4_6);
+    stream << m_weatherData->currentCity();
     stream << m_rawJSONWeatherString;
     stream << m_rawJSONForecastString;
-
-    qDebug() << m_rawJSONWeatherString;
-    qDebug() << m_rawJSONForecastString;
-
 
     if(cacheFile.error() != QFile::NoError)
     {
@@ -373,6 +377,9 @@ bool OpenWeatherMapDataEngine::readFromCache(QString alternateCacheFile)
 
     QDataStream stream(&cacheFile);
     stream.setVersion(QDataStream::Qt_4_6);
+    QString cityString;
+    stream >> cityString;
+    m_weatherData->setCurrentCity(cityString);
     stream >> m_rawJSONWeatherString;
     stream >> m_rawJSONForecastString;
 

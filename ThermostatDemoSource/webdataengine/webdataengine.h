@@ -26,7 +26,6 @@ signals:
     void networkTimeout();
 
 public slots:
-    virtual void responseReceived()=0;
 
 protected:
     QNetworkAccessManager *m_manager;
