@@ -38,8 +38,6 @@ void OpenWeatherMapDataEngine::dispatchRequest()
     QNetworkRequest request;
     request.setUrl(QUrl(cityUrl));
 
-    qDebug() << cityUrl;
-
     //set up timer to check for network timeout
     connect(&m_networkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
     m_networkTimer.start(15000);
@@ -72,7 +70,6 @@ void OpenWeatherMapDataEngine::responseReceived()
     }
     else
     {
-        qDebug() << m_reply->errorString();
         loadLocalData();
         emit networkTimeout();
         //docs say do not delete in the slot so well pass it off to the event loop
@@ -159,15 +156,14 @@ void OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherDa
     QScriptEngine engine;
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
-    qDebug() << result.toString() << *jsonData;
     if(result.isError())return;
 
 
     int temp = kelvinToFahrenheit(result.property("main").property("temp").toNumber());
     QDateTime localTime = QDateTime::fromTime_t(result.property("dt").toNumber());
-    qDebug() << result.property("img").toString();
+
     int iconIndex = convertImageNameToIndex(result.property("img").toString());
-    qDebug() << iconIndex;
+
     QString icon = m_iconNameToWeatherHash[iconIndex];
 
     weatherData->setCurrentTemp(temp);
@@ -180,7 +176,7 @@ void OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherD
     QScriptEngine engine;
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
-    qDebug() << result.toString() << *jsonData;
+
     if(result.isError())return;
 
     QScriptValueIterator it(result.property("list"));
@@ -382,10 +378,6 @@ bool OpenWeatherMapDataEngine::readFromCache(QString alternateCacheFile)
     m_weatherData->setCurrentCity(cityString);
     stream >> m_rawJSONWeatherString;
     stream >> m_rawJSONForecastString;
-
-    qDebug() << m_rawJSONWeatherString;
-    qDebug() << m_rawJSONForecastString;
-
 
     //we can at least assume if the size is zero, something is not right.
     if(cacheFile.error() != QFile::NoError)
