@@ -28,6 +28,9 @@ public:
     void increaseTemp();
     void decreaseTemp();
     QString time();
+    void setTimeBlockWidth(float timeBlockWidth);
+    void setPointArea(QRectF pointArea);
+    void setWeekHeight(int weekHeight);
 
 public slots:
     void updateUnit();
@@ -44,6 +47,9 @@ private:
     int temp;
     int ID;
     int location;
+    float m_timeBlockWidth;
+    int m_weekHeight;
+    QRectF m_pointArea;
 
     GlobalSettings* m_globalSettings;
     

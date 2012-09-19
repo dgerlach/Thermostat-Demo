@@ -25,19 +25,14 @@ public slots:
     void showPoints(int);
     void removeAllBlur();
     void updateData();
-
+    void createScheduleScene();
+    void showEvent(QShowEvent *);
+    void addSchedulePoints();
 private:
-    QCheckBox *MondayButton;
-    QCheckBox *TuesdayButton;
-    QCheckBox *WednesdayButton;
-    QCheckBox *ThursdayButton;
-    QCheckBox *FridayButton;
-    QCheckBox *SaturdayButton;
-    QCheckBox *SundayButton;
     QButtonGroup *daysButtonGroup;
     QGraphicsScene *scene;
     QGraphicsView *view;
-    void addSchedulePoints();
+
     int seqNumber;
     QGraphicsProxyWidget *proxyLeftButton;
     QGraphicsProxyWidget *proxyRightButton;
@@ -65,10 +60,18 @@ private:
     QLabel *hour16;
     QLabel *hour20;
 
+    QRectF pointArea;
+    qreal weekHeight;
+    qreal timeBlockWidth;
+    qreal timeWidth;
+
     GlobalSettings* m_globalSettings;
+
+    bool m_initialized;
 
 protected:
     void mousePressEvent(QMouseEvent */* event */);
+    bool eventFilter(QObject *, QEvent *);
 
 };
 

@@ -32,13 +32,32 @@ void SchedulePoint::setText(const QString &text)
     update();
 }
 
+void SchedulePoint::setTimeBlockWidth(float timeBlockWidth)
+{
+    m_timeBlockWidth = timeBlockWidth;
+}
+
+void SchedulePoint::setWeekHeight(int weekHeight)
+{
+    m_weekHeight = weekHeight;
+}
+
+void SchedulePoint::setPointArea(QRectF pointArea)
+{
+    m_pointArea = pointArea;
+}
+
 QRectF SchedulePoint::outlineRect() const
 {
     // define outline rectangle
-    const int padding = 3;
+    const int padding = 5;
     QFontMetricsF metrics = qApp->font();
     QRectF rect = metrics.boundingRect(myText);
-    rect.adjust(-padding, -padding, +padding, +padding);
+    //choose either to go smallest size to fit the text or 90% of the row Height
+    rect.setHeight(qMax(rect.height(), (qreal)(m_weekHeight*.90)));
+    //adjust to make wider and look normal
+    rect.adjust(-padding, 0, padding, 0);
+    //make it so the coords represent the center
     rect.translate(-rect.center());
     return rect;
 }
@@ -95,7 +114,7 @@ void SchedulePoint::shiftLeft()
 {
     // provide a slot to allow point shifting to the left
     location--;
-    this->moveBy(-3.4, 0.0);
+    this->moveBy(-m_timeBlockWidth, 0.0);
     update();
 }
 
@@ -103,7 +122,7 @@ void SchedulePoint::shiftRight()
 {
     // provide a slot to allow point shifting to the right
     location++;
-    this->moveBy(+3.4, 0.0);
+    this->moveBy(+m_timeBlockWidth, 0.0);
     update();
 }
 
@@ -148,8 +167,11 @@ int SchedulePoint::getLocation()
 QString SchedulePoint::time()
 {
     // output the current time represnted by this point's location
-    int hours = ((15/3.4)*(this->pos().x()+12.7)) / 60;
-    int minutes = (int)((15/3.4)*(this->pos().x()+12.7)) % 60;
+    int timeBlockCount = qRound((pos().x() -m_pointArea.left())/m_timeBlockWidth);
+    int hours = (timeBlockCount/4.0f + 2.0f);
+    qDebug() << "TIME: " << hours << pos().x() << timeBlockCount<< m_pointArea.left() << m_timeBlockWidth;
+    int minutes = (timeBlockCount%4) *15;
+    qDebug() << "TIME MINUTES: " << minutes << pos().x() << timeBlockCount<< m_pointArea.left() << m_timeBlockWidth;
     QTime time(hours, minutes);
     return formatTimeString(time, m_globalSettings->timeFormat());
 }
