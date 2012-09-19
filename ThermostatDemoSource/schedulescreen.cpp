@@ -66,7 +66,7 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
 
     QWidget *sizeLimiterWidget = new QWidget;
     sizeLimiterWidget->setMaximumSize(800, 450);
-    //sizeLimiterWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizeLimiterWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizeLimiterWidget->setLayout(mainLayout);
     QHBoxLayout* contentsBox = new QHBoxLayout;
     contentsBox->addWidget(sizeLimiterWidget);
@@ -196,8 +196,6 @@ void ScheduleScreen::showPoint(SchedulePoint *point)
 {
     qreal timeWidth = ((scene->width()- pointArea.left())/5.0);
 
-    qDebug() << "SHOW POINT  "<< QPoint(pointArea.left() + timeWidth + (timeWidth * (point->getID() % 4)), weekHeight/2 + (weekHeight * ((point->getID() / 4) % 7)));
-
     // show point based on unique ID
     point->setPos(QPoint(pointArea.left() + timeWidth + (timeWidth * (point->getID() % 4)), pointArea.top() + weekHeight/2 + (weekHeight * ((point->getID() / 4) % 7))));
     scene->addItem(point);
@@ -312,7 +310,7 @@ void ScheduleScreen::showButtons(SchedulePoint *point)
     currentTime->setText(currentPoint->time());
 
     // first hide all 4 buttons, then we will make them reappear in the correct position
-    hideButtons();
+    /*hideButtons();
 
     // create left arrow
     QPushButton *leftArrowButton = new QPushButton();
@@ -384,6 +382,7 @@ void ScheduleScreen::showButtons(SchedulePoint *point)
 
     // blur all columns except the currently selected column
     blur();
+    */
 
 }
 

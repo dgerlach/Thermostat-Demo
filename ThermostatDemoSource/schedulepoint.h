@@ -31,12 +31,15 @@ public:
     void setTimeBlockWidth(float timeBlockWidth);
     void setPointArea(QRectF pointArea);
     void setWeekHeight(int weekHeight);
+    QColor tempToColor(int temp);
 
 public slots:
     void updateUnit();
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent */* event */);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent * /* event */);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent * /* event */);
     void paintEvent(QPaintEvent */* event */);
 
 private:
@@ -52,6 +55,10 @@ private:
     QRectF m_pointArea;
 
     GlobalSettings* m_globalSettings;
+    bool m_pressed;
+    int m_xClickPos;
+    int m_yClickPos;
+    QPen pen; // outline color
     
 signals:
     void clicked(SchedulePoint *);

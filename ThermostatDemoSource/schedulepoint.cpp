@@ -6,22 +6,36 @@
 
 #include <QtGui>
 
+
+#define MAXTEMP 100
+#define MINTEMP 50
+
 SchedulePoint::SchedulePoint(int seqNumber)
 {
     m_globalSettings = GlobalSettings::getInstance();
 
     // create schedule point with necessary information
     ID = seqNumber;
-    myBackgroundColor = Qt::blue;
     temp = 72;
+    pen.setColor((Qt::white));
     setFlags(ItemIsSelectable);
     location=0;
+    m_pressed = false;
     updateUnit();
 }
 
 SchedulePoint::~SchedulePoint()
 {
     // destructor
+}
+
+//calculation to make color vary linearly from defined MINTEMP to MAXTEMP
+//based on passed temp
+
+QColor SchedulePoint::tempToColor(int temp)
+{
+     float pct = ((float)temp-MINTEMP)/100.0 *((float)MAXTEMP/MINTEMP);
+     return QColor(255*pct, 0, 255*(1-pct));
 }
 
 void SchedulePoint::setText(const QString &text)
@@ -50,13 +64,11 @@ void SchedulePoint::setPointArea(QRectF pointArea)
 QRectF SchedulePoint::outlineRect() const
 {
     // define outline rectangle
-    const int padding = 5;
-    QFontMetricsF metrics = qApp->font();
-    QRectF rect = metrics.boundingRect(myText);
+    QRectF rect;
     //choose either to go smallest size to fit the text or 90% of the row Height
     rect.setHeight(qMax(rect.height(), (qreal)(m_weekHeight*.90)));
     //adjust to make wider and look normal
-    rect.adjust(-padding, 0, padding, 0);
+    rect.adjust(-m_timeBlockWidth*2.5, 0, m_timeBlockWidth*2.5, 0);
     //make it so the coords represent the center
     rect.translate(-rect.center());
     return rect;
@@ -82,10 +94,12 @@ void SchedulePoint::paint(QPainter *painter,
                           const QStyleOptionGraphicsItem *option, QWidget * /*widget*/)
 {
     // draw point itself
-    QPen pen(Qt::white); // outline color
+
     if(option->state & QStyle::State_Selected) {
 
     }
+
+    myBackgroundColor = tempToColor(temp);
     painter->setPen(pen);
     painter->setBrush(myBackgroundColor);
 
@@ -95,11 +109,54 @@ void SchedulePoint::paint(QPainter *painter,
     painter->drawText(rect, Qt::AlignCenter, myText);
 }
 
-void SchedulePoint::mousePressEvent(QGraphicsSceneMouseEvent * /* event */)
+void SchedulePoint::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
     // provide event handler for mouse click
     emit clicked(this);
+    m_pressed = true;
+    pen.setColor(Qt::black);
+    setZValue(10);
+    m_xClickPos = e->pos().x();
+    m_yClickPos = e->pos().y();
+}
 
+void SchedulePoint::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
+{
+    // provide event handler for mouse move
+    emit clicked(this);
+    if(m_pressed == true)
+    {
+        if(m_yClickPos - m_weekHeight/4 > e->pos().y())
+        {
+            m_yClickPos = e->pos().y();
+            increaseTemp();
+        }
+        else if(m_yClickPos + m_weekHeight/4 < e->pos().y())
+        {
+            m_yClickPos = e->pos().y();
+            decreaseTemp();
+        }
+
+        if(m_xClickPos - m_timeBlockWidth > e->pos().x())
+        {
+            //m_xClickPos = e->pos().x();
+            shiftLeft();
+        }
+        else if(m_xClickPos + m_timeBlockWidth < e->pos().x())
+        {
+            //m_xClickPos = e->pos().x();
+            shiftRight();
+        }
+    }
+
+    e->accept();
+}
+
+void SchedulePoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
+{
+    setZValue(0);
+    pen.setColor(Qt::white);
+    e->accept();
 }
 
 int SchedulePoint::roundness(double size) const
@@ -112,6 +169,8 @@ int SchedulePoint::roundness(double size) const
 
 void SchedulePoint::shiftLeft()
 {
+    if(pos().x() - m_timeBlockWidth - boundingRect().width()/2.0 <m_pointArea.left())
+        return;
     // provide a slot to allow point shifting to the left
     location--;
     this->moveBy(-m_timeBlockWidth, 0.0);
@@ -120,6 +179,9 @@ void SchedulePoint::shiftLeft()
 
 void SchedulePoint::shiftRight()
 {
+    qDebug() <<boundingRect().width()/2.0;
+    if(pos().x() + m_timeBlockWidth + boundingRect().width()*1.5 > m_pointArea.right())
+        return;
     // provide a slot to allow point shifting to the right
     location++;
     this->moveBy(+m_timeBlockWidth, 0.0);
@@ -130,6 +192,7 @@ void SchedulePoint::increaseTemp()
 {
     // provide a slot to increase point temperature
     temp++;
+    if(temp>MAXTEMP)temp=MAXTEMP;
     updateUnit();
 }
 
@@ -137,6 +200,7 @@ void SchedulePoint::decreaseTemp()
 {
     // provide a slot to decrease temperature
     temp--;
+    if(temp<MINTEMP)temp=MINTEMP;
     updateUnit();
 }
 
@@ -169,9 +233,9 @@ QString SchedulePoint::time()
     // output the current time represnted by this point's location
     int timeBlockCount = qRound((pos().x() -m_pointArea.left())/m_timeBlockWidth);
     int hours = (timeBlockCount/4.0f + 2.0f);
-    qDebug() << "TIME: " << hours << pos().x() << timeBlockCount<< m_pointArea.left() << m_timeBlockWidth;
+    //qDebug() << "TIME: " << hours << pos().x() << timeBlockCount<< m_pointArea.left() << m_timeBlockWidth;
     int minutes = (timeBlockCount%4) *15;
-    qDebug() << "TIME MINUTES: " << minutes << pos().x() << timeBlockCount<< m_pointArea.left() << m_timeBlockWidth;
+    //qDebug() << "TIME MINUTES: " << minutes << pos().x() << timeBlockCount<< m_pointArea.left() << m_timeBlockWidth;
     QTime time(hours, minutes);
     return formatTimeString(time, m_globalSettings->timeFormat());
 }
