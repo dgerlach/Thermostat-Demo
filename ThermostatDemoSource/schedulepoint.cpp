@@ -179,7 +179,6 @@ void SchedulePoint::shiftLeft()
 
 void SchedulePoint::shiftRight()
 {
-    qDebug() <<boundingRect().width()/2.0;
     if(pos().x() + m_timeBlockWidth + boundingRect().width()*1.5 > m_pointArea.right())
         return;
     // provide a slot to allow point shifting to the right

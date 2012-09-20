@@ -28,6 +28,7 @@ public slots:
     void createScheduleScene();
     void showEvent(QShowEvent *);
     void addSchedulePoints();
+    void disableRow(bool checked);
 private:
     QButtonGroup *daysButtonGroup;
     QGraphicsScene *scene;
@@ -53,13 +54,6 @@ private:
     QLabel *currentTime;
     void blur();
 
-    // create time markings
-    QLabel *hour4;
-    QLabel *hour8;
-    QLabel *hour12;
-    QLabel *hour16;
-    QLabel *hour20;
-
     QRectF pointArea;
     qreal weekHeight;
     qreal timeBlockWidth;
@@ -71,8 +65,6 @@ private:
 
 protected:
     void mousePressEvent(QMouseEvent */* event */);
-    bool eventFilter(QObject *, QEvent *);
-
 };
 
 #endif // SCHEDULESCREEN_H

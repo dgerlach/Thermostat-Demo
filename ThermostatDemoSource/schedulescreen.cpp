@@ -28,9 +28,6 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     // create time represented by current point
     currentTime = new QLabel();
     currentTime->setObjectName("currentTime");
-    currentTime->setMinimumWidth(80);
-    currentTime->setMaximumWidth(80);
-    currentTime->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 
     // create back button
     QPushButton *backButton = new QPushButton();
@@ -59,16 +56,21 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     // create final layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(topLayout);
-    //mainLayout->addStretch();
     QHBoxLayout* viewLayout = new QHBoxLayout;
     viewLayout->addWidget(view);
+    viewLayout->setContentsMargins(0,0,0,0);
+    viewLayout->setSpacing(0);
     mainLayout->addLayout(viewLayout);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setSpacing(0);
 
     QWidget *sizeLimiterWidget = new QWidget;
     sizeLimiterWidget->setMaximumSize(800, 450);
     sizeLimiterWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizeLimiterWidget->setLayout(mainLayout);
+    sizeLimiterWidget->setContentsMargins(0,0,0,0);
     QHBoxLayout* contentsBox = new QHBoxLayout;
+    contentsBox->setContentsMargins(0,0,0,0);
     contentsBox->addWidget(sizeLimiterWidget);
 
     // show final layout
@@ -81,24 +83,24 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
 void ScheduleScreen::createScheduleScene()
 {
 
-    qDebug() << view->size();
     // create graphics view and scene
     scene = new QGraphicsScene(0,0,view->width(), view->height());
     view->setScene(scene);
 
     QPen pen(Qt::blue);
     QBrush brush(Qt::black);
-
-    weekHeight = (scene->height()/7.0)-7;
     QFont font = this->font();
     font.setBold(true);
     QFontMetrics fm(font);
 
-    QDate date = QDate::fromString("Sun", "ddd");
+    weekHeight = (scene->height()/7.0)-(scene->height()*.02);
 
     pointArea.setRect(fm.boundingRect("Wed").width()+20, 15, scene->width(), weekHeight*7);
     qreal timeWidth = ((scene->width()- pointArea.left())/5.0);
     timeBlockWidth = timeWidth/16.0; //15 min increments
+
+    QDate date = QDate::fromString("Sun", "ddd");
+
     for(int a = 0;a<7;a++)
     {
         pen.setColor(QColor(110+40*(a%2),110+40*(a%2),110+40*(a%2)));
@@ -113,8 +115,24 @@ void ScheduleScreen::createScheduleScene()
         date = date.addDays(1);
         QString dateString = date.toString("ddd");
         pen.setColor(QColor(50,50,50));
-        QGraphicsSimpleTextItem* textItem = scene->addSimpleText(dateString, font);
-        //installEventFilter(textItem);
+        QPushButton* b = new QPushButton;
+        connect(b, SIGNAL(clicked(bool)), this, SLOT(disableRow(bool)));
+        b->setFlat(true);
+        b->setFont(font);
+        b->setFocusPolicy(Qt::NoFocus);
+        b->setMaximumWidth(pointArea.left()-4);
+        b->setMaximumHeight(weekHeight-4);
+        QPalette buttonPalette(QColor(180,180,180));
+        //buttonPalette.setColor(QPalette::Active, QPalette::Button, QColor(180,180,180));
+        b->setPalette(buttonPalette);
+        b->setCheckable(true);
+        b->setChecked(true);
+        b->setText(dateString);
+        b->setProperty("dayNumber", date.dayOfWeek()-1);
+        QGraphicsProxyWidget* textItem = new QGraphicsProxyWidget;
+        textItem->setWidget(b);
+        scene->addItem(textItem);
+
         textItem->setPos(pointArea.left()/2 - textItem->boundingRect().width()/2, pointArea.top()+ a*weekHeight + weekHeight/2 - textItem->boundingRect().height()/2);
     }
 
@@ -139,15 +157,32 @@ void ScheduleScreen::createScheduleScene()
 
 }
 
-bool ScheduleScreen::eventFilter(QObject *o, QEvent *e)
+
+void ScheduleScreen::disableRow(bool checked)
 {
-    if(e->type() == QEvent::MouseButtonPress)
-    {
-        QGraphicsSimpleTextItem* textItem = dynamic_cast<QGraphicsSimpleTextItem*>(o);
-        if(!textItem)
-            return QObject::eventFilter(o,e);
-        textItem->setBrush(QBrush(QColor(233,233,233)));
+    QPushButton* button = dynamic_cast<QPushButton* >(this->sender());
+    int index = button->property("dayNumber").toInt()*4;
+
+    // display only those points that are requested by weekday check boxes
+    if(checked) {
+
+        pointList.at(index+0)->show();
+        pointList.at(index+1)->show();
+        pointList.at(index+2)->show();
+        pointList.at(index+3)->show();
+        button->setStyleSheet("");
     }
+    else
+    {
+        pointList.at(index+0)->hide();
+        pointList.at(index+1)->hide();
+        pointList.at(index+2)->hide();
+        pointList.at(index+3)->hide();
+        button->setStyleSheet("color:#CCCCCC");
+    }
+
+    return;
+
 }
 
 void ScheduleScreen::showEvent(QShowEvent *e)
@@ -205,7 +240,7 @@ void ScheduleScreen::shiftLeft()
 {
     // shift buttons left and shift visible points left in this column unless
     // left edge of graphics view has been reached
-    qDebug() << "POSITION DEBUG : " << currentPoint->pos().x() << pointArea.left();
+
     if(currentPoint->pos().x()- currentPoint->boundingRect().width()/2- timeBlockWidth > pointArea.left()) {
         shiftButtonsLeft();
         for(int i=0; i<7; i++) {
