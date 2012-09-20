@@ -27,6 +27,7 @@ signals:
 
 public slots:
 
+
 protected:
     QNetworkAccessManager *m_manager;
     QString m_preparedCity;
