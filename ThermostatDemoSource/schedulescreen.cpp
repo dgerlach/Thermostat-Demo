@@ -28,6 +28,7 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     // create time represented by current point
     currentTime = new QLabel();
     currentTime->setObjectName("currentTime");
+    currentTime->setMinimumWidth(80);
 
     // create back button
     QPushButton *backButton = new QPushButton();
@@ -95,8 +96,8 @@ void ScheduleScreen::createScheduleScene()
 
     weekHeight = (scene->height()/7.0)-(scene->height()*.02);
 
-    pointArea.setRect(fm.boundingRect("Wed").width()+20, 15, scene->width(), weekHeight*7);
-    qreal timeWidth = ((scene->width()- pointArea.left())/5.0);
+    pointArea.setRect(fm.boundingRect("Wed").width()+20, 15, scene->width()-40, weekHeight*7);
+    qreal timeWidth = ((pointArea.width() - pointArea.left())/5.0);
     timeBlockWidth = timeWidth/16.0; //15 min increments
 
     QDate date = QDate::fromString("Sun", "ddd");
@@ -106,7 +107,7 @@ void ScheduleScreen::createScheduleScene()
         pen.setColor(QColor(110+40*(a%2),110+40*(a%2),110+40*(a%2)));
         brush.setColor(QColor(120+40*(a%2),120+40*(a%2),120+40*(a%2)));
 
-        scene->addRect(0,pointArea.top()+a*weekHeight,(qreal)scene->width(),weekHeight, pen, brush);
+        scene->addRect(0,pointArea.top()+a*weekHeight,pointArea.width(),weekHeight, pen, brush);
 
         pen.setColor(QColor(150,150,150));
         brush.setColor(QColor(180,180,180));
@@ -229,7 +230,7 @@ void ScheduleScreen::addSchedulePoints()
 
 void ScheduleScreen::showPoint(SchedulePoint *point)
 {
-    qreal timeWidth = ((scene->width()- pointArea.left())/5.0);
+    qreal timeWidth = ((pointArea.width()- pointArea.left())/5.0);
 
     // show point based on unique ID
     point->setPos(QPoint(pointArea.left() + timeWidth + (timeWidth * (point->getID() % 4)), pointArea.top() + weekHeight/2 + (weekHeight * ((point->getID() / 4) % 7))));
