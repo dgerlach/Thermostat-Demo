@@ -121,9 +121,14 @@ void OpenWeatherMapDataEngine::currentWeatherResponseReceived()
         return;
     }
     m_rawJSONWeatherString = m_reply->readAll();
-    parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData);
-    m_weatherReceived = true;
-    checkIfDone();
+    bool result = parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData);
+    if(!result)
+        emit networkTimeout();
+    else
+    {
+        m_weatherReceived = true;
+        checkIfDone();
+    }
 }
 
 void OpenWeatherMapDataEngine::forecastResponseReceived()
@@ -136,9 +141,14 @@ void OpenWeatherMapDataEngine::forecastResponseReceived()
     }
     m_forecastNetworkTimer.stop();
     m_rawJSONForecastString = m_forecastReply->readAll();
-    parseJSONForecastData(&m_rawJSONForecastString, m_weatherData);
-    m_forecastReceived = true;
-    checkIfDone();
+    bool result = parseJSONForecastData(&m_rawJSONForecastString, m_weatherData);
+    if(!result)
+        emit networkTimeout();
+    else
+    {
+        m_forecastReceived = true;
+        checkIfDone();
+    }
 }
 
 void OpenWeatherMapDataEngine::checkIfDone()
@@ -151,12 +161,12 @@ void OpenWeatherMapDataEngine::checkIfDone()
     }
 }
 
-void OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherData *weatherData)
+bool OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherData *weatherData)
 {
     QScriptEngine engine;
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
-    if(result.isError())return;
+    if(result.isError())return false;
 
 
     int temp = kelvinToFahrenheit(result.property("main").property("temp").toNumber());
@@ -169,15 +179,16 @@ void OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherDa
     weatherData->setCurrentTemp(temp);
     weatherData->setLocalTime(localTime);
     weatherData->setIcon(icon);
+    return true;
 }
 
-void OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherData* weatherData)
+bool OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherData* weatherData)
 {
     QScriptEngine engine;
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
 
-    if(result.isError())return;
+    if(result.isError())return false;
 
     QScriptValueIterator it(result.property("list"));
 
@@ -223,6 +234,7 @@ void OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherD
             icon = "";
         }
     }
+    return true;
 }
 
 
@@ -299,11 +311,19 @@ void OpenWeatherMapDataEngine::loadLocalData()
     if(!result)
         readFromCache(":/data/cache.dat");
 
-    parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData);
-    parseJSONForecastData(&m_rawJSONForecastString, m_weatherData);
-    m_weatherData->setLastUpdated(QDateTime::currentDateTime());
-    writeToCache();
-    emit(dataAvailable(m_weatherData));
+    if(!parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData))
+    {
+        emit networkTimeout();
+    }
+    else if(!parseJSONForecastData(&m_rawJSONForecastString, m_weatherData))
+    {
+        emit networkTimeout();
+    }
+    else
+    {
+        m_weatherData->setLastUpdated(QDateTime::currentDateTime());
+        emit(dataAvailable(m_weatherData));
+    }
 }
 
 //FUNCTION writeToCache
