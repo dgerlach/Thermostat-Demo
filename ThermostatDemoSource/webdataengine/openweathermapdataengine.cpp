@@ -174,14 +174,6 @@ void OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherDa
     weatherData->setCurrentTemp(temp);
     weatherData->setLocalTime(localTime);
     weatherData->setIcon(icon);
-<<<<<<< HEAD
-=======
-
-    qDebug() << "CUYRRENT";
-    qDebug() << temp;
-    qDebug() << localTime.toString();
-    qDebug() << icon;
->>>>>>> 17637cf2fd8a8feaa930ac27589f0ed9a6d40b5f
 }
 
 void OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherData* weatherData)
