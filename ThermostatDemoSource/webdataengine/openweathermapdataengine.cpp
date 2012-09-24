@@ -72,6 +72,7 @@ void OpenWeatherMapDataEngine::responseReceived()
     }
     else
     {
+        qDebug() << "Network Error: " << m_reply->errorString();
         loadLocalData();
         emit networkTimeout();
         //docs say do not delete in the slot so well pass it off to the event loop
@@ -118,6 +119,7 @@ void OpenWeatherMapDataEngine::currentWeatherResponseReceived()
 
     if(m_reply->error() != QNetworkReply::NoError)
     {
+        qDebug() << "Network Error: " << m_reply->errorString();
         emit networkTimeout();
         m_reply->deleteLater();
         return;
@@ -137,6 +139,7 @@ void OpenWeatherMapDataEngine::forecastResponseReceived()
 {
     if(m_forecastReply->error() != QNetworkReply::NoError)
     {
+        qDebug() << "Network Error: " << m_reply->errorString();
         emit networkTimeout();
         m_forecastReply->deleteLater();
         return;
@@ -309,6 +312,7 @@ int OpenWeatherMapDataEngine::convertImageNameToIndex(QString img)
 void OpenWeatherMapDataEngine::loadLocalData()
 {
     m_weatherData = new WeatherData;
+    m_weatherData->setCachedDataFlag();
 
     bool result = readFromCache();
     //if we can't read from the cache file, read from the one included in the qrc!

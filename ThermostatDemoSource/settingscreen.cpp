@@ -64,6 +64,18 @@ SettingScreen::SettingScreen(QWidget *parent) :
     // show layout
     setLayout(mainLayout);
 
+
+}
+
+void SettingScreen::showEvent(QShowEvent *)
+{
+    qDebug() << "SHOWING";
+    fillSettingValues();
+    qDebug() << m_globalSettings->proxyHost() << m_globalSettings->proxyPort();
+}
+
+void SettingScreen::fillSettingValues()
+{
     //populate the current settings
 
     int index = cityBox->findText(m_globalSettings->currentCity());

@@ -14,6 +14,8 @@ class WebData : public QObject
 {
     Q_OBJECT
 public:
+    enum ProxyState { ExternalTI, InternalTI, Configured };
+
     explicit WebData(QObject *parent = 0);
 
     void changeCity(QString);
@@ -27,11 +29,20 @@ signals:
 public slots:
     void configureProxy();
 
+    void processDataAvailable(WeatherData* weatherData);
+    void processNetworkTimeout();
+
 private:
+
+    void configureNoProxy();
+    void configureTIProxy();
+    void configureSetProxy();
 
     GlobalSettings *m_globalSettings;
     QNetworkAccessManager *manager;
     WebDataEngine* webDataEngine;
+
+    ProxyState m_proxyState;
 };
 
 #endif // WEBDATA_H
