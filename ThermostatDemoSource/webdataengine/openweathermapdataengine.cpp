@@ -64,9 +64,11 @@ void OpenWeatherMapDataEngine::responseReceived()
         m_cityId = parseCityInformation(&QString::fromAscii(data));
         //docs say do not delete in the slot so well pass it off to the event loop
         m_reply->deleteLater();
-
-        //now we need to grab current weather information and forecast data
-        dispatchWeatherDataRequests();
+        if(m_cityId == -1)
+            emit networkTimeout();
+        else
+            //now we need to grab current weather information and forecast data
+            dispatchWeatherDataRequests();
     }
     else
     {
@@ -279,8 +281,10 @@ qlonglong OpenWeatherMapDataEngine::parseCityInformation(QString* jsonData)
     //must have an object set equal to the class data received from the web or qt throws parse error
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
-    QScriptValueIterator it(result.property("list"));
-    return result.property("list").property("0").property("id").toInteger();
+    if(result.property("message").toString() != "")
+        return -1;
+    else
+        return result.property("list").property("0").property("id").toInteger();
 }
 
 int OpenWeatherMapDataEngine::kelvinToFahrenheit(double k)
