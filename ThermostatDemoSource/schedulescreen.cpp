@@ -77,6 +77,7 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     // show final layout
     setLayout(contentsBox);
 
+    scene = NULL;
     m_initialized = false;
 
 }
@@ -84,9 +85,6 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
 void ScheduleScreen::createScheduleScene()
 {
 
-    // create graphics view and scene
-    scene = new QGraphicsScene(0,0,view->width(), view->height());
-    view->setScene(scene);
 
     QPen pen(Qt::blue);
     QBrush brush(Qt::black);
@@ -94,9 +92,9 @@ void ScheduleScreen::createScheduleScene()
     font.setBold(true);
     QFontMetrics fm(font);
 
-    weekHeight = (scene->height()/7.0)-(scene->height()*.02);
+    weekHeight = (scene->height()/7.0)-(scene->height()*.025);
 
-    pointArea.setRect(fm.boundingRect("Wed").width()+20, 15, scene->width()-40, weekHeight*7);
+    pointArea.setRect(fm.boundingRect("Wed").width()+20, 15, scene->width(), weekHeight*7);
     qreal timeWidth = ((pointArea.width() - pointArea.left())/5.0);
     timeBlockWidth = timeWidth/16.0; //15 min increments
 
@@ -164,6 +162,8 @@ void ScheduleScreen::disableRow(bool checked)
     QPushButton* button = dynamic_cast<QPushButton* >(this->sender());
     int index = button->property("dayNumber").toInt()*4;
 
+    qDebug() << index;
+
     // display only those points that are requested by weekday check boxes
     if(checked) {
 
@@ -191,15 +191,32 @@ void ScheduleScreen::showEvent(QShowEvent *e)
     if(!m_initialized)
     {
         m_initialized = true;
-        QTimer::singleShot(30, this, SLOT(createScheduleScene()));
-        QTimer::singleShot(35, this, SLOT(addSchedulePoints()));
+
+        QTimer::singleShot(50, this, SLOT(initializeScene()));
+        QTimer::singleShot(55, this, SLOT(createScheduleScene()));
+        QTimer::singleShot(60, this, SLOT(addSchedulePoints()));
         e->accept();
     }
 }
 
+void ScheduleScreen::initializeScene()
+{
+    // create graphics view and scene
+    scene = new QGraphicsScene(0,0,view->width(), view->height());
+    view->setScene(scene);
+}
+
 void ScheduleScreen::updateData()
 {
-    createScheduleScene();
+    if(scene)
+    {
+        scene->clear();
+        delete scene;
+        scene = 0;
+        m_initialized = false;
+        pointList.empty();
+        QApplication::sendEvent(this, new QShowEvent);
+    }
 }
 
 void ScheduleScreen::addSchedulePoints()
@@ -217,7 +234,7 @@ void ScheduleScreen::addSchedulePoints()
         schedulePoint->setWeekHeight(weekHeight);
         schedulePoint->setPointArea(pointArea);
         showPoint(schedulePoint);
-        pointList.append(schedulePoint);
+        pointList.insert(a,schedulePoint);
     }
 
     // create proxy widgets to hold push buttons so arrows can be added to graphics view

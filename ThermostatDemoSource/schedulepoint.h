@@ -32,7 +32,7 @@ public:
     void setPointArea(QRectF pointArea);
     void setWeekHeight(int weekHeight);
     QColor tempToColor(int temp);
-
+    int temp;
 public slots:
     void updateUnit();
 
@@ -47,7 +47,7 @@ private:
     int roundness(double size) const;
     QString myText;
     QColor myBackgroundColor;
-    int temp;
+
     int ID;
     int location;
     float m_timeBlockWidth;

@@ -29,6 +29,8 @@ public slots:
     void showEvent(QShowEvent *);
     void addSchedulePoints();
     void disableRow(bool checked);
+    void initializeScene();
+    //void showSchedulePoints();
 private:
     QButtonGroup *daysButtonGroup;
     QGraphicsScene *scene;
@@ -40,6 +42,8 @@ private:
     QGraphicsProxyWidget *proxyUpButton;
     QGraphicsProxyWidget *proxyDownButton;
     QList <SchedulePoint *> pointList;
+    QList <QPair<QPointF, int> > pointSave;
+
 
     SchedulePoint *currentPoint;
     void showPoint(SchedulePoint *);

@@ -206,12 +206,6 @@ QWidget* SettingScreen::buildFormatSettingsWidget()
     Button24h->setFocusPolicy(Qt::NoFocus);
     connect(Button24h, SIGNAL(clicked()), this, SLOT(setTimeFormat24h()));
 
-    // when either button is clicked, tell the rest of the program to switch between C/F
-    connect(FButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
-    connect(CButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
-
-
-
     // create layout
     QHBoxLayout *unitLayout = new QHBoxLayout;
     unitLayout->addSpacing(100);
