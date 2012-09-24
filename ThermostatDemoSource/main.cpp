@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     file.close();
     // create main window and show
     MainWindow *w = new MainWindow;
+    w->resize(app.desktop()->size());
     w->showFullScreen();
 
     // enter application loop
