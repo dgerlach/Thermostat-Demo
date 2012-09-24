@@ -48,11 +48,11 @@ void WundergroundDataEngine::dispatchRequest()
     connect(m_reply, SIGNAL(finished()),this,SLOT(responseReceived()));
 }
 
-void WundergroundDataEngine::parseXML(QByteArray* xmlData)
+void WundergroundDataEngine::parseXML(QByteArray* xmlData, bool cached)
 {
-    WeatherData *weatherData = NULL;
     QBuffer xmlBuffer(xmlData);
-
+    WeatherData *weatherData = NULL;
+    ForecastData *forecastData = NULL;
     // create XML reader on the document held in reply
     reader.setDevice(&xmlBuffer);
     xmlBuffer.open(QBuffer::ReadWrite);
@@ -75,7 +75,7 @@ void WundergroundDataEngine::parseXML(QByteArray* xmlData)
                     name = reader.name().toString();
                     if(name == "forecastday")
                     {
-                        ForecastData *forecastData = parseXMLForecastData(reader);
+                        forecastData = parseXMLForecastData(reader);
                         weatherData->addForecastDay(forecastData);
                     }
                     if(name == "simpleforecast" && reader.isEndElement())
@@ -92,7 +92,8 @@ void WundergroundDataEngine::parseXML(QByteArray* xmlData)
     else if (reader.atEnd()) {
         qDebug() << "Reached end of XML document" << endl;
     }
-
+    if(cached)
+        weatherData->setCachedDataFlag();
 
     emit dataAvailable(weatherData);
     xmlBuffer.close();
@@ -236,7 +237,7 @@ void WundergroundDataEngine::loadLocalData()
     if(!result)
         readFromCache(&xmlData, ":/data/cache.xml");
 
-    parseXML(&xmlData);
+    parseXML(&xmlData, true);
 }
 
 //FUNCTION writeToCache
