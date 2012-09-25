@@ -21,7 +21,8 @@ public slots:
     void shiftRight();
     void increaseTemp();
     void decreaseTemp();
-    void showButtons(SchedulePoint *);
+    void selectDay(SchedulePoint *);
+    void unselectDay();
     void showPoints(int);
     void removeAllBlur();
     void updateData();
@@ -30,7 +31,8 @@ public slots:
     void addSchedulePoints();
     void disableRow(bool checked);
     void initializeScene();
-    //void showSchedulePoints();
+    void initializeGraphics();
+
 private:
     QButtonGroup *daysButtonGroup;
     QGraphicsScene *scene;

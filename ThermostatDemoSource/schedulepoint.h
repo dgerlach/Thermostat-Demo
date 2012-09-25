@@ -35,6 +35,12 @@ public:
     int temp;
 public slots:
     void updateUnit();
+    void setDisabled(bool disabled);
+    bool disabled();
+
+    void setSelected(bool selected);
+    bool selected();
+    void adjust(int, int);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent */* event */);
@@ -59,12 +65,13 @@ private:
     int m_xClickPos;
     int m_yClickPos;
     QPen pen; // outline color
+
+    bool m_disabled;
+    bool m_selected;
     
 signals:
     void clicked(SchedulePoint *);
-
-
-    
+    void shareAdjustment(int tempAdjust, int xPos);
 };
 
 #endif // SCHEDULEPOINT_H

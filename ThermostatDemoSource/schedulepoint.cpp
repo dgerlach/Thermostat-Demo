@@ -21,6 +21,8 @@ SchedulePoint::SchedulePoint(int seqNumber)
     setFlags(ItemIsSelectable);
     location=0;
     m_pressed = false;
+    m_disabled = false;
+    m_selected = false;
     updateUnit();
 }
 
@@ -35,7 +37,7 @@ SchedulePoint::~SchedulePoint()
 QColor SchedulePoint::tempToColor(int temp)
 {
      float pct = ((float)temp-MINTEMP)/100.0 *((float)MAXTEMP/MINTEMP);
-     return QColor(255*pct, 0, 255*(1-pct));
+     return QColor(230*pct, 0, 230*(1-pct));
 }
 
 void SchedulePoint::setText(const QString &text)
@@ -99,18 +101,42 @@ void SchedulePoint::paint(QPainter *painter,
 
     }
 
-    myBackgroundColor = tempToColor(temp);
-    painter->setPen(pen);
-    painter->setBrush(myBackgroundColor);
+
+
+    if(m_disabled)
+    {
+        painter->setBrush(QColor(150,150,150));
+        painter->setPen(QColor(110,110,110));
+    }
+
+    else if(m_selected)
+    {
+        pen.setWidth(3);
+        pen.setColor(QColor(255, 189, 43));
+        painter->setPen(pen);
+        myBackgroundColor = tempToColor(temp);
+        painter->setBrush(myBackgroundColor);
+    }
+    else
+    {
+        myBackgroundColor = tempToColor(temp);
+        pen.setColor(Qt::white);
+        pen.setWidth(1);
+        painter->setPen(pen);
+        painter->setBrush(myBackgroundColor);
+    }
 
     QRectF rect = outlineRect();
     painter->drawRoundRect(rect, roundness(rect.width()), roundness(rect.height()));
-
+    painter->setPen(Qt::white);
     painter->drawText(rect, Qt::AlignCenter, myText);
 }
 
 void SchedulePoint::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
+    if(disabled())
+        return;
+
     // provide event handler for mouse click
     emit clicked(this);
     m_pressed = true;
@@ -122,6 +148,9 @@ void SchedulePoint::mousePressEvent(QGraphicsSceneMouseEvent *e)
 
 void SchedulePoint::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 {
+    if(disabled())
+        return;
+
     // provide event handler for mouse move
     emit clicked(this);
     if(m_pressed == true)
@@ -149,11 +178,15 @@ void SchedulePoint::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
         }
     }
 
+    emit(shareAdjustment(temp, pos().x()));
+
     e->accept();
 }
 
 void SchedulePoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
+    if(disabled())
+        return;
     setZValue(0);
     pen.setColor(Qt::white);
     e->accept();
@@ -232,9 +265,8 @@ QString SchedulePoint::time()
     // output the current time represnted by this point's location
     int timeBlockCount = qRound((pos().x() -m_pointArea.left())/m_timeBlockWidth);
     int hours = (timeBlockCount/4.0f + 2.0f);
-    //qDebug() << "TIME: " << hours << pos().x() << timeBlockCount<< m_pointArea.left() << m_timeBlockWidth;
     int minutes = (timeBlockCount%4) *15;
-    //qDebug() << "TIME MINUTES: " << minutes << pos().x() << timeBlockCount<< m_pointArea.left() << m_timeBlockWidth;
+
     QTime time(hours, minutes);
     return formatTimeString(time, m_globalSettings->timeFormat());
 }
@@ -243,4 +275,33 @@ void SchedulePoint::updateUnit()
 {
     myText = formatTemperatureString(temp, m_globalSettings->temperatureFormat());
     update();
+}
+
+void SchedulePoint::setDisabled(bool disabled)
+{
+    m_disabled = disabled;
+    update();
+}
+
+bool SchedulePoint::disabled()
+{
+    return m_disabled;
+}
+
+void SchedulePoint::setSelected(bool selected)
+{
+    m_selected = selected;
+    update();
+}
+
+bool SchedulePoint::selected()
+{
+    return m_selected;
+}
+
+void SchedulePoint::adjust(int tempAdjust, int xPos)
+{
+    setPos(xPos, pos().y());
+    temp = tempAdjust;
+    updateUnit();
 }

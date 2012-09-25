@@ -134,7 +134,6 @@ void WebData::processDataAvailable(WeatherData *weatherData)
     qDebug() << weatherData->cachedData();
     if(!weatherData->cachedData())
     {
-        qDebug() << "NOT CACHED DATA";
         m_globalSettings->setProxyInfo(manager->proxy().hostName(), manager->proxy().port());
         m_proxyState = WebData::Configured;
     }
@@ -164,6 +163,4 @@ void WebData::processNetworkTimeout()
         webDataEngine->dispatchRequest();
     else
         emit networkTimeout();
-
-    qDebug() << m_proxyState;
 }
