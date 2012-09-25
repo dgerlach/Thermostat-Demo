@@ -298,6 +298,10 @@ bool SchedulePoint::disabled()
 void SchedulePoint::setSelected(bool selected)
 {
     m_selected = selected;
+    if(selected)
+        setZValue(10);
+    else
+        setZValue(0);
     update();
 }
 
@@ -308,8 +312,12 @@ bool SchedulePoint::selected()
 
 void SchedulePoint::adjust(int tempAdjust, qreal xPos)
 {
-    qDebug() << xPos;
-    setPos(pos().x()+xPos, pos().y());
-    temp = temp + tempAdjust;
-    updateUnit();
+    if(tempAdjust>0)
+        increaseTemp();
+    if(tempAdjust<0)
+        decreaseTemp();
+    if(xPos<0)
+        shiftLeft();
+    if(xPos>0)
+        shiftRight();
 }
