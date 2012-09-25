@@ -7,6 +7,10 @@
 
 #include <QRect>
 
+//array that holds the times the columns should be initially positioned
+//0-23.75 in .25 increments (15 min)
+float columnTimes [] = {5,9.5,17,22};
+
 ScheduleScreen::ScheduleScreen(QWidget *parent) :
     QWidget(parent)
 {
@@ -260,7 +264,7 @@ void ScheduleScreen::addSchedulePoints()
 void ScheduleScreen::showPoint(SchedulePoint *point)
 {
     // show point based on unique ID
-    point->setPos(QPoint(pointArea.left() + timeWidth + (timeWidth * (point->getID() % 4)), pointArea.top() + weekHeight/2 + (weekHeight * ((point->getID() / 4) % 7))));
+    point->setPos(QPoint(timeBlockWidth*3 + pointArea.left() + (timeBlockWidth * 4 * columnTimes[point->getID()%4]), pointArea.top() + weekHeight/2 + (weekHeight * ((point->getID() / 4) % 7))));
     scene->addItem(point);
  }
 
