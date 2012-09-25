@@ -207,6 +207,7 @@ void ScheduleScreen::showEvent(QShowEvent *e)
     if(!m_initialized)
     {
         e->accept();
+        currentPoint = NULL;
         m_initialized = true;
         view->show();
         QTimer::singleShot(0, this, SLOT(initializeGraphics()));

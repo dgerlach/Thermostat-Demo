@@ -46,7 +46,7 @@ QString formatTimeString(QTime time, GlobalSettings::TimeFormat timeFormat, bool
 QString formatHourString(QTime time, GlobalSettings::TimeFormat timeFormat, bool includeAMPM)
 {
     if(timeFormat == GlobalSettings::TimeFormat24h)
-        return time.toString("hh");
+        return time.toString("hh:mm");
     else if( timeFormat == GlobalSettings::TimeFormat12h && !includeAMPM )
         return time.toString("h AP").left(5);
     else
