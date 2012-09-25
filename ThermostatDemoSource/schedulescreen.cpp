@@ -342,7 +342,7 @@ void ScheduleScreen::selectDay(SchedulePoint *point)
         {
             pointList.at(point->getID()%4 + a*4)->setSelected(true);
             if(point!=columnPoint)
-                connect(point, SIGNAL(shareAdjustment(int, int)), columnPoint, SLOT(adjust(int, int)));
+                connect(point, SIGNAL(shareAdjustment(int, qreal)), columnPoint, SLOT(adjust(int, qreal)));
         }
     }
 
@@ -359,7 +359,7 @@ void ScheduleScreen::unselectDay()
 
         point->setSelected(false);
         if(currentPoint!=point)
-            disconnect(currentPoint, SIGNAL(shareAdjustment(int, int)), point, SLOT(adjust(int, int)));
+            disconnect(currentPoint, SIGNAL(shareAdjustment(int, qreal)), point, SLOT(adjust(int, qreal)));
 
     }
 }

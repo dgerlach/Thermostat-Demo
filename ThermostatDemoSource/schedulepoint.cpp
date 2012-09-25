@@ -150,7 +150,8 @@ void SchedulePoint::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 {
     if(disabled())
         return;
-
+    int oldTemp = temp;
+    qreal oldX = pos().x();
     // provide event handler for mouse move
     emit clicked(this);
     if(m_pressed == true)
@@ -178,7 +179,7 @@ void SchedulePoint::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
         }
     }
 
-    emit(shareAdjustment(temp, pos().x()));
+    emit(shareAdjustment(temp-oldTemp, pos().x()-oldX));
 
     e->accept();
 }
@@ -264,7 +265,7 @@ QString SchedulePoint::time()
 {
     // output the current time represnted by this point's location
     int timeBlockCount = positionToTimeBlocks();
-    qDebug() << timeBlockCount;
+
     int hours = (timeBlockCount/4.0f);
     int minutes = (timeBlockCount%4) *15;
 
@@ -305,9 +306,10 @@ bool SchedulePoint::selected()
     return m_selected;
 }
 
-void SchedulePoint::adjust(int tempAdjust, int xPos)
+void SchedulePoint::adjust(int tempAdjust, qreal xPos)
 {
-    setPos(xPos, pos().y());
-    temp = tempAdjust;
+    qDebug() << xPos;
+    setPos(pos().x()+xPos, pos().y());
+    temp = temp + tempAdjust;
     updateUnit();
 }

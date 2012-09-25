@@ -40,7 +40,7 @@ public slots:
 
     void setSelected(bool selected);
     bool selected();
-    void adjust(int, int);
+    void adjust(int, qreal);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent */* event */);
@@ -74,7 +74,7 @@ private:
     
 signals:
     void clicked(SchedulePoint *);
-    void shareAdjustment(int tempAdjust, int xPos);
+    void shareAdjustment(int tempAdjust, qreal xPos);
 };
 
 #endif // SCHEDULEPOINT_H
