@@ -255,12 +255,6 @@ void ScheduleScreen::addSchedulePoints()
         pointList.insert(a,schedulePoint);
     }
 
-    // create proxy widgets to hold push buttons so arrows can be added to graphics view
-    proxyLeftButton = new QGraphicsProxyWidget();
-    proxyRightButton = new QGraphicsProxyWidget();
-    proxyUpButton = new QGraphicsProxyWidget();
-    proxyDownButton = new QGraphicsProxyWidget();
-
 }
 
 void ScheduleScreen::showPoint(SchedulePoint *point)
@@ -276,7 +270,6 @@ void ScheduleScreen::shiftLeft()
     // left edge of graphics view has been reached
 
     if(currentPoint->pos().x()- currentPoint->boundingRect().width()/2- timeBlockWidth > pointArea.left()) {
-        shiftButtonsLeft();
         for(int i=0; i<7; i++) {
             if(pointList.at((currentPoint->getID() + 4*i) % 28)->isVisible()) {
                 pointList.at((currentPoint->getID() + 4*i) % 28)->shiftLeft();
@@ -294,7 +287,6 @@ void ScheduleScreen::shiftRight()
     // shift buttons right and shift visible points right in this column unless
     // right edge of graphics view has been reached
     if(currentPoint->pos().x()+ currentPoint->boundingRect().width()/2+ timeBlockWidth < pointArea.right()) {
-        shiftButtonsRight();
         for(int i=0; i<7; i++) {
             if(pointList.at((currentPoint->getID() + 4*i) % 28)->isVisible()) {
                 pointList.at((currentPoint->getID() + 4*i) % 28)->shiftRight();
@@ -305,48 +297,6 @@ void ScheduleScreen::shiftRight()
         //qDebug() << currentPoint->pos().x();
     }
 
-}
-
-void ScheduleScreen::shiftButtonsLeft()
-{
-    // shift all 4 arrow buttons left
-    shiftVerticalButtonsLeft();
-    shiftHorizontalButtonsLeft();
-}
-
-void ScheduleScreen::shiftButtonsRight()
-{
-    // shift all 4 arrow buttons right
-    shiftVerticalButtonsRight();
-    shiftHorizontalButtonsRight();
-}
-
-void ScheduleScreen::shiftVerticalButtonsRight()
-{
-    // shift up and down buttons right
-    proxyUpButton->moveBy(timeBlockWidth,0);
-    proxyDownButton->moveBy(timeBlockWidth,0);
-}
-
-void ScheduleScreen::shiftVerticalButtonsLeft()
-{
-    // shift up and down buttons left
-    proxyUpButton->moveBy(-timeBlockWidth,0);
-    proxyDownButton->moveBy(-timeBlockWidth,0);
-}
-
-void ScheduleScreen::shiftHorizontalButtonsRight()
-{
-    // shift left and right buttons right
-    proxyLeftButton->moveBy(timeBlockWidth,0);
-    proxyRightButton->moveBy(timeBlockWidth,0);
-}
-
-void ScheduleScreen::shiftHorizontalButtonsLeft()
-{
-    // shift left and right buttons left
-    proxyLeftButton->moveBy(-timeBlockWidth,0);
-    proxyRightButton->moveBy(-timeBlockWidth,0);
 }
 
 void ScheduleScreen::increaseTemp()
@@ -409,59 +359,9 @@ void ScheduleScreen::unselectDay()
     }
 }
 
-void ScheduleScreen::hideButtons()
-{
-    // hide up, down, left, and right buttons
-    proxyLeftButton->hide();
-    proxyRightButton->hide();
-    proxyUpButton->hide();
-    proxyDownButton->hide();
-
-}
-
-void ScheduleScreen::hidePoints()
-{
-    // hide all points
-    for(int i=0; i<28; i++) {
-        pointList.at(i)->hide();
-    }
-    return;
-
-}
-
-void ScheduleScreen::showPoints(int)
-{
-
-}
-
-void ScheduleScreen::blur()
-{
-    // add blur to all points outside the current column
-    for(int i=0; i<28; i++) {
-        if(pointList.at(i)->graphicsEffect()) { // does the item have an exisiting graphics effect
-            pointList.at(i)->setGraphicsEffect(NULL);
-        }
-        if(pointList.at(i)->getID()%4 != currentPoint->getID()%4) {
-            pointList.at(i)->setGraphicsEffect(new QGraphicsBlurEffect(this));
-        }
-    }
-}
-
 void ScheduleScreen::mousePressEvent(QMouseEvent * /* event */)
 {
     // provide event handler for whole screen, so that user can click off a
     // a column and have all points be displayed
     emit clicked();
-    qDebug() << "GEO" << view->size();
-
-}
-
-void ScheduleScreen::removeAllBlur()
-{
-    // display all points by removing all blur
-    for(int i=0; i<28; i++) {
-        if(pointList.at(i)->graphicsEffect()) { // does the item have an exisiting graphics effect
-            pointList.at(i)->setGraphicsEffect(NULL);
-        }
-    }
 }

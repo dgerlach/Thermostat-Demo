@@ -23,8 +23,6 @@ public slots:
     void decreaseTemp();
     void selectDay(SchedulePoint *);
     void unselectDay();
-    void showPoints(int);
-    void removeAllBlur();
     void updateData();
     void createScheduleScene();
     void showEvent(QShowEvent *);
@@ -39,26 +37,13 @@ private:
     QGraphicsView *view;
 
     int seqNumber;
-    QGraphicsProxyWidget *proxyLeftButton;
-    QGraphicsProxyWidget *proxyRightButton;
-    QGraphicsProxyWidget *proxyUpButton;
-    QGraphicsProxyWidget *proxyDownButton;
     QList <SchedulePoint *> pointList;
     QList <QPair<QPointF, int> > pointSave;
 
 
     SchedulePoint *currentPoint;
     void showPoint(SchedulePoint *);
-    void hidePoints();
-    void hideButtons();
-    void shiftVerticalButtonsLeft();
-    void shiftVerticalButtonsRight();
-    void shiftHorizontalButtonsLeft();
-    void shiftHorizontalButtonsRight();
-    void shiftButtonsLeft();
-    void shiftButtonsRight();
     QLabel *currentTime;
-    void blur();
 
     QRectF pointArea;
     qreal weekHeight;
