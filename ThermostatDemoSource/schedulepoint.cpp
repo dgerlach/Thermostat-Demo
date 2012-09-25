@@ -37,7 +37,7 @@ SchedulePoint::~SchedulePoint()
 QColor SchedulePoint::tempToColor(int temp)
 {
      float pct = ((float)temp-MINTEMP)/100.0 *((float)MAXTEMP/MINTEMP);
-     return QColor(230*pct, 0, 230*(1-pct));
+     return QColor(200*pct, 20, 200*(1-pct));
 }
 
 void SchedulePoint::setText(const QString &text)
@@ -202,7 +202,7 @@ int SchedulePoint::roundness(double size) const
 
 void SchedulePoint::shiftLeft()
 {
-    if(pos().x() - m_timeBlockWidth - boundingRect().width()/2.0 <m_pointArea.left())
+    if(positionToTimeBlocks()<1)
         return;
     // provide a slot to allow point shifting to the left
     location--;
@@ -212,7 +212,7 @@ void SchedulePoint::shiftLeft()
 
 void SchedulePoint::shiftRight()
 {
-    if(pos().x() + m_timeBlockWidth + boundingRect().width()*1.5 > m_pointArea.right())
+    if(positionToTimeBlocks()>94)
         return;
     // provide a slot to allow point shifting to the right
     location++;
@@ -263,12 +263,18 @@ int SchedulePoint::getLocation()
 QString SchedulePoint::time()
 {
     // output the current time represnted by this point's location
-    int timeBlockCount = qRound((pos().x() -m_pointArea.left())/m_timeBlockWidth);
-    int hours = (timeBlockCount/4.0f + 2.0f);
+    int timeBlockCount = positionToTimeBlocks();
+    qDebug() << timeBlockCount;
+    int hours = (timeBlockCount/4.0f);
     int minutes = (timeBlockCount%4) *15;
 
-    QTime time(hours, minutes);
+    QTime time(hours%24, minutes);
     return formatTimeString(time, m_globalSettings->timeFormat());
+}
+
+int SchedulePoint::positionToTimeBlocks()
+{
+    return qRound((-3*m_timeBlockWidth + pos().x() -m_pointArea.left())/m_timeBlockWidth);
 }
 
 void SchedulePoint::updateUnit()

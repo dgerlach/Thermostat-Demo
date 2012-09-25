@@ -102,9 +102,9 @@ void ScheduleScreen::createScheduleScene()
     weekHeight = (scene->height()/7.0)-(scene->height()*.025);
 
     pointArea.setRect(fm.boundingRect("Wed").width()+20, 15, scene->width(), weekHeight*7);
-    timeWidth = ((pointArea.width() - pointArea.left())/5.0);
-    timeBlockWidth = timeWidth/16.0; //15 min increments
-
+    timeWidth = ((pointArea.width() - pointArea.left())/4.0)-((pointArea.width() - pointArea.left())/4.0)/16;
+    timeBlockWidth = timeWidth/24.0; //15 min increments
+    pointArea.adjust(0,0,-timeBlockWidth, 0);
     QDate date = QDate::fromString("Sun", "ddd");
 
     for(int a = 0;a<7;a++)
@@ -149,16 +149,17 @@ void ScheduleScreen::createScheduleScene()
         pen.setColor(QColor(110+40*(a%2),110+40*(a%2),110+40*(a%2)));
         brush.setColor(QColor(120+40*(a%2),120+40*(a%2),120+40*(a%2)));
 
-        QString timeString = formatTimeString(QTime((a+1)*4,0), m_globalSettings->timeFormat());
+        QString timeString = formatHourString(QTime(((a)*6)%24,0), m_globalSettings->timeFormat());
+
         pen.setColor(QColor(200,200,200));
         brush.setColor(QColor(200,200,200));
         QGraphicsSimpleTextItem* textItem = scene->addSimpleText(timeString, font);
 
         textItem->setBrush(brush);
-        textItem->setPos(timeWidth/2+pointArea.left()+timeWidth*a - textItem->boundingRect().width()/2, pointArea.bottom() +6);
+        textItem->setPos(timeBlockWidth*3+pointArea.left()+timeWidth*a - textItem->boundingRect().width()/2, pointArea.bottom() +6);
         pen.setColor(QColor(188,188,188));
         pen.setStyle(Qt::DashLine);
-        scene->addLine(timeWidth/2+pointArea.left()+timeWidth*a, pointArea.top()+1, timeWidth/2+pointArea.left()+timeWidth*a, pointArea.bottom()+3, pen);
+        scene->addLine(timeBlockWidth*3+pointArea.left()+timeWidth*a, pointArea.top()+1, timeBlockWidth*3+pointArea.left()+timeWidth*a, pointArea.bottom()+3, pen);
     }
 
 }
@@ -169,23 +170,27 @@ void ScheduleScreen::disableRow(bool checked)
     QPushButton* button = dynamic_cast<QPushButton* >(this->sender());
     int index = button->property("dayNumber").toInt()*4;
 
-    qDebug() << index;
-
     // display only those points that are requested by weekday check boxes
     if(checked) {
+        //enable all points in the row
+        for(int a = 0;a<4;a++)
+        {
+            pointList.at(index+a)->setDisabled(false);
 
-        pointList.at(index+0)->setDisabled(false);
-        pointList.at(index+1)->setDisabled(false);
-        pointList.at(index+2)->setDisabled(false);
-        pointList.at(index+3)->setDisabled(false);
+            //check each point in the column, if one is selected then select this one and break
+            for(int b=0;b<7;b++)
+                if(pointList.at(a +4*b)->selected())
+                {
+                    pointList.at(index+a)->setSelected(true);
+                    break;
+                }
+        }
         button->setStyleSheet("");
     }
     else
     {
-        pointList.at(index+0)->setDisabled(true);
-        pointList.at(index+1)->setDisabled(true);
-        pointList.at(index+2)->setDisabled(true);
-        pointList.at(index+3)->setDisabled(true);
+        for(int a = 0;a<4;a++)
+            pointList.at(index+a)->setDisabled(true);
         button->setStyleSheet("color:#CCCCCC");
     }
 
@@ -260,8 +265,6 @@ void ScheduleScreen::addSchedulePoints()
 
 void ScheduleScreen::showPoint(SchedulePoint *point)
 {
-    qreal timeWidth = ((pointArea.width()- pointArea.left())/5.0);
-
     // show point based on unique ID
     point->setPos(QPoint(pointArea.left() + timeWidth + (timeWidth * (point->getID() % 4)), pointArea.top() + weekHeight/2 + (weekHeight * ((point->getID() / 4) % 7))));
     scene->addItem(point);
@@ -395,15 +398,14 @@ void ScheduleScreen::unselectDay()
 {
     if(!currentPoint)
         return;
-    for(int a = 0; a<7; a++)
+    for(int a = 0; a<28; a++)
     {
-        SchedulePoint* columnPoint = currentPoint;
-        if(!columnPoint->disabled())
-        {
-            pointList.at(currentPoint->getID()%4 + a*4)->setSelected(false);
-            if(currentPoint!=columnPoint)
-                disconnect(currentPoint, SIGNAL(shareAdjustment(int, int)), columnPoint, SLOT(adjust(int, int)));
-        }
+        SchedulePoint* point = pointList.at(a);
+
+        point->setSelected(false);
+        if(currentPoint!=point)
+            disconnect(currentPoint, SIGNAL(shareAdjustment(int, int)), point, SLOT(adjust(int, int)));
+
     }
 }
 

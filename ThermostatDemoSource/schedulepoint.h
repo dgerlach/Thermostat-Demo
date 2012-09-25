@@ -51,6 +51,9 @@ protected:
 private:
     QRectF outlineRect() const;
     int roundness(double size) const;
+
+    int positionToTimeBlocks();
+
     QString myText;
     QColor myBackgroundColor;
 
