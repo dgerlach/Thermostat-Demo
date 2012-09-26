@@ -13,7 +13,7 @@ OptionsWidget {
         background-color: rgba(0,0,0,0);
 }
 */
-WeatherWidget > QLabel {
+WeatherWidget QLabel {
         color: white;
         font-size: 18px;
         qproperty-alignment: AlignCenter;
@@ -27,7 +27,11 @@ WeatherWidget > QLabel#currentTemp {
         font-size: 36px;
 }
 
-WeatherWidget > QLabel#statusLabel {
+WeatherWidget QLabel#statusLabel {
+        font-size: 12px;
+}
+
+WeatherWidget QLabel#statusLabel2 {
         font-size: 12px;
 }
 

@@ -1,6 +1,7 @@
 #include "openweathermapdataengine.h"
 
 #include <QNetworkAccessManager>
+#include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QScriptEngine>
@@ -15,6 +16,8 @@ OpenWeatherMapDataEngine::OpenWeatherMapDataEngine(QNetworkAccessManager *manage
     WebDataEngine(manager, parent)
 {
     generateJSONWeatherLookupTables();
+    connect(&m_networkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
+    connect(&m_forecastNetworkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
 }
 
 void OpenWeatherMapDataEngine::setCity(QString city)
@@ -39,16 +42,18 @@ void OpenWeatherMapDataEngine::dispatchRequest()
     request.setUrl(QUrl(cityUrl));
 
     //set up timer to check for network timeout
-    connect(&m_networkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
     m_networkTimer.start(15000);
 
     //make actual network request
     m_reply = m_manager->get(request);
+
     connect(m_reply, SIGNAL(finished()),this,SLOT(responseReceived()));
 }
 
 void OpenWeatherMapDataEngine::handleNetworkTimeout()
 {
+    m_networkTimer.stop();
+    m_forecastNetworkTimer.stop();
     emit(networkTimeout());
 }
 
@@ -75,8 +80,6 @@ void OpenWeatherMapDataEngine::responseReceived()
         qDebug() << "Network Error: " << m_reply->errorString();
         loadLocalData();
         emit networkTimeout();
-        //docs say do not delete in the slot so well pass it off to the event loop
-        m_reply->deleteLater();
     }
 }
 
@@ -92,7 +95,7 @@ void OpenWeatherMapDataEngine::dispatchWeatherDataRequests()
     request.setUrl(QUrl(currentWeatherURL));
 
     //set up timer to check for network timeout
-    connect(&m_networkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
+
     m_networkTimer.start(15000);
 
     //make actual network request
@@ -105,7 +108,6 @@ void OpenWeatherMapDataEngine::dispatchWeatherDataRequests()
     request.setUrl(QUrl(forecastWeatherURL));
 
     //set up timer to check for network timeout
-    connect(&m_forecastNetworkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
     m_forecastNetworkTimer.start(15000);
 
     //make actual network request
@@ -197,7 +199,6 @@ bool OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherD
 
     QScriptValueIterator it(result.property("list"));
 
-    int a =0;
     int high = 0;
     int low = 500;
     QString icon = "";
@@ -329,7 +330,6 @@ void OpenWeatherMapDataEngine::loadLocalData()
     }
     else
     {
-        m_weatherData->setLastUpdated(QDateTime::currentDateTime());
         emit(dataAvailable(m_weatherData));
     }
 }
@@ -358,6 +358,7 @@ bool OpenWeatherMapDataEngine::writeToCache()
     QDataStream stream(&cacheFile);
     stream.setVersion(QDataStream::Qt_4_6);
     stream << m_weatherData->currentCity();
+    stream << m_weatherData->lastUpdated();
     stream << m_rawJSONWeatherString;
     stream << m_rawJSONForecastString;
 
@@ -404,6 +405,9 @@ bool OpenWeatherMapDataEngine::readFromCache(QString alternateCacheFile)
     QString cityString;
     stream >> cityString;
     m_weatherData->setCurrentCity(cityString);
+    QDateTime lastUpdated;
+    stream >> lastUpdated;
+    m_weatherData->setLastUpdated(lastUpdated);
     stream >> m_rawJSONWeatherString;
     stream >> m_rawJSONForecastString;
 

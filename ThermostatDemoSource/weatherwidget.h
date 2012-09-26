@@ -36,6 +36,10 @@ public slots:
 
     void mousePressEvent(QMouseEvent *);
 
+    void advanceStatusWidget();
+
+
+
 
 protected:
 
@@ -43,8 +47,10 @@ private:
     QString weatherStyleSheet;
     QTime *clock;
     QLabel *statusLabel;
+    QLabel *statusLabel2;
     QLabel *statusMovieLabel;
     QMovie *statusMovie;
+    QStackedWidget *statusStackedWidget;
     WeatherDataWidget* weatherDataWidget;
     ForecastDataWidget* forecastDataWidget;
     WeatherData* m_weatherData;
@@ -52,6 +58,10 @@ private:
     GlobalSettings *m_globalSettings;
 
     CurrentStatus m_currentStatus;
+    QTimer statusMessageTimer;
+
+    //layout related functions
+    void buildStatusWidget();
 };
 
 #endif // WEATHERWIDGET_H

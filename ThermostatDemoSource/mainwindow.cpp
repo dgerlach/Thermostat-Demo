@@ -315,7 +315,10 @@ void MainWindow::setWebData(WeatherData* weatherData)
     }
     setBackground(weatherData->icon(), weatherData->localTime().time());
     weatherWidget->setWeatherData(weatherData);
-    weatherWidget->setStatusUpdated();
+    if(weatherData->cachedData())
+        weatherWidget->setStatusFailed();
+    else
+        weatherWidget->setStatusUpdated();
 }
 
 //FUNCTION: webDataFailed
@@ -325,5 +328,6 @@ void MainWindow::setWebData(WeatherData* weatherData)
 
 void MainWindow::webDataFailed()
 {
+
     weatherWidget->setStatusFailed();
 }

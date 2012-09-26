@@ -131,7 +131,6 @@ QString WebData::licenseString()
 
 void WebData::processDataAvailable(WeatherData *weatherData)
 {
-    qDebug() << weatherData->cachedData();
     if(!weatherData->cachedData())
     {
         m_globalSettings->setProxyInfo(manager->proxy().hostName(), manager->proxy().port());
