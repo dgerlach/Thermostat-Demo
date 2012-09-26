@@ -1,11 +1,5 @@
 == TI Thermostat Demo ==
 
-  Notes:
-    The included thermostat.conf file can be placed at 
-    /Settings/ti/thermostat.conf if a default ti-internal configuration is 
-    desired. All settings will be completely configurable from the application 
-    in a future version.
-
   Summary:
     This software provides a demo thermostat application.  All values are
     initialized to hard-coded values first and then updated from the web
