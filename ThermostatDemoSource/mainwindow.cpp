@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "forecastdata.h"
 #include "weatherwidget.h"
 #include "thermostatwidget.h"
 #include "optionswidget.h"
@@ -214,62 +215,6 @@ void MainWindow::updateClock()
 
 }
 
-void MainWindow::setBackground(QString icon, QTime localTime)
-{
-    // set the MainWindow background based on the current conditions
-
-    if (icon == "partlysunny" || icon == "mostlycloudy" ) {
-        if(localTime.hour() < 5 || localTime.hour() > 20) {
-            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
-        } else {
-            setStyleSheet("MainWindow {border-image: url(:/Images/mostlycloudy.jpg)}");
-        }
-    }
-    else if (icon == "fog") {
-        setStyleSheet("MainWindow {border-image: url(:/Images/fog.jpg)}");
-    }
-    else if (icon == "hazy") {
-        if(localTime.hour() < 5 || localTime.hour() > 20) {
-            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
-        } else {
-            setStyleSheet("MainWindow {border-image: url(:/Images/hazy.jpg)}");
-        }
-    }
-    else if (icon == "cloudy") {
-        setStyleSheet("MainWindow {border-image: url(:/Images/overcast.jpg)}");
-    }
-    else if (icon == "rain" || icon == "chancerain") {
-        setStyleSheet("MainWindow {border-image: url(:/Images/rain.jpg)}");
-    }
-    else if (icon == "sleet" || icon == "chancesleet") {
-        setStyleSheet("MainWindow {border-image: url(:/Images/sleet.jpg)}");
-    }
-    else if (icon == "flurries" || icon == "snow" ||
-             icon == "chanceflurries" || icon == "chancesnow") {
-        setStyleSheet("MainWindow {border-image: url(:/Images/snow.jpg)}");
-    }
-    else if (icon == "clear" || icon == "sunny") {
-        if(localTime.hour() < 5 || localTime.hour() > 20) {
-            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
-        } else {
-            setStyleSheet("MainWindow {border-image: url(:/Images/clear_sky.jpg)}");
-        }
-    }
-    else if (icon == "mostlysunny" || icon == "partlycloudy" ||
-             icon == "unknown") {
-        if(localTime.hour() < 5 || localTime.hour() > 20) {
-            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
-        } else {
-            setStyleSheet("MainWindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");
-        }
-    }
-    else if (icon == "tstorms" || icon == "chancetstorms") {
-        setStyleSheet("MainWindow {border-image: url(:/Images/storm.jpg)}");
-
-    }
-
-}
-
 void MainWindow::energySaving(bool setpointReached)
 {
     // change energyButton based on whether or not setpoint is reached
@@ -328,6 +273,99 @@ void MainWindow::setWebData(WeatherData* weatherData)
 
 void MainWindow::webDataFailed()
 {
+    WeatherData *weatherData = weatherWidget->weatherData();
+
+    //if the update fails, generate random data so things look nice!
+    //easiest way to tell if the update failed and we have no cached data is
+    //to compare the current configured city to the data's city
+
+    if(weatherData->currentCity() != m_globalSettings->currentCity())
+    {
+        //generate a quick lookup for the icons
+        QStringList icons;
+        icons << "sunny" << "partlysunny" << "cloudy" << "rain" << "tstorms";
+
+        //update the city to the current configured city
+        weatherData->setCurrentCity(m_globalSettings->currentCity());
+
+        //generate temperature numbers +/- 75
+        weatherData->setCurrentTemp(75+(qrand()%10*qrand()%2*(-1)));
+
+        //mod a random number by the number of icons then index into the array to pick one
+        weatherData->setIcon(icons[qrand()%icons.size()]);
+
+        //set the main page background to selected icon
+        setBackground(weatherData->icon(), weatherData->localTime().time());
+
+        //now iterate through the forecast days and do the same thing
+        QList<ForecastData* >::iterator i;
+        for(i=weatherData->forecastData().begin();i!=weatherData->forecastData().end();i++)
+        {
+
+            (*i)->setLowTemp(75+(qrand()%10*qrand()%2*(-1)));
+            (*i)->setHighTemp((*i)->lowTemp()+qrand()%10);
+            (*i)->setIcon(icons[qrand()%icons.size()]);
+        }
+
+        //set the data just to trigger an update of the widgets
+        weatherWidget->setWeatherData(weatherData);
+    }
 
     weatherWidget->setStatusFailed();
+}
+
+void MainWindow::setBackground(QString icon, QTime localTime)
+{
+    // set the MainWindow background based on the current conditions
+
+    if (icon == "partlysunny" || icon == "mostlycloudy" ) {
+        if(localTime.hour() < 5 || localTime.hour() > 20) {
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
+        } else {
+            setStyleSheet("MainWindow {border-image: url(:/Images/mostlycloudy.jpg)}");
+        }
+    }
+    else if (icon == "fog") {
+        setStyleSheet("MainWindow {border-image: url(:/Images/fog.jpg)}");
+    }
+    else if (icon == "hazy") {
+        if(localTime.hour() < 5 || localTime.hour() > 20) {
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
+        } else {
+            setStyleSheet("MainWindow {border-image: url(:/Images/hazy.jpg)}");
+        }
+    }
+    else if (icon == "cloudy") {
+        setStyleSheet("MainWindow {border-image: url(:/Images/overcast.jpg)}");
+    }
+    else if (icon == "rain" || icon == "chancerain") {
+        setStyleSheet("MainWindow {border-image: url(:/Images/rain.jpg)}");
+    }
+    else if (icon == "sleet" || icon == "chancesleet") {
+        setStyleSheet("MainWindow {border-image: url(:/Images/sleet.jpg)}");
+    }
+    else if (icon == "flurries" || icon == "snow" ||
+             icon == "chanceflurries" || icon == "chancesnow") {
+        setStyleSheet("MainWindow {border-image: url(:/Images/snow.jpg)}");
+    }
+    else if (icon == "clear" || icon == "sunny") {
+        if(localTime.hour() < 5 || localTime.hour() > 20) {
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
+        } else {
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_sky.jpg)}");
+        }
+    }
+    else if (icon == "mostlysunny" || icon == "partlycloudy" ||
+             icon == "unknown") {
+        if(localTime.hour() < 5 || localTime.hour() > 20) {
+            setStyleSheet("MainWindow {border-image: url(:/Images/clear_night_sky.jpeg)}");
+        } else {
+            setStyleSheet("MainWindow {border-image: url(:/Images/background-sunny-very-few-clouds.JPG)}");
+        }
+    }
+    else if (icon == "tstorms" || icon == "chancetstorms") {
+        setStyleSheet("MainWindow {border-image: url(:/Images/storm.jpg)}");
+
+    }
+
 }

@@ -20,6 +20,7 @@ public:
     void setClock(QTime);
 
     void setWeatherData(WeatherData* weatherData);
+    WeatherData* weatherData();
 
     enum CurrentStatus { Updating, UpdateSuccess, UpdateFailed };
 

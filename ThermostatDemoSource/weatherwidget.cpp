@@ -146,6 +146,11 @@ void WeatherWidget::setWeatherData(WeatherData *weatherData)
     forecastDataWidget->updateData();
 }
 
+WeatherData * WeatherWidget::weatherData()
+{
+    return m_weatherData;
+}
+
 void WeatherWidget::setStatusUpdated()
 {
     statusMessageTimer.stop();
