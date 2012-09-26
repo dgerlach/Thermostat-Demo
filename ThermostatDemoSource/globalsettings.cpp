@@ -54,6 +54,11 @@ bool GlobalSettings::save()
     settingsObject.setValue("temperature-format", temperatureFormat());
     settingsObject.setValue("time-format", timeFormat());
 
+    if(settingsObject.status() == QSettings::NoError)
+        return true;
+    else
+        return false;
+
 }
 
 //FUNCTION: load()
@@ -79,6 +84,10 @@ bool GlobalSettings::load()
     qDebug() << "Time Format: " << timeFormat();
     qDebug() << "Data Path: " << dataPath();
 
+    if(settingsObject.status() == QSettings::NoError)
+        return true;
+    else
+        return false;
 }
 
 void GlobalSettings::setProxyInfo(QString proxyHost, qint16 proxyPort)
