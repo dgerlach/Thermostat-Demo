@@ -35,7 +35,7 @@ void OpenWeatherMapDataEngine::dispatchRequest()
     m_weatherReceived = false;
 
     //for openweather map we first must find the city
-    QString cityUrl = "http://openweathermap.org/data/2.0/find/name?q="+m_preparedCity;
+    QString cityUrl = "http://openweathermap.org/data/2.1/find/name?q="+m_preparedCity;
 
     // receive document and parse it
     QNetworkRequest request;
@@ -89,7 +89,7 @@ void OpenWeatherMapDataEngine::dispatchWeatherDataRequests()
     m_weatherData->setCurrentCity(m_fullCity);
 
     //first send request for current weather
-    QString currentWeatherURL = "http://openweathermap.org/data/2.0/weather/city/"+QString::number(m_cityId);
+    QString currentWeatherURL = "http://openweathermap.org/data/2.1/weather/city/"+QString::number(m_cityId);
 
     QNetworkRequest request;
     request.setUrl(QUrl(currentWeatherURL));
@@ -103,7 +103,7 @@ void OpenWeatherMapDataEngine::dispatchWeatherDataRequests()
     connect(m_reply,SIGNAL(finished()),this,SLOT(currentWeatherResponseReceived()));
 
     //next send request for current weather
-    QString forecastWeatherURL = "http://openweathermap.org/data/2.0/forecast/city/"+QString::number(m_cityId);
+    QString forecastWeatherURL = "http://openweathermap.org/data/2.1/forecast/city/"+QString::number(m_cityId);
     qDebug() << "Forecast url: " << forecastWeatherURL;
     request.setUrl(QUrl(forecastWeatherURL));
 
