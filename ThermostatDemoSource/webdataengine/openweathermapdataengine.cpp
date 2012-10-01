@@ -175,11 +175,10 @@ bool OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherDa
 
     if(result.isError())return false;
 
-
     int temp = kelvinToFahrenheit(result.property("main").property("temp").toNumber());
     QDateTime localTime = QDateTime::fromTime_t(result.property("dt").toNumber());
 
-    int iconIndex = convertImageNameToIndex(result.property("img").toString());
+    int iconIndex = convertImageNameToIndex(result.property("weather").property(0).property("icon").toString());
 
     QString icon = m_iconNameToWeatherHash[iconIndex];
 
@@ -303,6 +302,11 @@ int OpenWeatherMapDataEngine::convertImageNameToIndex(QString img)
     int lastSlash = iconName.lastIndexOf("/");
     int lastDot = iconName.lastIndexOf(".");
     int endShift=1;
+
+    qDebug() << lastSlash << lastDot <<iconName[iconName.size()-1].isLetter();
+
+    if(lastSlash == -1 && lastDot == -1 && iconName[iconName.size()-1].isLetter())
+        return iconName.mid(0,iconName.size()-1).toInt();
 
     if(iconName[lastDot-1].isLetter())
         endShift = 2;
