@@ -1,6 +1,7 @@
 #include "openweathermapdataengine.h"
 
 #include <QNetworkAccessManager>
+#include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QScriptEngine>
@@ -15,6 +16,8 @@ OpenWeatherMapDataEngine::OpenWeatherMapDataEngine(QNetworkAccessManager *manage
     WebDataEngine(manager, parent)
 {
     generateJSONWeatherLookupTables();
+    connect(&m_networkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
+    connect(&m_forecastNetworkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
 }
 
 void OpenWeatherMapDataEngine::setCity(QString city)
@@ -32,13 +35,11 @@ void OpenWeatherMapDataEngine::dispatchRequest()
     m_weatherReceived = false;
 
     //for openweather map we first must find the city
-    QString cityUrl = "http://openweathermap.org/data/2.0/find/name?q="+m_preparedCity;
+    QString cityUrl = "http://openweathermap.org/data/2.1/find/name?q="+m_preparedCity;
 
     // receive document and parse it
     QNetworkRequest request;
     request.setUrl(QUrl(cityUrl));
-
-    qDebug() << cityUrl;
 
     //set up timer to check for network timeout
     connect(&m_networkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
@@ -46,12 +47,14 @@ void OpenWeatherMapDataEngine::dispatchRequest()
 
     //make actual network request
     m_reply = m_manager->get(request);
+
     connect(m_reply, SIGNAL(finished()),this,SLOT(responseReceived()));
 }
 
 void OpenWeatherMapDataEngine::handleNetworkTimeout()
 {
-
+    m_networkTimer.stop();
+    m_forecastNetworkTimer.stop();
     emit(networkTimeout());
 }
 
@@ -67,17 +70,17 @@ void OpenWeatherMapDataEngine::responseReceived()
         m_cityId = parseCityInformation(&QString::fromAscii(data));
         //docs say do not delete in the slot so well pass it off to the event loop
         m_reply->deleteLater();
-
-        //now we need to grab current weather information and forecast data
-        dispatchWeatherDataRequests();
+        if(m_cityId == -1)
+            emit networkTimeout();
+        else
+            //now we need to grab current weather information and forecast data
+            dispatchWeatherDataRequests();
     }
     else
     {
-        qDebug() << m_reply->errorString();
+        qDebug() << "Network Error: " << m_reply->errorString();
         loadLocalData();
         emit networkTimeout();
-        //docs say do not delete in the slot so well pass it off to the event loop
-        m_reply->deleteLater();
     }
 }
 
@@ -87,13 +90,13 @@ void OpenWeatherMapDataEngine::dispatchWeatherDataRequests()
     m_weatherData->setCurrentCity(m_fullCity);
 
     //first send request for current weather
-    QString currentWeatherURL = "http://openweathermap.org/data/2.0/weather/city/"+QString::number(m_cityId);
+    QString currentWeatherURL = "http://openweathermap.org/data/2.1/weather/city/"+QString::number(m_cityId);
 
     QNetworkRequest request;
     request.setUrl(QUrl(currentWeatherURL));
 
     //set up timer to check for network timeout
-    connect(&m_networkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
+
     m_networkTimer.start(15000);
 
     //make actual network request
@@ -101,12 +104,11 @@ void OpenWeatherMapDataEngine::dispatchWeatherDataRequests()
     connect(m_reply,SIGNAL(finished()),this,SLOT(currentWeatherResponseReceived()));
 
     //next send request for current weather
-    QString forecastWeatherURL = "http://openweathermap.org/data/2.0/forecast/city/"+QString::number(m_cityId);
+    QString forecastWeatherURL = "http://openweathermap.org/data/2.1/forecast/city/"+QString::number(m_cityId);
     qDebug() << "Forecast url: " << forecastWeatherURL;
     request.setUrl(QUrl(forecastWeatherURL));
 
     //set up timer to check for network timeout
-    connect(&m_forecastNetworkTimer, SIGNAL(timeout()), this, SLOT(handleNetworkTimeout()));
     m_forecastNetworkTimer.start(15000);
 
     //make actual network request
@@ -120,29 +122,41 @@ void OpenWeatherMapDataEngine::currentWeatherResponseReceived()
 
     if(m_reply->error() != QNetworkReply::NoError)
     {
+        qDebug() << "Network Error: " << m_reply->errorString();
         emit networkTimeout();
         m_reply->deleteLater();
         return;
     }
     m_rawJSONWeatherString = m_reply->readAll();
-    parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData);
-    m_weatherReceived = true;
-    checkIfDone();
+    bool result = parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData);
+    if(!result)
+        emit networkTimeout();
+    else
+    {
+        m_weatherReceived = true;
+        checkIfDone();
+    }
 }
 
 void OpenWeatherMapDataEngine::forecastResponseReceived()
 {
     if(m_forecastReply->error() != QNetworkReply::NoError)
     {
+        qDebug() << "Network Error: " << m_reply->errorString();
         emit networkTimeout();
         m_forecastReply->deleteLater();
         return;
     }
     m_forecastNetworkTimer.stop();
     m_rawJSONForecastString = m_forecastReply->readAll();
-    parseJSONForecastData(&m_rawJSONForecastString, m_weatherData);
-    m_forecastReceived = true;
-    checkIfDone();
+    bool result = parseJSONForecastData(&m_rawJSONForecastString, m_weatherData);
+    if(!result)
+        emit networkTimeout();
+    else
+    {
+        m_forecastReceived = true;
+        checkIfDone();
+    }
 }
 
 void OpenWeatherMapDataEngine::checkIfDone()
@@ -155,38 +169,36 @@ void OpenWeatherMapDataEngine::checkIfDone()
     }
 }
 
-void OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherData *weatherData)
+bool OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherData *weatherData)
 {
     QScriptEngine engine;
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
-    qDebug() << result.toString() << *jsonData;
-    if(result.isError())return;
-
+    if(result.isError())return false;
 
     int temp = kelvinToFahrenheit(result.property("main").property("temp").toNumber());
     QDateTime localTime = QDateTime::fromTime_t(result.property("dt").toNumber());
-    qDebug() << result.property("img").toString();
-    int iconIndex = convertImageNameToIndex(result.property("img").toString());
-    qDebug() << iconIndex;
+
+    int iconIndex = convertImageNameToIndex(result.property("weather").property(0).property("icon").toString());
+
     QString icon = m_iconNameToWeatherHash[iconIndex];
 
     weatherData->setCurrentTemp(temp);
     weatherData->setLocalTime(localTime);
     weatherData->setIcon(icon);
+    return true;
 }
 
-void OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherData* weatherData)
+bool OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherData* weatherData)
 {
     QScriptEngine engine;
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
-    qDebug() << result.toString() << *jsonData;
-    if(result.isError())return;
+
+    if(result.isError())return false;
 
     QScriptValueIterator it(result.property("list"));
 
-    int a =0;
     int high = 0;
     int low = 500;
     QString icon = "";
@@ -228,6 +240,7 @@ void OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherD
             icon = "";
         }
     }
+    return true;
 }
 
 
@@ -272,8 +285,10 @@ qlonglong OpenWeatherMapDataEngine::parseCityInformation(QString* jsonData)
     //must have an object set equal to the class data received from the web or qt throws parse error
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
-    QScriptValueIterator it(result.property("list"));
-    return result.property("list").property("0").property("id").toInteger();
+    if(result.property("message").toString() != "")
+        return -1;
+    else
+        return result.property("list").property("0").property("id").toInteger();
 }
 
 int OpenWeatherMapDataEngine::kelvinToFahrenheit(double k)
@@ -289,6 +304,11 @@ int OpenWeatherMapDataEngine::convertImageNameToIndex(QString img)
     int lastDot = iconName.lastIndexOf(".");
     int endShift=1;
 
+    qDebug() << lastSlash << lastDot <<iconName[iconName.size()-1].isLetter();
+
+    if(lastSlash == -1 && lastDot == -1 && iconName[iconName.size()-1].isLetter())
+        return iconName.mid(0,iconName.size()-1).toInt();
+
     if(iconName[lastDot-1].isLetter())
         endShift = 2;
 
@@ -298,17 +318,25 @@ int OpenWeatherMapDataEngine::convertImageNameToIndex(QString img)
 void OpenWeatherMapDataEngine::loadLocalData()
 {
     m_weatherData = new WeatherData;
+    m_weatherData->setCachedDataFlag();
 
     bool result = readFromCache();
     //if we can't read from the cache file, read from the one included in the qrc!
     if(!result)
         readFromCache(":/data/cache.dat");
 
-    parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData);
-    parseJSONForecastData(&m_rawJSONForecastString, m_weatherData);
-    m_weatherData->setLastUpdated(QDateTime::currentDateTime());
-    writeToCache();
-    emit(dataAvailable(m_weatherData));
+    if(!parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData))
+    {
+        emit networkTimeout();
+    }
+    else if(!parseJSONForecastData(&m_rawJSONForecastString, m_weatherData))
+    {
+        emit networkTimeout();
+    }
+    else
+    {
+        emit(dataAvailable(m_weatherData));
+    }
 }
 
 //FUNCTION writeToCache
@@ -335,6 +363,7 @@ bool OpenWeatherMapDataEngine::writeToCache()
     QDataStream stream(&cacheFile);
     stream.setVersion(QDataStream::Qt_4_6);
     stream << m_weatherData->currentCity();
+    stream << m_weatherData->lastUpdated();
     stream << m_rawJSONWeatherString;
     stream << m_rawJSONForecastString;
 
@@ -381,12 +410,11 @@ bool OpenWeatherMapDataEngine::readFromCache(QString alternateCacheFile)
     QString cityString;
     stream >> cityString;
     m_weatherData->setCurrentCity(cityString);
+    QDateTime lastUpdated;
+    stream >> lastUpdated;
+    m_weatherData->setLastUpdated(lastUpdated);
     stream >> m_rawJSONWeatherString;
     stream >> m_rawJSONForecastString;
-
-    qDebug() << m_rawJSONWeatherString;
-    qDebug() << m_rawJSONForecastString;
-
 
     //we can at least assume if the size is zero, something is not right.
     if(cacheFile.error() != QFile::NoError)

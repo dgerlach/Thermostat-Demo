@@ -29,6 +29,9 @@ public:
     void setLocalTime(QDateTime localTime);
     QDateTime localTime();
 
+    void setCachedDataFlag();
+    bool cachedData();
+
 private:
     QString m_city;
     int m_currentTemp;
@@ -36,6 +39,7 @@ private:
     QDateTime m_lastUpdated;
     QDateTime m_localTime;
     QList<ForecastData *> m_forecastList;
+    bool m_cached;
 };
 
 

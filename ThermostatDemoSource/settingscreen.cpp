@@ -64,6 +64,18 @@ SettingScreen::SettingScreen(QWidget *parent) :
     // show layout
     setLayout(mainLayout);
 
+
+}
+
+void SettingScreen::showEvent(QShowEvent *)
+{
+    qDebug() << "SHOWING";
+    fillSettingValues();
+    qDebug() << m_globalSettings->proxyHost() << m_globalSettings->proxyPort();
+}
+
+void SettingScreen::fillSettingValues()
+{
     //populate the current settings
 
     int index = cityBox->findText(m_globalSettings->currentCity());
@@ -205,12 +217,6 @@ QWidget* SettingScreen::buildFormatSettingsWidget()
     Button24h->setCheckable(true);
     Button24h->setFocusPolicy(Qt::NoFocus);
     connect(Button24h, SIGNAL(clicked()), this, SLOT(setTimeFormat24h()));
-
-    // when either button is clicked, tell the rest of the program to switch between C/F
-    connect(FButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
-    connect(CButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
-
-
 
     // create layout
     QHBoxLayout *unitLayout = new QHBoxLayout;

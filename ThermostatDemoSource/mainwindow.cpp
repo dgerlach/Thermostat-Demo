@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "forecastdata.h"
 #include "weatherwidget.h"
 #include "thermostatwidget.h"
 #include "optionswidget.h"
@@ -214,6 +215,105 @@ void MainWindow::updateClock()
 
 }
 
+void MainWindow::energySaving(bool setpointReached)
+{
+    // change energyButton based on whether or not setpoint is reached
+    if(setpointReached == true) {
+        energyButton->setStyleSheet("background: green;");
+        energyButton->setText("48kW");
+    }
+    else if(setpointReached == false) {
+        energyButton->setStyleSheet("background: red;");
+        energyButton->setText("64kW");
+    }
+
+}
+
+//FUNCTION: changeCity
+//
+//  sends a web request through the webdata class to get weather data for the city
+//  passed. returns immediately. the webdata class invokes setWebData slot on success
+//  or webDataFailed otherwise.
+
+void MainWindow::loadWebData()
+{
+    // get new city information and pass it to WebData to send
+    // a new request and get updated information for that city
+    weatherWidget->setStatusUpdating();
+    webData->changeCity(m_globalSettings->currentCity());
+
+}
+
+//FUNCTION: setWebData
+//
+//  slot invoked by the webdata class on transfer of data across the network that handles
+//  setting an appropriate background for the mainwidget and passing the parsed data along
+//  to the weatherwidget
+
+void MainWindow::setWebData(WeatherData* weatherData)
+{
+
+    if(!weatherData)
+    {
+        webDataFailed();
+        return;
+    }
+    setBackground(weatherData->icon(), weatherData->localTime().time());
+    weatherWidget->setWeatherData(weatherData);
+    if(weatherData->cachedData())
+        weatherWidget->setStatusFailed();
+    else
+        weatherWidget->setStatusUpdated();
+}
+
+//FUNCTION: webDataFailed
+//
+//  slot invoked by the webdata class on an unsuccessful attempt at fetching weather data
+//  from the network. tells the weather widget to alert the user of the failure.
+
+void MainWindow::webDataFailed()
+{
+    WeatherData *weatherData = weatherWidget->weatherData();
+
+    //if the update fails, generate random data so things look nice!
+    //easiest way to tell if the update failed and we have no cached data is
+    //to compare the current configured city to the data's city
+
+    if(weatherData->currentCity() != m_globalSettings->currentCity())
+    {
+        //generate a quick lookup for the icons
+        QStringList icons;
+        icons << "sunny" << "partlysunny" << "cloudy" << "rain" << "tstorms";
+
+        //update the city to the current configured city
+        weatherData->setCurrentCity(m_globalSettings->currentCity());
+
+        //generate temperature numbers +/- 75
+        weatherData->setCurrentTemp(75+(qrand()%10*qrand()%2*(-1)));
+
+        //mod a random number by the number of icons then index into the array to pick one
+        weatherData->setIcon(icons[qrand()%icons.size()]);
+
+        //set the main page background to selected icon
+        setBackground(weatherData->icon(), weatherData->localTime().time());
+
+        //now iterate through the forecast days and do the same thing
+        QList<ForecastData* >::iterator i;
+        for(i=weatherData->forecastData().begin();i!=weatherData->forecastData().end();i++)
+        {
+
+            (*i)->setLowTemp(75+(qrand()%10*qrand()%2*(-1)));
+            (*i)->setHighTemp((*i)->lowTemp()+qrand()%10);
+            (*i)->setIcon(icons[qrand()%icons.size()]);
+        }
+
+        //set the data just to trigger an update of the widgets
+        weatherWidget->setWeatherData(weatherData);
+    }
+
+    weatherWidget->setStatusFailed();
+}
+
 void MainWindow::setBackground(QString icon, QTime localTime)
 {
     // set the MainWindow background based on the current conditions
@@ -268,62 +368,4 @@ void MainWindow::setBackground(QString icon, QTime localTime)
 
     }
 
-}
-
-void MainWindow::energySaving(bool setpointReached)
-{
-    // change energyButton based on whether or not setpoint is reached
-    if(setpointReached == true) {
-        energyButton->setStyleSheet("background: green;");
-        energyButton->setText("48kW");
-    }
-    else if(setpointReached == false) {
-        energyButton->setStyleSheet("background: red;");
-        energyButton->setText("64kW");
-    }
-
-}
-
-//FUNCTION: changeCity
-//
-//  sends a web request through the webdata class to get weather data for the city
-//  passed. returns immediately. the webdata class invokes setWebData slot on success
-//  or webDataFailed otherwise.
-
-void MainWindow::loadWebData()
-{
-    // get new city information and pass it to WebData to send
-    // a new request and get updated information for that city
-    weatherWidget->setStatusUpdating();
-    webData->changeCity(m_globalSettings->currentCity());
-
-}
-
-//FUNCTION: setWebData
-//
-//  slot invoked by the webdata class on transfer of data across the network that handles
-//  setting an appropriate background for the mainwidget and passing the parsed data along
-//  to the weatherwidget
-
-void MainWindow::setWebData(WeatherData* weatherData)
-{
-
-    if(!weatherData)
-    {
-        webDataFailed();
-        return;
-    }
-    setBackground(weatherData->icon(), weatherData->localTime().time());
-    weatherWidget->setWeatherData(weatherData);
-    weatherWidget->setStatusUpdated();
-}
-
-//FUNCTION: webDataFailed
-//
-//  slot invoked by the webdata class on an unsuccessful attempt at fetching weather data
-//  from the network. tells the weather widget to alert the user of the failure.
-
-void MainWindow::webDataFailed()
-{
-    weatherWidget->setStatusFailed();
 }

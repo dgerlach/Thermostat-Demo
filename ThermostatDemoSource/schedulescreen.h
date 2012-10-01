@@ -21,55 +21,41 @@ public slots:
     void shiftRight();
     void increaseTemp();
     void decreaseTemp();
-    void showButtons(SchedulePoint *);
-    void showPoints(int);
-    void removeAllBlur();
+    void selectDay(SchedulePoint *);
+    void unselectDay();
     void updateData();
+    void createScheduleScene();
+    void showEvent(QShowEvent *);
+    void addSchedulePoints();
+    void disableRow(bool checked);
+    void initializeScene();
+    void initializeGraphics();
 
 private:
-    QCheckBox *MondayButton;
-    QCheckBox *TuesdayButton;
-    QCheckBox *WednesdayButton;
-    QCheckBox *ThursdayButton;
-    QCheckBox *FridayButton;
-    QCheckBox *SaturdayButton;
-    QCheckBox *SundayButton;
     QButtonGroup *daysButtonGroup;
     QGraphicsScene *scene;
     QGraphicsView *view;
-    void addSchedulePoints();
+
     int seqNumber;
-    QGraphicsProxyWidget *proxyLeftButton;
-    QGraphicsProxyWidget *proxyRightButton;
-    QGraphicsProxyWidget *proxyUpButton;
-    QGraphicsProxyWidget *proxyDownButton;
     QList <SchedulePoint *> pointList;
+    QList <QPair<QPointF, int> > pointSave;
+
 
     SchedulePoint *currentPoint;
     void showPoint(SchedulePoint *);
-    void hidePoints();
-    void hideButtons();
-    void shiftVerticalButtonsLeft();
-    void shiftVerticalButtonsRight();
-    void shiftHorizontalButtonsLeft();
-    void shiftHorizontalButtonsRight();
-    void shiftButtonsLeft();
-    void shiftButtonsRight();
     QLabel *currentTime;
-    void blur();
 
-    // create time markings
-    QLabel *hour4;
-    QLabel *hour8;
-    QLabel *hour12;
-    QLabel *hour16;
-    QLabel *hour20;
+    QRectF pointArea;
+    qreal weekHeight;
+    qreal timeBlockWidth;
+    qreal timeWidth;
 
     GlobalSettings* m_globalSettings;
 
+    bool m_initialized;
+
 protected:
     void mousePressEvent(QMouseEvent */* event */);
-
 };
 
 #endif // SCHEDULESCREEN_H

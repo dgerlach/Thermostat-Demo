@@ -35,8 +35,8 @@ private:
     void dispatchWeatherDataRequests();
 
     qint64 parseCityInformation(QString *jsonData);
-    void parseJSONWeatherData(QString* jsonData, WeatherData* weatherData);
-    void parseJSONForecastData(QString* jsonData, WeatherData* weatherData);
+    bool parseJSONWeatherData(QString* jsonData, WeatherData* weatherData);
+    bool parseJSONForecastData(QString* jsonData, WeatherData* weatherData);
     void generateJSONWeatherLookupTables();
     void checkIfDone();
 

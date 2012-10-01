@@ -65,7 +65,7 @@ ForecastDataWidget::ForecastDataWidget(QWidget *parent) :
 
 }
 
-//FUNCTION: createScreenLayout
+//FUNCTION: setData
 //
 //  A setter function that gives the widget the data list obtained from the web
 //

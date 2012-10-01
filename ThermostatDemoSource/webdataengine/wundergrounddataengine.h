@@ -22,7 +22,7 @@ signals:
     
 public slots:
     void responseReceived();
-    void parseXML(QByteArray *xmlData);
+    void parseXML(QByteArray *xmlData, bool cached = false);
 private:
     bool writeToCache(QByteArray *xmlData);
     bool readFromCache(QByteArray *xmlData, QString alternateCacheFile = "");

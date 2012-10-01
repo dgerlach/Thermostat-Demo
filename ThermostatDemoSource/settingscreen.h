@@ -26,6 +26,10 @@ public slots:
     void setTimeFormat24h();
 
     void commitChanges();
+    void fillSettingValues();
+
+protected:
+    void showEvent(QShowEvent *);
 
 private:
     QComboBox *cityBox;

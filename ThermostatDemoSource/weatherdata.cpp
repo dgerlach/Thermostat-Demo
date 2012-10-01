@@ -2,7 +2,7 @@
 
 WeatherData::WeatherData()
 {
-
+    m_cached = false;
 }
 
 void WeatherData::setCurrentCity(QString city)
@@ -68,4 +68,14 @@ void WeatherData::setLocalTime(QDateTime localTime)
 QDateTime WeatherData::localTime()
 {
     return m_localTime;
+}
+
+void WeatherData::setCachedDataFlag()
+{
+    m_cached = true;
+}
+
+bool WeatherData::cachedData()
+{
+    return m_cached;
 }

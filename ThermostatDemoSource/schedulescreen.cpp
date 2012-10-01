@@ -5,9 +5,16 @@
 
 #include "QtDebug"
 
+#include <QRect>
+
+//array that holds the times the columns should be initially positioned
+//0-23.75 in .25 increments (15 min)
+float columnTimes [] = {5,9.5,17,22};
+
 ScheduleScreen::ScheduleScreen(QWidget *parent) :
     QWidget(parent)
 {
+    setObjectName("ScheduleScreen");
     //get an instance of the global configuration
     m_globalSettings = GlobalSettings::getInstance();
 
@@ -15,7 +22,7 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     seqNumber = 0;
 
     // allow user to click off points to remove blur and see all
-    connect(this, SIGNAL(clicked()), this, SLOT(removeAllBlur()));
+    connect(this, SIGNAL(clicked()), this, SLOT(unselectDay()));
     //allow valueChanged signal to trigger updateData() slot
     connect(this, SIGNAL(valueChanged()), this, SLOT(updateData()));
     // create title
@@ -26,8 +33,6 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     currentTime = new QLabel();
     currentTime->setObjectName("currentTime");
     currentTime->setMinimumWidth(80);
-    currentTime->setMaximumWidth(80);
-    currentTime->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 
     // create back button
     QPushButton *backButton = new QPushButton();
@@ -45,163 +50,231 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     topLayout->addStretch();
     topLayout->addWidget(backButton);
 
-    // create checkboxes for days of week
-    MondayButton = new QCheckBox(QString("Mon"));
-    MondayButton->setFocusPolicy(Qt::NoFocus);
-    TuesdayButton = new QCheckBox(QString("Tue"));
-    TuesdayButton->setFocusPolicy(Qt::NoFocus);
-    WednesdayButton = new QCheckBox(QString("Wed"));
-    WednesdayButton->setFocusPolicy(Qt::NoFocus);
-    ThursdayButton = new QCheckBox(QString("Thu"));
-    ThursdayButton->setFocusPolicy(Qt::NoFocus);
-    FridayButton = new QCheckBox(QString("Fri"));
-    FridayButton->setFocusPolicy(Qt::NoFocus);
-    SaturdayButton = new QCheckBox(QString("Sat"));
-    SaturdayButton->setFocusPolicy(Qt::NoFocus);
-    SundayButton = new QCheckBox(QString("Sun"));
-    SundayButton->setFocusPolicy(Qt::NoFocus);
-
-    // create button group to hold weekdays check boxes
-    daysButtonGroup = new QButtonGroup(this);
-    daysButtonGroup->addButton(MondayButton);
-    daysButtonGroup->addButton(TuesdayButton);
-    daysButtonGroup->addButton(WednesdayButton);
-    daysButtonGroup->addButton(ThursdayButton);
-    daysButtonGroup->addButton(FridayButton);
-    daysButtonGroup->addButton(SaturdayButton);
-    daysButtonGroup->addButton(SundayButton);  
-    connect(daysButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(showPoints(int)));
-
-    // set all boxes to initially checked
-    daysButtonGroup->setExclusive(false);
-    MondayButton->setChecked(true);
-    TuesdayButton->setChecked(true);
-    WednesdayButton->setChecked(true);
-    ThursdayButton->setChecked(true);
-    FridayButton->setChecked(true);
-    SaturdayButton->setChecked(true);
-    SundayButton->setChecked(true);
-
-    // create time markings
-    hour4 = new QLabel("");
-    hour8 = new QLabel("");
-    hour12 = new QLabel("");
-    hour16 = new QLabel("");
-    hour20 = new QLabel("");
-
-    // create days layout
-    QVBoxLayout *daysButtonLayout = new QVBoxLayout;
-    daysButtonLayout->addStretch();
-    daysButtonLayout->addSpacing(15);
-    daysButtonLayout->addWidget(MondayButton);
-    daysButtonLayout->addWidget(TuesdayButton);
-    daysButtonLayout->addWidget(WednesdayButton);
-    daysButtonLayout->addWidget(ThursdayButton);
-    daysButtonLayout->addWidget(FridayButton);
-    daysButtonLayout->addWidget(SaturdayButton);
-    daysButtonLayout->addWidget(SundayButton);
-    daysButtonLayout->addSpacing(15);
-    daysButtonLayout->addStretch();
-
-    // create time layout
-    QHBoxLayout *timeLayout = new QHBoxLayout;
-    timeLayout->addSpacing(134);
-    timeLayout->addWidget(hour4);
-    timeLayout->addSpacing(10);
-    timeLayout->addWidget(hour8);
-    timeLayout->addSpacing(16);
-    timeLayout->addWidget(hour12);
-    timeLayout->addSpacing(14);
-    timeLayout->addWidget(hour16);
-    timeLayout->addSpacing(24);
-    timeLayout->addWidget(hour20);
-    timeLayout->addSpacing(50);
-    timeLayout->setSizeConstraint(QLayout::SetFixedSize);
-
-    // force time layout to retain size independent of screen size
-    QHBoxLayout *bottomLayout = new QHBoxLayout;
-    bottomLayout->addLayout(timeLayout);
-    bottomLayout->setAlignment(timeLayout,Qt::AlignCenter);
-
-    // create graphics view and scene
-    scene = new QGraphicsScene(0,0,300,200);
-    view = new QGraphicsView;
-    view->setScene(scene);
+    view = new QGraphicsView();
+    view->setBackgroundBrush(QBrush(Qt::black));
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    // create all 28 schedule points
-    addSchedulePoints();
-
-    // show graphics view
-    view->show();
-
-    // create layout for graphics view and weekday checkboxes
-    QHBoxLayout *weekdaysLayout = new QHBoxLayout;
-    weekdaysLayout->addLayout(daysButtonLayout);
-    weekdaysLayout->addWidget(view);
 
     // create final layout
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(topLayout);
-    mainLayout->addStretch();
-    mainLayout->addLayout(weekdaysLayout);
-    mainLayout->addLayout(bottomLayout);
-    mainLayout->addStretch();
+    QHBoxLayout* viewLayout = new QHBoxLayout;
+    viewLayout->addWidget(view);
+    viewLayout->setContentsMargins(0,0,0,0);
+    viewLayout->setSpacing(0);
+    mainLayout->addLayout(viewLayout);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setSpacing(0);
+
+    QWidget *sizeLimiterWidget = new QWidget;
+    sizeLimiterWidget->setMaximumSize(800, 450);
+
+    qDebug() << "SIZE: " << sizeLimiterWidget->size();
+    sizeLimiterWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizeLimiterWidget->setLayout(mainLayout);
+    sizeLimiterWidget->setContentsMargins(0,0,0,0);
+    QHBoxLayout* contentsBox = new QHBoxLayout;
+    contentsBox->setContentsMargins(0,0,0,0);
+    contentsBox->addWidget(sizeLimiterWidget);
 
     // show final layout
-    setLayout(mainLayout);
+    setLayout(contentsBox);
 
-    updateData();
+    resize(qApp->desktop()->size());
+    updateGeometry();
+
+    scene = NULL;
+    m_initialized = false;
+    currentPoint  = NULL;
+
+}
+
+void ScheduleScreen::createScheduleScene()
+{
+    qDebug() << view->size();
+
+    QPen pen(Qt::blue);
+    QBrush brush(Qt::black);
+    QFont font = this->font();
+    font.setBold(true);
+    QFontMetrics fm(font);
+
+    weekHeight = (scene->height()/7.0)-(scene->height()*.025);
+
+    pointArea.setRect(fm.boundingRect("Wed").width()+20, 15, scene->width(), weekHeight*7);
+    timeWidth = ((pointArea.width() - pointArea.left())/4.0)-((pointArea.width() - pointArea.left())/4.0)/16;
+    timeBlockWidth = timeWidth/24.0; //15 min increments
+    pointArea.adjust(0,0,-timeBlockWidth, 0);
+    QDate date = QDate::fromString("Sun", "ddd");
+
+    for(int a = 0;a<7;a++)
+    {
+        pen.setColor(QColor(110+40*(a%2),110+40*(a%2),110+40*(a%2)));
+        brush.setColor(QColor(120+40*(a%2),120+40*(a%2),120+40*(a%2)));
+
+        scene->addRect(0,pointArea.top()+a*weekHeight,pointArea.width(),weekHeight, pen, brush);
+
+        pen.setColor(QColor(150,150,150));
+        brush.setColor(QColor(180,180,180));
+        scene->addRect(0,pointArea.top()+a*weekHeight,pointArea.left(),weekHeight-1, pen, brush);
+
+        date = date.addDays(1);
+        QString dateString = date.toString("ddd");
+        pen.setColor(QColor(50,50,50));
+        QPushButton* b = new QPushButton;
+        connect(b, SIGNAL(clicked(bool)), this, SLOT(disableRow(bool)));
+        b->setFlat(true);
+        b->setFont(font);
+        b->setFocusPolicy(Qt::NoFocus);
+        b->setMaximumWidth(pointArea.left()-4);
+        b->setMaximumHeight(weekHeight-4);
+        QPalette buttonPalette(QColor(180,180,180));
+        //buttonPalette.setColor(QPalette::Active, QPalette::Button, QColor(180,180,180));
+        b->setPalette(buttonPalette);
+        b->setCheckable(true);
+        b->setChecked(true);
+        b->setText(dateString);
+        b->setProperty("dayNumber", date.dayOfWeek()-1);
+        QGraphicsProxyWidget* textItem = new QGraphicsProxyWidget;
+        textItem->setWidget(b);
+        scene->addItem(textItem);
+
+        textItem->setPos(pointArea.left()/2 - textItem->boundingRect().width()/2, pointArea.top()+ a*weekHeight + weekHeight/2 - textItem->boundingRect().height()/2);
+    }
+
+    scene->addLine(pointArea.left(), pointArea.top()+1, pointArea.left(), scene->height()-1);
+
+    for(int a = 0;a<5;a++)
+    {
+        pen.setColor(QColor(110+40*(a%2),110+40*(a%2),110+40*(a%2)));
+        brush.setColor(QColor(120+40*(a%2),120+40*(a%2),120+40*(a%2)));
+
+        QString timeString = formatHourString(QTime(((a)*6)%24,0), m_globalSettings->timeFormat());
+
+        pen.setColor(QColor(200,200,200));
+        brush.setColor(QColor(200,200,200));
+        QGraphicsSimpleTextItem* textItem = scene->addSimpleText(timeString, font);
+
+        textItem->setBrush(brush);
+        textItem->setPos(timeBlockWidth*3+pointArea.left()+timeWidth*a - textItem->boundingRect().width()/2, pointArea.bottom() +6);
+        pen.setColor(QColor(188,188,188));
+        pen.setStyle(Qt::DashLine);
+        scene->addLine(timeBlockWidth*3+pointArea.left()+timeWidth*a, pointArea.top()+1, timeBlockWidth*3+pointArea.left()+timeWidth*a, pointArea.bottom()+3, pen);
+    }
+
+}
+
+
+void ScheduleScreen::disableRow(bool checked)
+{
+    QPushButton* button = dynamic_cast<QPushButton* >(this->sender());
+    int index = button->property("dayNumber").toInt()*4;
+
+    // display only those points that are requested by weekday check boxes
+    if(checked) {
+        //enable all points in the row
+        for(int a = 0;a<4;a++)
+        {
+            pointList.at(index+a)->setDisabled(false);
+
+            //check each point in the column, if one is selected then select this one and break
+            for(int b=0;b<7;b++)
+                if(pointList.at(a +4*b)->selected())
+                {
+                    pointList.at(index+a)->setSelected(true);
+                    break;
+                }
+        }
+        button->setStyleSheet("");
+    }
+    else
+    {
+        for(int a = 0;a<4;a++)
+            pointList.at(index+a)->setDisabled(true);
+        button->setStyleSheet("color:#CCCCCC");
+    }
+
+    return;
+
+}
+
+void ScheduleScreen::showEvent(QShowEvent *e)
+{
+    if(!m_initialized)
+    {
+        e->accept();
+        currentPoint = NULL;
+        m_initialized = true;
+        view->show();
+        QTimer::singleShot(0, this, SLOT(initializeGraphics()));
+    }
+}
+
+void ScheduleScreen::initializeGraphics()
+{
+    initializeScene();
+    createScheduleScene();
+    addSchedulePoints();
+}
+
+void ScheduleScreen::initializeScene()
+{
+    // create graphics view and scene
+    scene = new QGraphicsScene(0,0,view->width(), view->height());
+    view->setScene(scene);
+    qDebug() << view->size();
 }
 
 void ScheduleScreen::updateData()
 {
-    hour4->setText(formatTimeString(QTime(4,0), m_globalSettings->timeFormat(), false));
-    hour8->setText(formatTimeString(QTime(8,0), m_globalSettings->timeFormat(), false));
-    hour12->setText("Noon");
-    hour16->setText(formatTimeString(QTime(16,0), m_globalSettings->timeFormat(), false));
-    hour20->setText(formatTimeString(QTime(20,0), m_globalSettings->timeFormat(), false));
-
+    if(scene)
+    {
+        scene->clear();
+        delete scene;
+        scene = 0;
+        m_initialized = false;
+        pointList.empty();
+        QApplication::sendEvent(this, new QShowEvent);
+    }
 }
 
 void ScheduleScreen::addSchedulePoints()
 {
-
+    qDebug() << view->size();
     // create all 28 schedule points with proper connections
     // fill all points into pointList for easy access
 
     for(int a=0;a<28;a++)
     {
         SchedulePoint *schedulePoint = new SchedulePoint(a);
-        connect(schedulePoint, SIGNAL(clicked(SchedulePoint *)), this, SLOT(showButtons(SchedulePoint *)));
+        connect(schedulePoint, SIGNAL(clicked(SchedulePoint *)), this, SLOT(selectDay(SchedulePoint*)));
         connect(this, SIGNAL(valueChanged()), schedulePoint, SLOT(updateUnit()));
+        schedulePoint->setTimeBlockWidth(timeBlockWidth);
+        schedulePoint->setWeekHeight(weekHeight);
+        schedulePoint->setPointArea(pointArea);
         showPoint(schedulePoint);
-        pointList.append(schedulePoint);
+        pointList.insert(a,schedulePoint);
     }
-
-    // create proxy widgets to hold push buttons so arrows can be added to graphics view
-    proxyLeftButton = new QGraphicsProxyWidget();
-    proxyRightButton = new QGraphicsProxyWidget();
-    proxyUpButton = new QGraphicsProxyWidget();
-    proxyDownButton = new QGraphicsProxyWidget();
 
 }
 
 void ScheduleScreen::showPoint(SchedulePoint *point)
 {
     // show point based on unique ID
-    point->setPos(QPoint(35.025 + (85 * (point->getID() % 4)),
-                        37 + (22 * ((point->getID() / 4) % 7))));
+    point->setPos(QPoint(timeBlockWidth*3 + pointArea.left() + (timeBlockWidth * 4 * columnTimes[point->getID()%4]), pointArea.top() + weekHeight/2 + (weekHeight * ((point->getID() / 4) % 7))));
     scene->addItem(point);
-}
+ }
 
 void ScheduleScreen::shiftLeft()
 {
     // shift buttons left and shift visible points left in this column unless
     // left edge of graphics view has been reached
-    if(currentPoint->pos().x() > -10) {
-        shiftButtonsLeft();
+
+    if(currentPoint->pos().x()- currentPoint->boundingRect().width()/2- timeBlockWidth > pointArea.left()) {
         for(int i=0; i<7; i++) {
             if(pointList.at((currentPoint->getID() + 4*i) % 28)->isVisible()) {
                 pointList.at((currentPoint->getID() + 4*i) % 28)->shiftLeft();
@@ -218,8 +291,7 @@ void ScheduleScreen::shiftRight()
 {
     // shift buttons right and shift visible points right in this column unless
     // right edge of graphics view has been reached
-    if(currentPoint->pos().x() < 310) {
-        shiftButtonsRight();
+    if(currentPoint->pos().x()+ currentPoint->boundingRect().width()/2+ timeBlockWidth < pointArea.right()) {
         for(int i=0; i<7; i++) {
             if(pointList.at((currentPoint->getID() + 4*i) % 28)->isVisible()) {
                 pointList.at((currentPoint->getID() + 4*i) % 28)->shiftRight();
@@ -230,48 +302,6 @@ void ScheduleScreen::shiftRight()
         //qDebug() << currentPoint->pos().x();
     }
 
-}
-
-void ScheduleScreen::shiftButtonsLeft()
-{
-    // shift all 4 arrow buttons left
-    shiftVerticalButtonsLeft();
-    shiftHorizontalButtonsLeft();
-}
-
-void ScheduleScreen::shiftButtonsRight()
-{
-    // shift all 4 arrow buttons right
-    shiftVerticalButtonsRight();
-    shiftHorizontalButtonsRight();
-}
-
-void ScheduleScreen::shiftVerticalButtonsRight()
-{
-    // shift up and down buttons right
-    proxyUpButton->moveBy(3.4,0);
-    proxyDownButton->moveBy(3.4,0);
-}
-
-void ScheduleScreen::shiftVerticalButtonsLeft()
-{
-    // shift up and down buttons left
-    proxyUpButton->moveBy(-3.4,0);
-    proxyDownButton->moveBy(-3.4,0);
-}
-
-void ScheduleScreen::shiftHorizontalButtonsRight()
-{
-    // shift left and right buttons right
-    proxyLeftButton->moveBy(3.4,0);
-    proxyRightButton->moveBy(3.4,0);
-}
-
-void ScheduleScreen::shiftHorizontalButtonsLeft()
-{
-    // shift left and right buttons left
-    proxyLeftButton->moveBy(-3.4,0);
-    proxyRightButton->moveBy(-3.4,0);
 }
 
 void ScheduleScreen::increaseTemp()
@@ -294,187 +324,43 @@ void ScheduleScreen::decreaseTemp()
     }
 }
 
-void ScheduleScreen::showButtons(SchedulePoint *point)
+void ScheduleScreen::selectDay(SchedulePoint *point)
 {
-    // show left, right, up, and down buttons in correct position for any input conditions
-    int i;
+    //ifa point has already been clicked on we need to unselect it.
+    if(currentPoint)
+        unselectDay();
+
     // track which is the point that has been clicked on
     currentPoint = point;
     // show time indicated by position of current point
     currentTime->setText(currentPoint->time());
 
-    // first hide all 4 buttons, then we will make them reappear in the correct position
-    hideButtons();
-
-    // create left arrow
-    QPushButton *leftArrowButton = new QPushButton();
-    leftArrowButton->setFocusPolicy(Qt::NoFocus);
-    leftArrowButton->setStyleSheet("background: rgba(0,0,0,0);"
-                                   "border-image: url(:/Images/simple-black-square-icon-arrowleft.png) 1;");
-    leftArrowButton->setFixedSize(25,25);
-    connect(leftArrowButton, SIGNAL(clicked()), this, SLOT(shiftLeft()));
-
-    // create right arrow
-    QPushButton *rightArrowButton = new QPushButton();
-    rightArrowButton->setFocusPolicy(Qt::NoFocus);
-    rightArrowButton->setStyleSheet("background: rgba(0,0,0,0);"
-                                   "border-image: url(:/Images/simple-black-square-icon-arrowright.png) 1;");
-    rightArrowButton->setFixedSize(25,25);
-    connect(rightArrowButton, SIGNAL(clicked()),this,SLOT(shiftRight()));
-
-    // create up arrow
-    QPushButton *upArrowButton = new QPushButton();
-    upArrowButton->setFocusPolicy(Qt::NoFocus);
-    upArrowButton->setStyleSheet("background: rgba(0,0,0,0);"
-                                 "border-image: url(:/Images/simple-black-square-icon-arrowup.png) 1;");
-    upArrowButton->setFixedSize(25,25);
-    connect(upArrowButton, SIGNAL(clicked()), this, SLOT(increaseTemp()));
-
-    // create down arrow
-    QPushButton *downArrowButton = new QPushButton();
-    downArrowButton->setFocusPolicy(Qt::NoFocus);
-    downArrowButton->setStyleSheet("background: rgba(0,0,0,0);"
-                                 "border-image: url(:/Images/simple-black-square-icon-arrowdown.png) 1;");
-    downArrowButton->setFixedSize(25,25);
-    connect(downArrowButton, SIGNAL(clicked()), this, SLOT(decreaseTemp()));
-
-    // create proxy widgets so that buttons can be added to graphics view
-    proxyLeftButton = new QGraphicsProxyWidget();
-    proxyLeftButton->setWidget(leftArrowButton);
-    proxyRightButton = new QGraphicsProxyWidget();
-    proxyRightButton->setWidget(rightArrowButton);
-    proxyUpButton = new QGraphicsProxyWidget();
-    proxyUpButton->setWidget(upArrowButton);
-    proxyDownButton = new QGraphicsProxyWidget();
-    proxyDownButton->setWidget(downArrowButton);
-
-    // set position of left and right buttons on either side of currently selected point
-    proxyLeftButton->setPos(QPoint(0.075 + (85 * (point->getID() % 4)),
-                                        25 + (22 * ((point->getID() / 4) % 7))));
-    scene->addItem(proxyLeftButton);
-    proxyRightButton->setPos(QPoint(45.075 + (85 * (point->getID() % 4)),
-                                    25 + (22 * ((point->getID() / 4) % 7))));
-    scene->addItem(proxyRightButton);
-
-    // set up and down buttons at the top and bottom of currently visible column
-    for(i=0; i<7; i++) {
-        if(pointList.at((point->getID()%4 + 4*i))->isVisible()) {
-            proxyUpButton->setPos(QPoint(-13 + pointList.at(point->getID()%4 + 4*i)->pos().x(),
-                                         -31 + pointList.at(point->getID()%4 +4*i)->pos().y()));
-            break;
-        }
-    }
-    scene->addItem(proxyUpButton);
-
-    for(i=0; i<7; i++) {
-        if(pointList.at((24+(point->getID()%4) - 4*i))->isVisible()) { // only works if last row is visible
-            proxyDownButton->setPos(QPoint(-13 + pointList.at((24+(point->getID()%4) - 4*i))->pos().x(),
-                                           6 + pointList.at((24+(point->getID()%4) - 4*i))->pos().y()));
-            break;
+    for(int a = 0; a<7; a++)
+    {
+        SchedulePoint* columnPoint = pointList.at(point->getID()%4 + a*4);
+        if(!columnPoint->disabled())
+        {
+            pointList.at(point->getID()%4 + a*4)->setSelected(true);
+            if(point!=columnPoint)
+                connect(point, SIGNAL(shareAdjustment(int, qreal)), columnPoint, SLOT(adjust(int, qreal)));
         }
     }
 
-    scene->addItem(proxyDownButton);
-
-    // if the point has already been moved, make sure buttons are created at the right spot
-    if(point->getLocation()<0) {
-        for(i=0; i>point->getLocation(); i--) {
-            shiftHorizontalButtonsLeft();
-        }
-    } else {
-        for(i=0; i<point->getLocation(); i++) {
-            shiftHorizontalButtonsRight();
-        }
-    }
-
-    // blur all columns except the currently selected column
-    blur();
 
 }
 
-void ScheduleScreen::hideButtons()
+void ScheduleScreen::unselectDay()
 {
-    // hide up, down, left, and right buttons
-    proxyLeftButton->hide();
-    proxyRightButton->hide();
-    proxyUpButton->hide();
-    proxyDownButton->hide();
+    if(!currentPoint)
+        return;
+    for(int a = 0; a<28; a++)
+    {
+        SchedulePoint* point = pointList.at(a);
 
-}
+        point->setSelected(false);
+        if(currentPoint!=point)
+            disconnect(currentPoint, SIGNAL(shareAdjustment(int, qreal)), point, SLOT(adjust(int, qreal)));
 
-void ScheduleScreen::hidePoints()
-{
-    // hide all points
-    for(int i=0; i<28; i++) {
-        pointList.at(i)->hide();
-    }
-    return;
-
-}
-
-void ScheduleScreen::showPoints(int)
-{
-    // first hide everything
-    hidePoints();
-    hideButtons();
-
-    // display only those points that are requested by weekday check boxes
-    if(MondayButton->isChecked()) {
-        pointList.at(0)->show();
-        pointList.at(1)->show();
-        pointList.at(2)->show();
-        pointList.at(3)->show();
-    }
-    if(TuesdayButton->isChecked()) {
-        pointList.at(4)->show();
-        pointList.at(5)->show();
-        pointList.at(6)->show();
-        pointList.at(7)->show();
-    }
-    if(WednesdayButton->isChecked()) {
-        pointList.at(8)->show();
-        pointList.at(9)->show();
-        pointList.at(10)->show();
-        pointList.at(11)->show();
-    }
-    if(ThursdayButton->isChecked()) {
-        pointList.at(12)->show();
-        pointList.at(13)->show();
-        pointList.at(14)->show();
-        pointList.at(15)->show();
-    }
-    if(FridayButton->isChecked()) {
-        pointList.at(16)->show();
-        pointList.at(17)->show();
-        pointList.at(18)->show();
-        pointList.at(19)->show();
-    }
-    if(SaturdayButton->isChecked()) {
-        pointList.at(20)->show();
-        pointList.at(21)->show();
-        pointList.at(22)->show();
-        pointList.at(23)->show();
-    }
-    if(SundayButton->isChecked()) {
-        pointList.at(24)->show();
-        pointList.at(25)->show();
-        pointList.at(26)->show();
-        pointList.at(27)->show();
-    }
-    return;
-
-}
-
-void ScheduleScreen::blur()
-{
-    // add blur to all points outside the current column
-    for(int i=0; i<28; i++) {
-        if(pointList.at(i)->graphicsEffect()) { // does the item have an exisiting graphics effect
-            pointList.at(i)->setGraphicsEffect(NULL);
-        }
-        if(pointList.at(i)->getID()%4 != currentPoint->getID()%4) {
-            pointList.at(i)->setGraphicsEffect(new QGraphicsBlurEffect(this));
-        }
     }
 }
 
@@ -483,15 +369,4 @@ void ScheduleScreen::mousePressEvent(QMouseEvent * /* event */)
     // provide event handler for whole screen, so that user can click off a
     // a column and have all points be displayed
     emit clicked();
-
-}
-
-void ScheduleScreen::removeAllBlur()
-{
-    // display all points by removing all blur
-    for(int i=0; i<28; i++) {
-        if(pointList.at(i)->graphicsEffect()) { // does the item have an exisiting graphics effect
-            pointList.at(i)->setGraphicsEffect(NULL);
-        }
-    }
 }

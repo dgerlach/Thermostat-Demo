@@ -13,7 +13,7 @@ OptionsWidget {
         background-color: rgba(0,0,0,0);
 }
 */
-WeatherWidget > QLabel {
+WeatherWidget QLabel {
         color: white;
         font-size: 18px;
         qproperty-alignment: AlignCenter;
@@ -27,7 +27,11 @@ WeatherWidget > QLabel#currentTemp {
         font-size: 36px;
 }
 
-WeatherWidget > QLabel#statusLabel {
+WeatherWidget QLabel#statusLabel {
+        font-size: 12px;
+}
+
+WeatherWidget QLabel#statusLabel2 {
         font-size: 12px;
 }
 
@@ -171,22 +175,22 @@ ScheduleScreen {
         background: black;
 }
 
-ScheduleScreen > QLabel {
+ScheduleScreen  QLabel {
         color: white;
         font-size: 12px;
         margin: 0;
         padding: 0;
 }
 
-ScheduleScreen > QLabel#title {
+ScheduleScreen  QLabel#title {
         font-size: 16px;
 }
 
-ScheduleScreen > QLabel#currentTime {
+ScheduleScreen  QLabel#currentTime {
         font-size: 16px;
 }
 
-ScheduleScreen > QCheckBox::indicator:checked {
+ScheduleScreen  QCheckBox::indicator:checked {
         image: url(:/Images/simple-black-square-icon-check-box-full.png) 1;
         height: 32px;
         width: 32px;
@@ -195,7 +199,7 @@ ScheduleScreen > QCheckBox::indicator:checked {
         border: 0px;
 }
 
-ScheduleScreen > QCheckBox::indicator:unchecked {
+ScheduleScreen  QCheckBox::indicator:unchecked {
         image: url(:/Images/simple-black-square-icon-check-box-empty.png) 1;
         height: 32px;
         width: 32px;
@@ -204,18 +208,18 @@ ScheduleScreen > QCheckBox::indicator:unchecked {
         border: 0px;
 }
 
-ScheduleScreen > QCheckBox {
+ScheduleScreen  QCheckBox {
         color: white;
         spacing: 0px;
 }
 
-ScheduleScreen > QPushButton {
+ScheduleScreen  QPushButton {
         background: rgba(0,0,0,0);
         margin: 0;
         padding: 4px 4px;
 }
 
-ScheduleScreen > QGraphicsView {
+ScheduleScreen  QGraphicsView {
         background: black;
         border: 0;
 }
@@ -225,7 +229,7 @@ QMessageBox {
         spacing: 40px;
 }
 
-QMessageBox > QWidget {
+QMessageBox  QWidget {
         color: white;
         font-size: 16px;
         padding-top: 45px;
