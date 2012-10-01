@@ -90,7 +90,6 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     scene = NULL;
     m_initialized = false;
     currentPoint  = NULL;
-
 }
 
 void ScheduleScreen::createScheduleScene()

@@ -43,6 +43,7 @@ private:
 
     QKeyboardLineEdit* m_proxyHostLineEdit;
     QKeyboardLineEdit* m_proxyPortLineEdit;
+    QKeyboardLineEdit* m_remoteListenPortLineEdit;
 
     GlobalSettings* m_globalSettings;
 

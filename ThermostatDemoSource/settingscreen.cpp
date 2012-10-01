@@ -122,11 +122,21 @@ QWidget* SettingScreen::buildNetworkSettingsWidget()
     proxyVBoxLayout->addLayout(proxyLayout);
 
     QGroupBox* proxySettingsGroupBox = new QGroupBox("Proxy Settings");
-
     proxySettingsGroupBox->setLayout(proxyVBoxLayout);
+
+
+    QLabel *m_remoteListenPort = new QLabel("Remote Listen Port: ", this);
+    m_remoteListenPortLineEdit = new QKeyboardLineEdit;
+
+    QFormLayout* remoteListenLayout = new QFormLayout;
+    remoteListenLayout->addRow(m_remoteListenPort, m_remoteListenPortLineEdit);
+
+    QGroupBox* remoteSettingsGroupBox = new QGroupBox("Remote Settings");
+    remoteSettingsGroupBox->setLayout(remoteListenLayout);
 
     QVBoxLayout *networkSettingsLayout = new QVBoxLayout(this);
     networkSettingsLayout->addWidget(proxySettingsGroupBox);
+    networkSettingsLayout->addWidget(remoteSettingsGroupBox);
     networkSettingsLayout->addStretch();
 
     networkSettingsWidget->setLayout(networkSettingsLayout);

@@ -30,7 +30,8 @@ SOURCES += main.cpp \
     weatherdatawidget.cpp \
     webdataengine/webdataengine.cpp \
     webdataengine/openweathermapdataengine.cpp \
-    webdataengine/wundergrounddataengine.cpp
+    webdataengine/wundergrounddataengine.cpp \
+    remoteaccessmanager.cpp
 
 HEADERS  += \
     weatherwidget.h \
@@ -54,7 +55,8 @@ HEADERS  += \
     main.h \
     webdataengine/webdataengine.h \
     webdataengine/openweathermapdataengine.h \
-    webdataengine/wundergrounddataengine.h
+    webdataengine/wundergrounddataengine.h \
+    remoteaccessmanager.h
 
 RESOURCES += \
     thermostatdemo.qrc

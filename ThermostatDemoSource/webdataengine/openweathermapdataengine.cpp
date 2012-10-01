@@ -174,6 +174,8 @@ bool OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherDa
     QScriptEngine engine;
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
+    qDebug() << *jsonData;
+
     if(result.isError())return false;
 
     int temp = kelvinToFahrenheit(result.property("main").property("temp").toNumber());
@@ -219,7 +221,7 @@ bool OpenWeatherMapDataEngine::parseJSONForecastData(QString *jsonData, WeatherD
             if(high < it.value().property("main").property("temp_max").toNumber()) high = it.value().property("main").property("temp_max").toInteger();
             if(low > it.value().property("main").property("temp_min").toNumber()) low = it.value().property("main").property("temp_min").toInteger();
 
-            int iconIndex = convertImageNameToIndex(it.value().property("img").toString());
+            int iconIndex = convertImageNameToIndex(it.value().property("weather").property(0).property("icon").toString());
 
             if(m_weatherPriorityHash[icon]< m_weatherPriorityHash[m_iconNameToWeatherHash[iconIndex]]) icon = m_iconNameToWeatherHash[iconIndex];
 
@@ -303,8 +305,6 @@ int OpenWeatherMapDataEngine::convertImageNameToIndex(QString img)
     int lastSlash = iconName.lastIndexOf("/");
     int lastDot = iconName.lastIndexOf(".");
     int endShift=1;
-
-    qDebug() << lastSlash << lastDot <<iconName[iconName.size()-1].isLetter();
 
     if(lastSlash == -1 && lastDot == -1 && iconName[iconName.size()-1].isLetter())
         return iconName.mid(0,iconName.size()-1).toInt();

@@ -3,6 +3,7 @@
 #include "weatherwidget.h"
 #include "thermostatwidget.h"
 #include "optionswidget.h"
+#include "remoteaccessmanager.h"
 #include "settingscreen.h"
 #include "globalsettings.h"
 #include "weatherdata.h"
@@ -113,6 +114,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(clockTimer,SIGNAL(timeout()),this,SLOT(updateClock()));
     clockTimer->start(1000);
 
+
+    //create and start the remote access manager
+    RemoteAccessManager *m_remoteAccessManager = new RemoteAccessManager;
+    m_remoteAccessManager->start();
 
     //first set based on local cache so user sees something!
     webData->loadLocalData();
