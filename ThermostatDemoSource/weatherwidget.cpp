@@ -235,3 +235,11 @@ void WeatherWidget::mousePressEvent(QMouseEvent *e)
         emit webReloadRequested();
     e->accept();
 }
+
+QVariantHash WeatherWidget::getCurrentData()
+{
+    QVariantHash data;
+    data.insert("weatherCurrent", weatherDataWidget->getCurrentData());
+    data.insert("weatherForecast", forecastDataWidget->getCurrentData());
+    return data;
+}

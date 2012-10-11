@@ -16,14 +16,15 @@ public:
 public slots:
     void updateUnit();
     void setCurrentTempPtr(int * currentTemp);
+    void increaseTemp();
+    void decreaseTemp();
+    QHash<QString, QVariant> getCurrentData();
     
 signals:
     void timeout();
     void setpointIsReached(bool);
     
 private slots:
-    void increaseTemp();
-    void decreaseTemp();
     void update();
     void resizeEvent(QResizeEvent *);
 

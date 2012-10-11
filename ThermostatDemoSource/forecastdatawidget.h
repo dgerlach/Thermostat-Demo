@@ -2,6 +2,7 @@
 #define FORECASTDATAWIDGET_H
 
 #include <QWidget>
+#include <QVariant>
 
 class ForecastData;
 class GlobalSettings;
@@ -33,6 +34,7 @@ public slots:
     void updateData();
     void setData(QList<ForecastData* > data);
     void scaleContents();
+    QVariantHash getCurrentData();
 
 private:
     ForecastDataWidgetGroup m_forecastDataWidgetGroup[3];

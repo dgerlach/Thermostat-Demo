@@ -1,8 +1,172 @@
 <html>
 <head>
-	<script src = "remote/jquery-1.8.2.min.js" ></script>
+	<link type="text/css" href="remote/jquery-ui-1.8.24.custom.css" rel="stylesheet" />
+	<script src = "remote/jquery-1.8.2.min.js" type = "text/javascript"></script>
+	<script src = "remote/jquery-ui-1.8.24.custom.min.js" type = "text/javascript"></script>
 </head>
+
 <body>
+	<center>
 	<h1>Remote Thermostat Configuration</h1>
+
+
+
+	<script charset="utf-8">
+	$(function() {
+		$( "#tabs" ).tabs();
+		$( "input:submit, a, button", ".demo" ).button();
+		$( "a", ".demo" ).click(function() { return false; });
+
+		$("#tabs-1").ajaxError(function(event, request, settings){
+		  $("#error").fadeIn();
+		});
+
+		getCurrentThermostatData();
+		setInterval(updateCurrentThermostatData, 1000);
+	});
+
+	function changeThermostatSetPoint( dt ) {
+		$.get('?command=change_temp&dt='+dt, function(data) {
+		});
+
+		var currentSetPoint = parseInt($("#setpointTemp").html());
+		currentSetPoint += dt;
+		$("#setpointTemp").html(currentSetPoint+"°");
+	}
+
+	function getCurrentThermostatData()
+	{
+			$.get('?command=update_forced&r='+Math.random(), function(data) {
+			update(data, true);
+		});
+	}
+
+	function updateCurrentThermostatData()
+	{
+			$.get('?command=update&r='+Math.random(), function(data) {
+			update(data, false);
+		});
+	}
+
+	function update(data, show)
+	{
+		$("#error").fadeOut();
+		var parsedData = $.parseJSON(data);
+
+		$("#setpointTemp").html(parsedData.setpointTemp);
+		$("#currentTemp").html(parsedData.currentTemp);	
+
+		if(parsedData.weatherCurrent != null)
+			$("#weatherTable").html(buildWeatherTable(parsedData));
+
+		if(show == true)
+			$("#contentdiv").fadeIn();
+	}
+
+	function buildWeatherTable( data )
+	{
+		var str = "<table style=\"color:#ffffff\">";
+		str += "<tr><td colspan=2><img src=\""+data.weatherCurrent.currentImage+"\" /></td><td><h1>"+data.weatherCurrent.currentTemp+"</h1><h3>"+data.weatherCurrent.currentCity+"</h3></td></tr>";
+		str += "<tr><td><h4>"+data.weatherForecast.day0.day+"</h4></td><td><img src=\""+data.weatherForecast.day0.image+"\" style=\"max-width:48px;max-height:48px;\"/></td><td><h4>"+data.weatherForecast.day0.low+"</h4></td><td><h4>"+data.weatherForecast.day0.high+"</h4></td></tr>";
+		str += "<tr><td><h4>"+data.weatherForecast.day1.day+"</h4></td><td><img src=\""+data.weatherForecast.day1.image+"\" style=\"max-width:48px;max-height:48px;\"/></td><td><h4>"+data.weatherForecast.day1.low+"</h4></td><td><h4>"+data.weatherForecast.day1.high+"</h4></td></tr>";
+		str += "<tr><td><h4>"+data.weatherForecast.day2.day+"</h4></td><td><img src=\""+data.weatherForecast.day2.image+"\" style=\"max-width:48px;max-height:48px;\"/></td><td><h4>"+data.weatherForecast.day2.low+"</h4></td><td><h4>"+data.weatherForecast.day2.high+"</h4></td></tr>";
+		str += "</table>"
+		return str;
+	}
+	</script>
+
+
+<div class="demo" style="max-width:800px;max-height:480;">
+
+<div id="tabs">
+	<ul>
+		<li><a href="#tabs-1">Thermostat</a></li>
+	</ul>
+	<div id="tabs-1">
+		<div id="contentdiv" style="display:none;">
+			<div style="display:inline;width:50%">
+
+			<div id="thermostat" style="display:inline-block;margin:auto;padding:20px;">
+				<div style="border: 2px groove gray;border-radius: 10px;padding: 10px;">
+								<h2>Home Temperature</h2>
+				<h1 id="currentTemp" style="text-align:center;">72</h1>
+				<center>
+					<button style="text-align:center;" onClick="changeThermostatSetPoint(-1);">-</button>
+					<div style="display:inline;" id="setpointTemp">72</div>
+					<button style="align:center;" onClick="changeThermostatSetPoint(1);">+</button>
+				</center>
+			</div>
+			<br />
+			<br />
+			<br />
+			</div>
+
+			</div>
+			<div style="display:inline-block;border: 2px groove gray;border-radius: 10px;padding: 10px;">
+			<div style="display:inline-block;" id="weatherTable">
+				
+				<center>
+					
+				<table style="color:#ffffff" style="align:center;">
+					<tr>
+						<td colspan=2><img src="Images/weather-sunny-very-few-clouds.png" /></td>
+						<td>
+							<h1>74*</h1>	
+							<h3>Dallas, TX</h3>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<h4>Mon</h4>
+						</td>
+						<td>
+							<img src="Images/weather-sunny-very-few-clouds.png" style="max-width:48px;max-height:48px;"/>
+						</td>
+						<td>
+							<h4>64*</h4>
+						</td>
+						<td>
+							<h4>71*</h4>
+						</td>
+					</tr>
+						<tr>
+						<td>
+							<h4>Tue</h4>
+						</td>
+						<td>
+							<img src="Images/weather-sunny-very-few-clouds.png" style="max-width:48px;max-height:48px;"/>
+						</td>
+						<td>
+							<h4>64*</h4>
+						</td>
+						<td>
+							<h4>71*</h4>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<h4>Wed</h4>
+						</td>
+						<td>
+							<img src="Images/weather-sunny-very-few-clouds.png" style="max-width:48px;max-height:48px;"/>
+						</td>
+						<td>
+							<h4>64*</h4>
+						</td>
+						<td>
+							<h4>71*</h4>
+						</td>
+					</tr>
+				</table>
+			</center>
+			</div>
+		</div>
+	</div>
+		<div style="display:none;" id="error">Unable to connect to thermostat!</div>
+	</div>
+</div>
+
+</div><!-- End demo -->
+</center>
 </body>
 </html>

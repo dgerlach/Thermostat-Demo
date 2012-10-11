@@ -116,8 +116,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     //create and start the remote access manager
-    RemoteAccessManager *m_remoteAccessManager = new RemoteAccessManager;
+    RemoteAccessManager *m_remoteAccessManager = new RemoteAccessManager(this);
     m_remoteAccessManager->start();
+    //connect(m_remoteAccessManager, SIGNAL(remoteChangeReceived(QHash<QString,QVariant>)), this, SLOT(processCommand(QHash<QString,QVariant>)));
 
     //first set based on local cache so user sees something!
     webData->loadLocalData();
@@ -373,4 +374,24 @@ void MainWindow::setBackground(QString icon, QTime localTime)
 
     }
 
+}
+
+QHash<QString, QVariant> MainWindow::processCommand(QHash<QString, QVariant> command)
+{
+    if(command["command"] == "update" || command["command"] == "update_forced")
+    {
+        QVariantHash data;
+        data.unite(weatherWidget->getCurrentData());
+        data.unite(thermostatWidget->getCurrentData());
+        return data;
+
+    }
+    else if(command["command"] == "change_temp")
+    {
+        if(command["dt"].toInt()>0)
+            thermostatWidget->increaseTemp();
+        else if(command["dt"].toInt()<0)
+            thermostatWidget->decreaseTemp();
+    }
+    return QHash<QString, QVariant>();
 }

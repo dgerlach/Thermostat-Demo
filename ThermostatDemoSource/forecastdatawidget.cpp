@@ -155,3 +155,22 @@ QString ForecastDataWidget::iconNameToPixmap(QString icon)
         return":Images/weather-sunny-very-few-clouds.png";
 
 }
+
+QVariantHash ForecastDataWidget::getCurrentData()
+{
+    QVariantHash data;
+    if(m_data.size()>0)
+    {
+        for(int a = 0;a<m_data.size();a++)
+        {
+            ForecastData* forecastData = m_data.at(a);
+            QVariantHash forecastDataHash;
+            forecastDataHash.insert("day", forecastData->day());
+            forecastDataHash.insert("high", formatTemperatureString(m_data[a]->highTemp(), m_globalSettings->temperatureFormat()));
+            forecastDataHash.insert("low", formatTemperatureString(m_data[a]->lowTemp(), m_globalSettings->temperatureFormat()));
+            forecastDataHash.insert("image", iconNameToPixmap(forecastData->icon()).mid(1));
+            data.insert("day"+QString::number(a), forecastDataHash);
+        }
+    }
+    return data;
+}

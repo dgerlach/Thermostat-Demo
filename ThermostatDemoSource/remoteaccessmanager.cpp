@@ -2,10 +2,13 @@
 
 #include <QDateTime>
 #include <QFile>
+#include <QHash>
+#include <QStringList>
 #include <QTcpServer>
 #include <QTcpSocket>
 
 #include "globalsettings.h"
+#include "mainwindow.h"
 
 /***********************************************************************************************************
 * RemoteAccessManager
@@ -18,8 +21,14 @@ RemoteAccessManager::RemoteAccessManager(QObject *parent) :
 {
     m_globalSettings = GlobalSettings::getInstance();
 
-    m_listenPort = 8945;
+    m_listenPort = 8081;
     m_tcpServer = new QTcpServer;
+}
+
+RemoteAccessManager::~RemoteAccessManager()
+{
+    stop();
+    if(m_tcpServer) delete m_tcpServer;
 }
 
 //Function: start()
@@ -28,8 +37,14 @@ RemoteAccessManager::RemoteAccessManager(QObject *parent) :
 
 void RemoteAccessManager::start()
 {
-    m_tcpServer->listen(QHostAddress::Any, m_listenPort);
+    qDebug() << m_tcpServer->listen(QHostAddress::Any, m_listenPort);
+    qDebug() << m_tcpServer->errorString();
     connect(m_tcpServer, SIGNAL(newConnection()), this, SLOT(handleIncomingConnection()));
+}
+
+void RemoteAccessManager::stop()
+{
+    m_tcpServer->close();
 }
 
 //Function: handleIncomingConnection()
@@ -39,7 +54,6 @@ void RemoteAccessManager::start()
 
 void RemoteAccessManager::handleIncomingConnection()
 {
-    qDebug() << "INCOMING CONNECTION";
     m_clientConnection = m_tcpServer->nextPendingConnection();
     connect(m_clientConnection, SIGNAL(readyRead()), this, SLOT(processIncomingConnection()));
     if(!m_clientConnection)
@@ -80,7 +94,7 @@ void RemoteAccessManager::processIncomingConnection()
             {
                 ba = "HTTP/1.1 200 OK\r\n";
                 ba += "Date: "+currentDateTimeString+"\r\n";
-                ba += "Content-Type: text/html\r\n";
+                ba += "Content-Type: text/html; charset=utf-8\r\n";
                 ba += "Content-Length: "+QByteArray::number(htmlFile.size())+"\r\n";
                 ba += "\r\n";
                 ba += htmlFile.readAll();
@@ -112,11 +126,79 @@ void RemoteAccessManager::processIncomingConnection()
             {
                 ba = "HTTP/1.1 200 OK\r\n";
                 ba += "Date: "+currentDateTimeString+"\r\n";
-                ba += "Content-Type: text/javascript\r\n";
+                ba += "Content-Type: text/javascript; charset=utf-8\r\n";
                 ba += "Content-Length: "+QByteArray::number(jsFile.size())+"\r\n";
                 ba += "\r\n";
                 ba+=jsFile.readAll();
             }
+        }
+        else if(requestParser[1].contains(".css"))
+        {
+            QFile cssFile(":"+QString::fromAscii(requestParser[1]));
+
+            if(!cssFile.open(QFile::ReadOnly))
+                ba = "HTTP/1.1 404 NOT FOUND";
+            else
+            {
+                ba = "HTTP/1.1 200 OK\r\n";
+                ba += "Date: "+currentDateTimeString+"\r\n";
+                ba += "Content-Type: text/css; charset=utf-8\r\n";
+                ba += "Content-Length: "+QByteArray::number(cssFile.size())+"\r\n";
+                ba += "\r\n";
+                ba+=cssFile.readAll();
+            }
+        }
+        else if(requestParser[1].contains("?"))
+        {
+            //create a hash table so we can lookup based on variable name
+            //ie getVar["command"] will give us the value set in the http request
+            QHash<QString, QVariant> getVar;
+
+            //let's parse the get variables
+
+            QString getVarsString = requestParser[1].mid(requestParser[1].lastIndexOf("?")+1);
+
+            foreach(QString keyValuePair, getVarsString.split("&"))
+            {
+                QStringList splitKeyValue = keyValuePair.split("=");
+                getVar[splitKeyValue[0]]=splitKeyValue[1];
+            }
+
+            QHash<QString, QVariant> data, optimizedData;
+
+            //QMetaObject::invokeMethod(parent(), Qt::BlockingQueuedConnection,  SLOT("remoteChangeReceived"), Q_RETURN_ARG(QHash<QString, QVariant>, data), Q_ARG(QHash<QString, QVariant>, getVar));
+            data = static_cast<MainWindow*>(parent())->processCommand(getVar);
+
+
+
+            optimizedData = data;
+
+            qDebug() << (data["weatherCurrent"] == m_oldData["weatherCurrent"]);
+            qDebug() << (data["weatherCurrent"]);
+            qDebug() << m_oldData["weatherCurrent"];
+
+
+
+            if(data["weatherCurrent"] == m_oldData["weatherCurrent"])
+                optimizedData.remove("weatherCurrent");
+            if(data["weatherForecast"] == m_oldData["weatherForecast"])
+                optimizedData.remove("weatherForecast");
+            if(getVar["command"] == "update")
+                m_oldData = (data);
+
+            QByteArray jsonByteArray;
+
+            if(getVar["command"] == "update_forced")
+                jsonByteArray=hashToJSONByteArray(data);
+            else
+                jsonByteArray=hashToJSONByteArray(optimizedData);
+
+            ba = "HTTP/1.1 200 OK\r\n";
+            ba += "Date: "+currentDateTimeString+"\r\n";
+            ba += "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            ba += "Content-Length: "+QByteArray::number(jsonByteArray.size())+"\r\n";
+            ba += "\r\n";
+            ba += jsonByteArray;
         }
         else
             ba = "HTTP/1.1 404 NOT FOUND";
@@ -124,4 +206,27 @@ void RemoteAccessManager::processIncomingConnection()
 
     m_clientConnection->write(ba); //write the response
     m_clientConnection->disconnectFromHost(); //http specifies completion with a closed connection
+}
+
+QByteArray RemoteAccessManager::hashToJSONByteArray(QHash<QString, QVariant> hash)
+{
+    QByteArray jsonByteArray="{";
+    QHashIterator<QString, QVariant> it(hash);
+
+
+    while(it.hasNext())
+    {
+        it.next();
+        if(it.value().type() == QVariant::Hash)
+            jsonByteArray+="\""+it.key().toAscii()+"\""+QByteArray::fromRawData(":",1)+""+hashToJSONByteArray(it.value().toHash())+",";
+        else
+            jsonByteArray += "\""+it.key().toAscii()+"\""+QByteArray::fromRawData(":",1)+"\""+it.value().toByteArray()+"\""+QByteArray::fromRawData(",",1);
+    }
+
+    jsonByteArray = jsonByteArray.left(jsonByteArray.size()-1);
+
+    //terminate the json object
+    jsonByteArray += "}";
+
+    return jsonByteArray;
 }

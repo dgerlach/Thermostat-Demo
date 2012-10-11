@@ -27,6 +27,7 @@ public slots:
     void closeEvent(QCloseEvent *);
     void setWebData(WeatherData* weatherData);
     void webDataFailed();
+    QHash<QString, QVariant> processCommand(QHash<QString, QVariant> command);
 
 private:
     WebData *webData;

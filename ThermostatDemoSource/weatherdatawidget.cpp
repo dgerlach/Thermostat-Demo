@@ -8,6 +8,7 @@
 WeatherDataWidget::WeatherDataWidget(QWidget *parent) :
     QWidget(parent)
 {
+    m_data=NULL;
     m_globalSettings = GlobalSettings::getInstance();
 
     m_currentTemp = new QLabel();
@@ -111,4 +112,16 @@ QString WeatherDataWidget::iconNameToPixmap(QString icon)
     }
 
     return pixmap;
+}
+
+QVariantHash WeatherDataWidget::getCurrentData()
+{
+    QVariantHash data;
+    if(m_data)
+    {
+        data.insert("currentTemp", formatTemperatureString(m_data->currentTemp(), m_globalSettings->temperatureFormat()));
+        data.insert("currentCity", m_data->currentCity());
+        data.insert("currentImage", iconNameToPixmap(m_data->icon()).mid(1));
+    }
+    return data;
 }

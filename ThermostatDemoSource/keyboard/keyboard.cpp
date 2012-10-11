@@ -244,6 +244,7 @@ void Keyboard::on_clear_clicked()
 {
     // turned into cancel button for this application
     this->close();
+    emit(closed());
     //outputText="";
     //ui->lineEdit->setText(outputText);
 }

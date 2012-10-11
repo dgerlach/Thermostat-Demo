@@ -24,6 +24,8 @@ public:
 
     enum CurrentStatus { Updating, UpdateSuccess, UpdateFailed };
 
+    QVariantHash getCurrentData();
+
 signals:
     void valueChanged();
     void webReloadRequested();

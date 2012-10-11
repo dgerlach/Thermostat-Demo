@@ -32,7 +32,7 @@ WebData::WebData(QObject *parent) :
     connect(webDataEngine, SIGNAL(networkTimeout()), this, SLOT(processNetworkTimeout()));
 
     //set proxy by default to none so we can try it
-    m_proxyState = WebData::ExternalTI;
+    m_proxyState = WebData::InternalTI;
 
     configureProxy();
 

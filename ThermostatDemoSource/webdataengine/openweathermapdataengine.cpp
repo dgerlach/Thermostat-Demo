@@ -174,8 +174,6 @@ bool OpenWeatherMapDataEngine::parseJSONWeatherData(QString *jsonData, WeatherDa
     QScriptEngine engine;
     QScriptValue result = engine.evaluate("weatherObject="+*jsonData);
 
-    qDebug() << *jsonData;
-
     if(result.isError())return false;
 
     int temp = kelvinToFahrenheit(result.property("main").property("temp").toNumber());
@@ -324,6 +322,8 @@ void OpenWeatherMapDataEngine::loadLocalData()
     //if we can't read from the cache file, read from the one included in the qrc!
     if(!result)
         readFromCache(":/data/cache.dat");
+
+    //qDebug() << m_rawJSONWeatherString << m_rawJSONForecastString;
 
     if(!parseJSONWeatherData(&m_rawJSONWeatherString, m_weatherData))
     {

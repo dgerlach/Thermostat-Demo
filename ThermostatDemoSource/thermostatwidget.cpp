@@ -124,3 +124,12 @@ void ThermostatWidget::setCurrentTempPtr(int *currentTemp)
     currentTempInt = currentTemp;
     updateUnit();
 }
+
+QHash<QString, QVariant> ThermostatWidget::getCurrentData()
+{
+    QHash<QString, QVariant> hash;
+    hash.insert("currentTemp", formatTemperatureString(*currentTempInt, m_globalSettings->temperatureFormat()));
+    hash.insert("setpointTemp", formatTemperatureString(setpointTempInt, m_globalSettings->temperatureFormat()));
+    return hash;
+}
+

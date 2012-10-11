@@ -2,6 +2,7 @@
 #define WEATHERDATAWIDGET_H
 
 #include <QWidget>
+#include <QVariant>
 
 class GlobalSettings;
 class QLabel;
@@ -19,6 +20,7 @@ public slots:
     void updateData();
     void setData(WeatherData* data);
     void scaleContents();
+    QVariantHash getCurrentData();
 
 
 private:
