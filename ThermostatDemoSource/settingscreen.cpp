@@ -136,7 +136,7 @@ QWidget* SettingScreen::buildNetworkSettingsWidget()
 
     QVBoxLayout *networkSettingsLayout = new QVBoxLayout(this);
     networkSettingsLayout->addWidget(proxySettingsGroupBox);
-    networkSettingsLayout->addWidget(remoteSettingsGroupBox);
+    //networkSettingsLayout->addWidget(remoteSettingsGroupBox);
     networkSettingsLayout->addStretch();
 
     networkSettingsWidget->setLayout(networkSettingsLayout);
