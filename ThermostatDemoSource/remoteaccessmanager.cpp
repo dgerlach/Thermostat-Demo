@@ -23,6 +23,7 @@ RemoteAccessManager::RemoteAccessManager(QObject *parent) :
 
     m_listenPort = 8081;
     m_tcpServer = new QTcpServer;
+
 }
 
 RemoteAccessManager::~RemoteAccessManager()

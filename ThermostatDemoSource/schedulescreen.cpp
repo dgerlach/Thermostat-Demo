@@ -73,7 +73,6 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
     QWidget *sizeLimiterWidget = new QWidget;
     sizeLimiterWidget->setMaximumSize(800, 450);
 
-    qDebug() << "SIZE: " << sizeLimiterWidget->size();
     sizeLimiterWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizeLimiterWidget->setLayout(mainLayout);
     sizeLimiterWidget->setContentsMargins(0,0,0,0);
@@ -94,8 +93,6 @@ ScheduleScreen::ScheduleScreen(QWidget *parent) :
 
 void ScheduleScreen::createScheduleScene()
 {
-    qDebug() << view->size();
-
     QPen pen(Qt::blue);
     QBrush brush(Qt::black);
     QFont font = this->font();
@@ -225,7 +222,6 @@ void ScheduleScreen::initializeScene()
     // create graphics view and scene
     scene = new QGraphicsScene(0,0,view->width(), view->height());
     view->setScene(scene);
-    qDebug() << view->size();
 }
 
 void ScheduleScreen::updateData()
@@ -243,7 +239,6 @@ void ScheduleScreen::updateData()
 
 void ScheduleScreen::addSchedulePoints()
 {
-    qDebug() << view->size();
     // create all 28 schedule points with proper connections
     // fill all points into pointList for easy access
 
